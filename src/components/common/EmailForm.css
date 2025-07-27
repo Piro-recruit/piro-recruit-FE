@@ -1,0 +1,55 @@
+.email-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.form-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.email-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.email-input.error {
+  border-color: #dc3545;
+}
+
+.email-input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  white-space: nowrap;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.success-message {
+  color: #28a745;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .form-group {
+    flex-direction: column;
+  }
+}

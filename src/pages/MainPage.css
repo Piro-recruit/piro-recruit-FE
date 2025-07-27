@@ -1,0 +1,137 @@
+.main-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.intro-section {
+  margin-bottom: 4rem;
+}
+
+.intro-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.intro-text h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.intro-text p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #666;
+}
+
+.intro-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.recruiting-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 3rem;
+  background-color: #f8f9fa;
+  border-radius: 16px;
+}
+
+.recruiting-section h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.recruiting-inactive p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.recruiting-active p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.recruiting-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.contact-section {
+  text-align: center;
+}
+
+.contact-section h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.contact-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 모달 폼 스타일 */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .intro-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .intro-text h1 {
+    font-size: 2rem;
+  }
+  
+  .recruiting-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .contact-links {
+    flex-direction: column;
+    align-items: center;
+  }
+}
