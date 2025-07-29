@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Filter, Users, Clock, CheckCircle, XCircle, User } from 'lucide-react';
+import { Search, Plus, Filter, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import './RecruitingManagePage.css';
 
@@ -8,22 +8,16 @@ const RecruitingManagePage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('전체 상태');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const handleRecruitingClick = (recruitingId) => {
     // 추후 구현할 상세 페이지로 이동
     navigate(`/admin/recruiting/${recruitingId}`);
   };
 
-  // 모의 데이터
-  const stats = {
-    totalRecruitings: 3,
-    active: 1,
-    recruiting: 1,
-    closed: 1,
-    totalApplicants: 216
-  };
-
-  const recruitings = [
+  // 확장된 모의 데이터
+  const allRecruitings = [
     {
       id: 1,
       title: '2024년 여름기 신입 개발자 채용',
@@ -50,8 +44,144 @@ const RecruitingManagePage = () => {
       statusColor: 'red',
       applicants: 89,
       comments: 3
+    },
+    {
+      id: 4,
+      title: '2024년 봄학기 백엔드 개발자 채용',
+      period: '2024.04.01 ~ 2024.04.30',
+      status: '모집중',
+      statusColor: 'green',
+      applicants: 45,
+      comments: 1
+    },
+    {
+      id: 5,
+      title: '2024년 인턴십 프로그램',
+      period: '2024.02.01 ~ 2024.02.28',
+      status: '마감',
+      statusColor: 'red',
+      applicants: 203,
+      comments: 8
+    },
+    {
+      id: 6,
+      title: '2024년 하반기 프론트엔드 개발자 채용',
+      period: '2024.08.01 ~ 2024.08.31',
+      status: '작성중',
+      statusColor: 'yellow',
+      applicants: 12,
+      comments: 0
+    },
+    {
+      id: 7,
+      title: '2024년 겨울기 UI/UX 디자이너 채용',
+      period: '2024.12.01 ~ 2024.12.31',
+      status: '작성중',
+      statusColor: 'yellow',
+      applicants: 0,
+      comments: 0
+    },
+    {
+      id: 8,
+      title: '2024년 데이터 사이언티스트 채용',
+      period: '2024.05.01 ~ 2024.05.31',
+      status: '마감',
+      statusColor: 'red',
+      applicants: 67,
+      comments: 4
+    },
+    {
+      id: 9,
+      title: '2024년 풀스택 개발자 채용',
+      period: '2024.09.01 ~ 2024.09.30',
+      status: '모집중',
+      statusColor: 'green',
+      applicants: 89,
+      comments: 6
+    },
+    {
+      id: 10,
+      title: '2024년 모바일 앱 개발자 채용',
+      period: '2024.10.01 ~ 2024.10.31',
+      status: '작성중',
+      statusColor: 'yellow',
+      applicants: 34,
+      comments: 2
+    },
+    {
+      id: 11,
+      title: '2024년 DevOps 엔지니어 채용',
+      period: '2024.11.01 ~ 2024.11.30',
+      status: '모집중',
+      statusColor: 'green',
+      applicants: 23,
+      comments: 1
+    },
+    {
+      id: 12,
+      title: '2024년 QA 엔지니어 채용',
+      period: '2024.01.01 ~ 2024.01.31',
+      status: '마감',
+      statusColor: 'red',
+      applicants: 156,
+      comments: 9
     }
   ];
+
+  // 필터링된 데이터
+  const filteredRecruitings = useMemo(() => {
+    let filtered = allRecruitings;
+
+    // 검색 필터
+    if (searchTerm) {
+      filtered = filtered.filter(recruiting =>
+        recruiting.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // 상태 필터
+    if (statusFilter !== '전체 상태') {
+      filtered = filtered.filter(recruiting => recruiting.status === statusFilter);
+    }
+
+    return filtered;
+  }, [searchTerm, statusFilter]);
+
+  // 페이지네이션
+  const totalPages = Math.ceil(filteredRecruitings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentRecruitings = filteredRecruitings.slice(startIndex, endIndex);
+
+  // 통계 계산
+  const stats = useMemo(() => ({
+    totalRecruitings: allRecruitings.length,
+    active: allRecruitings.filter(r => r.status === '작성중').length,
+    recruiting: allRecruitings.filter(r => r.status === '모집중').length,
+    closed: allRecruitings.filter(r => r.status === '마감').length,
+    totalApplicants: allRecruitings.reduce((sum, r) => sum + r.applicants, 0)
+  }), []);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // 검색어나 필터가 변경되면 첫 페이지로 돌아가기
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   return (
     <div className="recruiting-manage-page">
@@ -90,7 +220,7 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             <div className="top-actions">
-              <button className="download-btn">
+              <button className="code-create-btn">
                 코드 생성
               </button>
               <button className="create-btn">
@@ -155,7 +285,7 @@ const RecruitingManagePage = () => {
 
           {/* 리쿠르팅 목록 */}
           <div className="recruiting-list">
-            {recruitings.map((recruiting) => (
+            {currentRecruitings.map((recruiting) => (
               <div 
                 key={recruiting.id} 
                 className="recruiting-item clickable"
@@ -186,6 +316,48 @@ const RecruitingManagePage = () => {
               </div>
             ))}
           </div>
+
+          {/* 페이지네이션 */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                className="pagination-btn prev"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft size={16} />
+                이전
+              </button>
+              
+              <div className="pagination-numbers">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              
+              <button 
+                className="pagination-btn next"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                다음
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* 결과 없음 표시 */}
+          {filteredRecruitings.length === 0 && (
+            <div className="no-results">
+              <p>검색 결과가 없습니다.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

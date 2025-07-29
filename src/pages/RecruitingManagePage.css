@@ -38,7 +38,7 @@
   margin-left: auto;
 }
 
-.download-btn,
+.code-create-btn,
 .create-btn {
   display: flex;
   align-items: center;
@@ -52,13 +52,13 @@
   white-space: nowrap;
 }
 
-.download-btn {
+.code-create-btn {
   background-color: var(--color-gray-6);
   color: var(--color-white);
   border: 1px solid var(--color-gray-5);
 }
 
-.download-btn:hover {
+.code-create-btn:hover {
   background-color: var(--color-gray-5);
 }
 
@@ -228,7 +228,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.5rem;
+  padding: 0.9rem 1.5rem;
   background-color: var(--color-gray-7);
   border: 1px solid var(--color-gray-6);
   border-radius: 12px;
@@ -270,7 +270,6 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0.5rem;
 }
 
 .recruiting-title {
@@ -321,6 +320,83 @@
   font-size: 0.875rem;
 }
 
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 1rem 0;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-6);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-numbers {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 1rem;
+}
+
+.pagination-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination-number:hover {
+  background-color: var(--color-gray-6);
+}
+
+.pagination-number.active {
+  background-color: var(--color-green-0);
+  border-color: var(--color-green-0);
+  color: var(--color-white);
+}
+
+/* 결과 없음 */
+.no-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.no-results p {
+  color: var(--color-gray-3);
+  font-size: 1.125rem;
+}
 
 /* 반응형 */
 @media (max-width: 1024px) {
@@ -392,5 +468,25 @@
   .recruiting-stats {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .pagination-numbers {
+    margin: 0 0.5rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .pagination-number {
+    width: 36px;
+    height: 36px;
+    font-size: 0.75rem;
   }
 }
