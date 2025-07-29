@@ -326,7 +326,6 @@ const RecruitingManagePage = () => {
                 disabled={currentPage === 1}
               >
                 <ChevronLeft size={16} />
-                이전
               </button>
               
               <div className="pagination-numbers">
@@ -346,7 +345,6 @@ const RecruitingManagePage = () => {
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                다음
                 <ChevronRight size={16} />
               </button>
             </div>
