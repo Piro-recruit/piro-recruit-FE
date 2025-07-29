@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
+import logoImage from '../assets/pirologo.png';
 import './MainPage.css';
 
 const PiroMainPage = () => {
@@ -33,7 +34,9 @@ const PiroMainPage = () => {
       <div className="piro-main">
         <header className="header">
           <nav className="nav">
-            <div className="logo">🔥</div>
+            <div className="logo">
+              <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
+            </div>
             <div className="nav-links">
               <a href="#">Home</a>
               <a href="#">About Us</a>
@@ -87,13 +90,13 @@ const PiroMainPage = () => {
 
               <div className="category-card">
                 <div className="category-icon">📚</div>
-                <h3 className="category-title">노력</h3>
+                <h3 className="category-title">성장</h3>
               </div>
             </div>
 
             <p className="categories-description">
               을 목표로 하는 수도권에서 활동 가능한 대학생
-              <span className="highlight">비전공자</span> / <span className="highlight">전공자</span>
+              <span className="highlight"> 비전공자</span> / <span className="highlight">전공자</span>
             </p>
           </div>
         </section>
@@ -132,7 +135,7 @@ const PiroMainPage = () => {
           <div className="schedule-content">
             <h2 className="section-title">모집 일정</h2>
             <button className="schedule-btn">
-              메인 페이지 접근
+              메인 페이지 참고
             </button>
           </div>
         </section>
@@ -156,7 +159,7 @@ const PiroMainPage = () => {
                   className="contact-link kakao"
               >
                 <MessageCircle className="contact-icon" />
-                카카오톡채팅
+                피로그래밍
               </a>
 
               <a
@@ -173,7 +176,7 @@ const PiroMainPage = () => {
         <footer className="footer">
           <div className="footer-content">
             <div className="footer-info">
-              <span className="footer-brand">PIROGRAMMING 회원</span>
+              <span className="footer-brand">PIROGRAMMING</span>
               <div className="footer-socials">
                 <Github className="footer-social-icon" />
                 <Globe className="footer-social-icon" />
