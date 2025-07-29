@@ -5,6 +5,7 @@ import MainPage from './pages/MainPage';
 import ApplicationPage from './pages/ApplicationPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import RecruitingManagePage from './pages/RecruitingManagePage';
+import RecruitingDetailPage from './pages/RecruitingDetailPage';
 import './App.css';
 
 function App() {
@@ -28,10 +29,10 @@ function App() {
         
         {/* 어드민 대시보드 페이지들 */}
         <Route path="/admin/recruiting" element={<RecruitingManagePage />} />
+        <Route path="/admin/recruiting/:id" element={<RecruitingDetailPage />} />
         
         {/* TODO: 추가 어드민 페이지들 */}
         {/* <Route path="/admin/recruiting/create" element={<CreateRecruiting />} /> */}
-        {/* <Route path="/admin/recruiting/:id" element={<RecruitingDetail />} /> */}
       </Routes>
     </Router>
   );
