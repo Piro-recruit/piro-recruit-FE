@@ -18,13 +18,6 @@ const PiroMainPage = () => {
     }
   };
 
-  const faqItems = [
-    { id: 1, question: '코딩테스트가 있는데, 코딩을 못하면 지원하지 못하나요?' },
-    { id: 2, question: '대면 활동은 어디서 하나요?' },
-    { id: 3, question: '워크샵은 몇 시에 어디서 진행되나요?' },
-    { id: 4, question: '계절학기와 (혹은 다른 일정들) 병행이 가능할까요?' },
-    { id: 5, question: '몇 명을 선발하고, 경쟁률은 얼마나 되나요?' }
-  ];
 
   const toggleFaq = (id) => {
     setExpandedFaq(expandedFaq === id ? null : id);
@@ -101,42 +94,10 @@ const PiroMainPage = () => {
           </div>
         </section>
 
-        <section className="faq">
-          <div className="faq-content">
-            <h2 className="section-title">FAQ</h2>
-
-            <ul className="faq-list">
-              {faqItems.map((item) => (
-                  <li key={item.id} className="faq-item">
-                    <button
-                        onClick={() => toggleFaq(item.id)}
-                        className="faq-button"
-                    >
-                      <span className="faq-q">Q</span>
-                      <span className="faq-question">{item.question}</span>
-                      <ChevronDown
-                          className={`faq-icon ${
-                              expandedFaq === item.id ? 'expanded' : ''
-                          }`}
-                      />
-                    </button>
-                    {expandedFaq === item.id && (
-                        <div className="faq-answer">
-                          <p>답변 내용이 여기에 표시됩니다.</p>
-                        </div>
-                    )}
-                  </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section className="schedule">
-          <div className="schedule-content">
-            <h2 className="section-title">모집 일정</h2>
-            <button className="schedule-btn">
-              메인 페이지 참고
-            </button>
+        <section className="info-section">
+          <div className="info-content">
+            <h2 className="section-title">FAQ & 모집 일정</h2>
+            <p className="info-message">자세한 질문과 답변 및 모집일정은 메인 페이지를 참고해주세요</p>
           </div>
         </section>
 

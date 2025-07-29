@@ -47,6 +47,7 @@
 
 .nav-links a:hover {
   color: var(--color-green-0);
+  text-decoration-line: none;
 }
 
 .nav-links a.active {
@@ -175,95 +176,20 @@
   font-weight: 600;
 }
 
-/* FAQ Section */
-.faq {
+/* Info Section (FAQ & Schedule combined) */
+.info-section {
   padding: 4rem 1.5rem;
 }
 
-.faq-content {
+.info-content {
   max-width: 1000px;
-  margin: 0 auto;
-}
-
-.faq-list {
-  list-style: none;
-}
-
-.faq-item {
-  border-bottom: 1px solid var(--color-gray-6);
-}
-
-.faq-button {
-  width: 100%;
-  padding: 1.5rem 1rem;
-  background: none;
-  border: none;
-  color: var(--color-white);
-  text-align: left;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.faq-button:hover {
-  background-color: var(--color-gray-7);
-}
-
-.faq-q {
-  color: var(--color-green-0);
-  margin-right: 1rem;
-  font-weight: 700;
-}
-
-.faq-question {
-  flex: 1;
-}
-
-.faq-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  transition: transform 0.3s;
-}
-
-.faq-icon.expanded {
-  transform: rotate(180deg);
-}
-
-.faq-answer {
-  padding: 0 1rem 1.5rem;
-  color: var(--color-gray-1);
-}
-
-/* Schedule Section */
-.schedule {
-  padding: 4rem 1.5rem;
-}
-
-.schedule-content {
-  max-width: 24rem;
   margin: 0 auto;
   text-align: center;
 }
 
-.schedule-btn {
-  width: 100%;
-  padding: 1rem;
-  background-color: var(--color-gray-6);
-  color: var(--color-white);
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.schedule-btn:hover {
-  background-color: var(--color-gray-5);
+.info-message {
+  color: var(--color-gray-1);
+  font-size: 1.1rem;
 }
 
 /* Contact Section */
