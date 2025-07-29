@@ -1,25 +1,16 @@
-/* Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-}
+/* MainPage Styles using project colors and fonts */
 
 /* Layout */
 .piro-main {
   min-height: 100vh;
-  background-color: #111827;
-  color: white;
+  background-color: var(--color-gray-8);
+  color: var(--color-white);
+  font-family: var(--font-family);
 }
 
 /* Header */
 .header {
-  background-color: #000;
+  background-color: var(--color-black);
   padding: 1rem 1.5rem;
 }
 
@@ -32,9 +23,9 @@ body {
 }
 
 .logo {
-  color: #10b981;
+  color: var(--color-green-0);
   font-size: 1.25rem;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .nav-links {
@@ -44,17 +35,18 @@ body {
 }
 
 .nav-links a {
-  color: white;
+  color: var(--color-white);
   text-decoration: none;
   transition: color 0.3s;
+  font-weight: 500;
 }
 
 .nav-links a:hover {
-  color: #10b981;
+  color: var(--color-green-0);
 }
 
 .nav-links a.active {
-  color: #10b981;
+  color: var(--color-green-0);
 }
 
 /* Hero Section */
@@ -70,14 +62,16 @@ body {
 
 .hero h1 {
   font-size: 3rem;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 1.5rem;
+  color: var(--color-white);
 }
 
 .hero-subtitle {
   font-size: 1.5rem;
-  color: #ffffff;
+  color: var(--color-white);
   margin-bottom: 3rem;
+  font-weight: 400;
 }
 
 .email-form {
@@ -92,34 +86,34 @@ body {
   padding: 0.75rem 1.5rem;
   border-radius: 50px;
   border: none;
-  background-color: white;
-  color: #111827;
+  background-color: var(--color-white);
+  color: var(--color-gray-8);
   font-size: 1rem;
 }
 
 .email-input::placeholder {
-  color: #6b7280;
+  color: var(--color-gray-5);
 }
 
 .email-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #10b981;
+  box-shadow: 0 0 0 2px var(--color-green-0);
 }
 
 .email-btn {
   padding: 0.75rem 2rem;
-  background-color: #10b981;
-  color: white;
+  background-color: var(--color-green-0);
+  color: var(--color-white);
   border: none;
   border-radius: 50px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .email-btn:hover {
-  background-color: #059669;
+  background-color: var(--color-green-1);
 }
 
 /* Categories Section */
@@ -134,9 +128,10 @@ body {
 
 .section-title {
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
+  color: var(--color-white);
 }
 
 .categories-grid {
@@ -147,11 +142,11 @@ body {
 }
 
 .category-card {
-  background-color: #e5e7eb;
+  background-color: var(--color-gray-0);
   border-radius: 1rem;
   padding: 2rem;
   text-align: center;
-  color: #111827;
+  color: var(--color-gray-8);
 }
 
 .category-icon {
@@ -161,17 +156,18 @@ body {
 
 .category-title {
   font-size: 1.25rem;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .categories-description {
   text-align: center;
-  color: #d1d5db;
+  color: var(--color-gray-1);
   margin-top: 2rem;
 }
 
 .highlight {
-  color: #10b981;
+  color: var(--color-green-0);
+  font-weight: 600;
 }
 
 /* FAQ Section */
@@ -189,7 +185,7 @@ body {
 }
 
 .faq-item {
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid var(--color-gray-6);
 }
 
 .faq-button {
@@ -197,7 +193,7 @@ body {
   padding: 1.5rem 1rem;
   background: none;
   border: none;
-  color: white;
+  color: var(--color-white);
   text-align: left;
   display: flex;
   justify-content: space-between;
@@ -205,15 +201,17 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .faq-button:hover {
-  background-color: #1f2937;
+  background-color: var(--color-gray-7);
 }
 
 .faq-q {
-  color: #10b981;
+  color: var(--color-green-0);
   margin-right: 1rem;
+  font-weight: 700;
 }
 
 .faq-question {
@@ -232,7 +230,7 @@ body {
 
 .faq-answer {
   padding: 0 1rem 1.5rem;
-  color: #d1d5db;
+  color: var(--color-gray-1);
 }
 
 /* Schedule Section */
@@ -249,17 +247,18 @@ body {
 .schedule-btn {
   width: 100%;
   padding: 1rem;
-  background-color: #374151;
-  color: white;
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
   border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .schedule-btn:hover {
-  background-color: #4b5563;
+  background-color: var(--color-gray-5);
 }
 
 /* Contact Section */
@@ -274,8 +273,9 @@ body {
 }
 
 .contact-description {
-  color: #10b981;
+  color: var(--color-green-0);
   margin-bottom: 2rem;
+  font-weight: 500;
 }
 
 .contact-links {
@@ -302,17 +302,17 @@ body {
 
 .contact-link.instagram {
   background-color: #db2777;
-  color: white;
+  color: var(--color-white);
 }
 
 .contact-link.kakao {
   background-color: #eab308;
-  color: #000;
+  color: var(--color-black);
 }
 
 .contact-link.email {
-  background-color: #059669;
-  color: white;
+  background-color: var(--color-green-1);
+  color: var(--color-white);
 }
 
 .contact-icon {
@@ -322,7 +322,7 @@ body {
 
 /* Footer */
 .footer {
-  background-color: #000;
+  background-color: var(--color-black);
   padding: 2rem 1.5rem;
 }
 
@@ -343,7 +343,8 @@ body {
 }
 
 .footer-brand {
-  color: white;
+  color: var(--color-white);
+  font-weight: 600;
 }
 
 .footer-socials {
@@ -354,11 +355,12 @@ body {
 .footer-social-icon {
   width: 1.25rem;
   height: 1.25rem;
-  color: white;
+  color: var(--color-white);
 }
 
 .footer-email {
-  color: white;
+  color: var(--color-white);
+  font-weight: 500;
 }
 
 .footer-links {
@@ -368,13 +370,14 @@ body {
 }
 
 .footer-links a {
-  color: #9ca3af;
+  color: var(--color-gray-3);
   text-decoration: none;
   transition: color 0.3s;
+  font-weight: 500;
 }
 
 .footer-links a:hover {
-  color: white;
+  color: var(--color-white);
 }
 
 /* Mobile Responsiveness */
