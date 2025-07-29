@@ -12,9 +12,7 @@ function App() {
       <Routes>
         {/* 메인 페이지 */}
         <Route path="/" element={
-          <Layout>
             <MainPage />
-          </Layout>
         } />
         
         {/* 지원서 작성 페이지 */}
