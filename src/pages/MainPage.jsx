@@ -18,11 +18,11 @@ const PiroMainPage = () => {
   };
 
   const faqItems = [
-    { id: 1, question: '코딩테스트가 있나요? 코딩을 조금만 저학연자 문제가?' },
+    { id: 1, question: '코딩테스트가 있는데, 코딩을 못하면 지원하지 못하나요?' },
     { id: 2, question: '대면 활동은 어디서 하나요?' },
-    { id: 3, question: '학교랑 몇 시세 여러서 괜찮은가요?' },
-    { id: 4, question: '개발학기 (혹은 다른 생활을) 방해시 괜찮은가요?' },
-    { id: 5, question: '몇 학기 선택학점 괜찮음에 없다나 되나요?' }
+    { id: 3, question: '워크샵은 몇 시에 어디서 진행되나요?' },
+    { id: 4, question: '계절학기와 (혹은 다른 일정들) 병행이 가능할까요?' },
+    { id: 5, question: '몇 명을 선발하고, 경쟁률은 얼마나 되나요?' }
   ];
 
   const toggleFaq = (id) => {
@@ -47,9 +47,9 @@ const PiroMainPage = () => {
 
         <section className="hero">
           <div className="hero-content">
-            <h1>지금은 모집 기간이 아닙니다.</h1>
             <p className="hero-subtitle">
-              모집 시작 알림을 메일로 받아보세요.
+              지금은 모집 기간이 아니에요<br/>
+              <span className="highlight">모집 시작 알림</span>을 메일로 받아보세요.
             </p>
 
             <div className="email-form">
@@ -92,8 +92,8 @@ const PiroMainPage = () => {
             </div>
 
             <p className="categories-description">
-              동욱회로 하는 수요일에서 힘을 기르는 대학생
-              <span className="highlight">피로그래밍</span> / <span className="highlight">징검자</span>
+              을 목표로 하는 수도권에서 활동 가능한 대학생
+              <span className="highlight">비전공자</span> / <span className="highlight">전공자</span>
             </p>
           </div>
         </section>
