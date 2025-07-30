@@ -10,7 +10,7 @@
 
 /* Header */
 .header {
-  background-color: var(--color-black);
+  background: linear-gradient(to top, transparent 0%, var(--color-black) 100%);
   padding: 1rem 1.5rem;
 }
 
@@ -28,7 +28,7 @@
 }
 
 .logo-image {
-  height: 32px;
+  height: 60px;
   width: auto;
 }
 
@@ -42,7 +42,8 @@
   color: var(--color-white);
   text-decoration: none;
   transition: color 0.3s;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 1.2rem;
 }
 
 .nav-links a:hover {
@@ -327,15 +328,34 @@
   gap: 1rem;
 }
 
+.footer-socials a {
+  transition: transform 0.3s;
+}
+
+.footer-socials a:hover {
+  transform: translateY(-2px);
+}
+
 .footer-social-icon {
   width: 1.25rem;
   height: 1.25rem;
   color: var(--color-white);
+  transition: color 0.3s;
+}
+
+.footer-socials a:hover .footer-social-icon {
+  color: var(--color-green-0);
 }
 
 .footer-email {
   color: var(--color-white);
   font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-email:hover {
+  color: var(--color-green-0);
 }
 
 .footer-links {

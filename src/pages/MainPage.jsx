@@ -148,7 +148,9 @@ const PiroMainPage = () => {
 
             <div className="contact-links">
               <a
-                  href="#"
+                  href="https://www.instagram.com/pirogramming_official/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="contact-link instagram"
               >
                 <Instagram className="contact-icon" />
@@ -156,7 +158,9 @@ const PiroMainPage = () => {
               </a>
 
               <a
-                  href="#"
+                  href="https://pf.kakao.com/_xdHxdXK"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="contact-link kakao"
               >
                 <MessageCircle className="contact-icon" />
@@ -179,11 +183,34 @@ const PiroMainPage = () => {
             <div className="footer-info">
               <span className="footer-brand">PIROGRAMMING</span>
               <div className="footer-socials">
-                <Github className="footer-social-icon" />
-                <Globe className="footer-social-icon" />
-                <Instagram className="footer-social-icon" />
+                <a 
+                  href="https://github.com/pirogramming" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Github className="footer-social-icon" />
+                </a>
+                <a 
+                  href="https://pirogramming.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Globe className="footer-social-icon" />
+                </a>
+                <a 
+                  href="https://www.instagram.com/pirogramming_official/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Instagram className="footer-social-icon" />
+                </a>
               </div>
-              <span className="footer-email">pirogramming.official@gmail.com</span>
+              <a 
+                href="mailto:pirogramming.official@gmail.com"
+                className="footer-email"
+              >
+                pirogramming.official@gmail.com
+              </a>
             </div>
 
             <div className="footer-links">
