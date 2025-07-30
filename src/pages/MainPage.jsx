@@ -42,14 +42,26 @@ const PiroMainPage = () => {
         <header className="header">
           <nav className="nav">
             <div className="logo">
-              <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
+              <a href="https://www.pirogramming.com/">
+                <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
+              </a>
             </div>
             <div className="nav-links">
-              <a href="#">Home</a>
-              <a href="#">About Us</a>
-              <a href="#">Portfolio</a>
-              <a href="#">Interview</a>
-              <a href="#">Gallery</a>
+              <a href="https://www.pirogramming.com/">
+                Home
+              </a>
+              <a href="https://www.pirogramming.com/about/">
+                About Us
+              </a>
+              <a href="https://www.pirogramming.com/portfolio/">
+                Portfolio
+              </a>
+              <a href="https://www.pirogramming.com/interview/">
+                Interview
+              </a>
+              <a href="https://www.pirogramming.com/gallery/">
+                Gallery
+              </a>
               <a href="#" className="active">Recruit</a>
             </div>
           </nav>
@@ -214,11 +226,21 @@ const PiroMainPage = () => {
             </div>
 
             <div className="footer-links">
-              <a href="#">Home</a>
-              <a href="#">About Us</a>
-              <a href="#">Portfolio</a>
-              <a href="#">Interview</a>
-              <a href="#">Gallery</a>
+              <a href="https://www.pirogramming.com/">
+                Home
+              </a>
+              <a href="https://www.pirogramming.com/about/">
+                About Us
+              </a>
+              <a href="https://www.pirogramming.com/portfolio/">
+                Portfolio
+              </a>
+              <a href="https://www.pirogramming.com/interview/">
+                Interview
+              </a>
+              <a href="https://www.pirogramming.com/gallery/">
+                Gallery
+              </a>
               <a href="#">Recruit</a>
             </div>
           </div>

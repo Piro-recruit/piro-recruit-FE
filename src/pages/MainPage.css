@@ -12,6 +12,7 @@
 .header {
   background: linear-gradient(to top, transparent 0%, var(--color-black) 100%);
   padding: 1rem 1.5rem;
+  box-shadow: none;
 }
 
 .nav {
