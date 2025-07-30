@@ -159,13 +159,27 @@ const RecruitingDetailPage = () => {
   }, [searchTerm, statusFilter, sortBy]);
 
   // 통계 계산
-  const stats = useMemo(() => ({
-    total: allApplicants.length,
-    reviewing: allApplicants.filter(a => a.status === '검토중').length,
-    passed: allApplicants.filter(a => a.status === '합격').length,
-    failed: allApplicants.filter(a => a.status === '불합격').length,
-    averageScore: Math.round(allApplicants.reduce((sum, a) => sum + a.score, 0) / allApplicants.length)
-  }), []);
+  const stats = useMemo(() => {
+    const recruitmentLimit = 30; // 모집 인원
+    
+    // 평가된 지원자들의 점수를 가져와서 정렬 (내림차순)
+    const evaluatedScores = Object.values(evaluations)
+      .map(evaluation => evaluation.score)
+      .sort((a, b) => b - a);
+    
+    // 30등의 점수를 커트라인으로 설정 (평가된 지원자가 30명 미만이면 0점)
+    const cutlineScore = evaluatedScores.length >= recruitmentLimit 
+      ? evaluatedScores[recruitmentLimit - 1] 
+      : 0;
+    
+    return {
+      total: allApplicants.length,
+      reviewing: allApplicants.filter(a => a.status === '검토중').length,
+      passed: allApplicants.filter(a => a.status === '합격').length,
+      failed: allApplicants.filter(a => a.status === '불합격').length,
+      cutlineScore: cutlineScore
+    };
+  }, [evaluations]);
 
   const handleHeaderClick = () => {
     navigate('/admin/recruiting');
@@ -318,8 +332,8 @@ const RecruitingDetailPage = () => {
                   <FileText size={24} />
                 </div>
                 <div className="stat-info">
-                  <div className="stat-label">평균 점수</div>
-                  <div className="stat-value">{stats.averageScore}</div>
+                  <div className="stat-label">합격 커트라인</div>
+                  <div className="stat-value">{stats.cutlineScore}점</div>
                 </div>
               </div>
             </div>
