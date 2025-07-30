@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import logoImage from '../assets/pirologo.png';
+import { ROUTES } from '../constants/routes';
 import './MainPage.css';
 
 const PiroMainPage = () => {
   const [email, setEmail] = useState('');
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const navigate = useNavigate();
+  
+  // 모집 기간 상태 (실제로는 API나 설정에서 가져와야 함)
+  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(true); // 임시로 true로 설정
 
   const handleEmailSubmit = () => {
     if (email && email.includes('@')) {
@@ -18,6 +24,15 @@ const PiroMainPage = () => {
     }
   };
 
+  const handleApply = () => {
+    navigate(ROUTES.APPLICATION);
+  };
+
+  const handleCheckApplication = () => {
+    // 지원서 확인 및 수정 페이지로 이동 (추후 구현)
+    alert('지원서 확인 및 수정 기능은 추후 구현됩니다.');
+  };
+
 
   const toggleFaq = (id) => {
     setExpandedFaq(expandedFaq === id ? null : id);
@@ -28,14 +43,26 @@ const PiroMainPage = () => {
         <header className="header">
           <nav className="nav">
             <div className="logo">
-              <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
+              <a href={ROUTES.PIROGRAMMING.HOME}>
+                <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
+              </a>
             </div>
             <div className="nav-links">
-              <a href="#">Home</a>
-              <a href="#">About Us</a>
-              <a href="#">Portfolio</a>
-              <a href="#">Interview</a>
-              <a href="#">Gallery</a>
+              <a href={ROUTES.PIROGRAMMING.HOME}>
+                Home
+              </a>
+              <a href={ROUTES.PIROGRAMMING.ABOUT}>
+                About Us
+              </a>
+              <a href={ROUTES.PIROGRAMMING.PORTFOLIO}>
+                Portfolio
+              </a>
+              <a href={ROUTES.PIROGRAMMING.INTERVIEW}>
+                Interview
+              </a>
+              <a href={ROUTES.PIROGRAMMING.GALLERY}>
+                Gallery
+              </a>
               <a href="#" className="active">Recruit</a>
             </div>
           </nav>
@@ -43,26 +70,52 @@ const PiroMainPage = () => {
 
         <section className="hero">
           <div className="hero-content">
-            <p className="hero-subtitle">
-              지금은 모집 기간이 아니에요<br/>
-              <span className="highlight">모집 시작 알림</span>을 메일로 받아보세요.
-            </p>
+            {isRecruitmentPeriod ? (
+              <>
+                <p className="hero-subtitle">
+                  현재 <span className="highlight">모집</span> 중입니다.<br/>
+                  망설이지 말고 지금 바로 지원하세요.
+                </p>
 
-            <div className="email-form">
-              <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="메일을 입력해주세요"
-                  className="email-input"
-              />
-              <button
-                  onClick={handleEmailSubmit}
-                  className="email-btn"
-              >
-                알림받기
-              </button>
-            </div>
+                <div className="recruitment-actions">
+                  <button
+                    onClick={handleApply}
+                    className="apply-btn primary"
+                  >
+                    지원하기
+                  </button>
+                  <button
+                    onClick={handleCheckApplication}
+                    className="apply-btn secondary"
+                  >
+                    지원기록 조회하기
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="hero-subtitle">
+                  지금은 모집 기간이 아니에요<br/>
+                  <span className="highlight">모집 시작 알림</span>을 메일로 받아보세요.
+                </p>
+
+                <div className="email-form">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="메일을 입력해주세요"
+                    className="email-input"
+                  />
+                  <button
+                    onClick={handleEmailSubmit}
+                    className="email-btn"
+                  >
+                    알림받기
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -108,7 +161,9 @@ const PiroMainPage = () => {
 
             <div className="contact-links">
               <a
-                  href="#"
+                  href={ROUTES.SOCIAL.INSTAGRAM}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="contact-link instagram"
               >
                 <Instagram className="contact-icon" />
@@ -116,7 +171,9 @@ const PiroMainPage = () => {
               </a>
 
               <a
-                  href="#"
+                  href={ROUTES.SOCIAL.KAKAO}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="contact-link kakao"
               >
                 <MessageCircle className="contact-icon" />
@@ -124,7 +181,7 @@ const PiroMainPage = () => {
               </a>
 
               <a
-                  href="mailto:pirogramming.official@gmail.com"
+                  href={ROUTES.SOCIAL.EMAIL}
                   className="contact-link email"
               >
                 <Mail className="contact-icon" />
@@ -139,19 +196,52 @@ const PiroMainPage = () => {
             <div className="footer-info">
               <span className="footer-brand">PIROGRAMMING</span>
               <div className="footer-socials">
-                <Github className="footer-social-icon" />
-                <Globe className="footer-social-icon" />
-                <Instagram className="footer-social-icon" />
+                <a 
+                  href={ROUTES.SOCIAL.GITHUB} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Github className="footer-social-icon" />
+                </a>
+                <a 
+                  href={ROUTES.PIROGRAMMING.HOME} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Globe className="footer-social-icon" />
+                </a>
+                <a 
+                  href={ROUTES.SOCIAL.INSTAGRAM} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Instagram className="footer-social-icon" />
+                </a>
               </div>
-              <span className="footer-email">pirogramming.official@gmail.com</span>
+              <a 
+                href={ROUTES.SOCIAL.EMAIL}
+                className="footer-email"
+              >
+                pirogramming.official@gmail.com
+              </a>
             </div>
 
             <div className="footer-links">
-              <a href="#">Home</a>
-              <a href="#">About Us</a>
-              <a href="#">Portfolio</a>
-              <a href="#">Interview</a>
-              <a href="#">Gallery</a>
+              <a href={ROUTES.PIROGRAMMING.HOME}>
+                Home
+              </a>
+              <a href={ROUTES.PIROGRAMMING.ABOUT}>
+                About Us
+              </a>
+              <a href={ROUTES.PIROGRAMMING.PORTFOLIO}>
+                Portfolio
+              </a>
+              <a href={ROUTES.PIROGRAMMING.INTERVIEW}>
+                Interview
+              </a>
+              <a href={ROUTES.PIROGRAMMING.GALLERY}>
+                Gallery
+              </a>
               <a href="#">Recruit</a>
             </div>
           </div>
