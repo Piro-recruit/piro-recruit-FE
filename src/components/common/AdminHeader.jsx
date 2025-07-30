@@ -2,9 +2,9 @@ import React from 'react';
 import logoImage from '../../assets/pirologo.png';
 import './AdminHeader.css';
 
-const AdminHeader = ({ pageType, title }) => {
+const AdminHeader = ({ pageType, title, onClick }) => {
   return (
-    <header className="admin-header">
+    <header className="admin-header" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className="admin-header-container">
         <div className="admin-header-left">
           <div className="admin-logo">

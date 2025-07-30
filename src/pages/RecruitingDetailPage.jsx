@@ -8,14 +8,21 @@ import {
   Clock, 
   CheckCircle, 
   XCircle, 
-  ArrowLeft,
   User,
   Eye,
   MessageSquare,
   FileText,
   ChevronDown,
   ChevronUp,
-  Star
+  Star,
+  MapPin,
+  GraduationCap,
+  Users2,
+  Mail,
+  Send,
+  Users as UsersIcon,
+  Type,
+  MessageCircle
 } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import './RecruitingDetailPage.css';
@@ -61,6 +68,11 @@ const RecruitingDetailPage = () => {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [expandedApplicants, setExpandedApplicants] = useState(new Set());
   const [evaluations, setEvaluations] = useState({});
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailContent, setEmailContent] = useState({
+    subject: '',
+    message: ''
+  });
 
   // 리쿠르팅 정보 (실제로는 API에서 가져와야 함)
   const recruitingInfo = {
@@ -69,19 +81,6 @@ const RecruitingDetailPage = () => {
     period: '2024.07.01 ~ 2024.07.31',
     status: '모집중',
     statusColor: 'green',
-    description: '우리 회사에서는 열정적이고 창의적인 신입 개발자를 모집합니다. React, Node.js 등의 기술 스택을 활용하여 함께 성장할 수 있는 분을 찾고 있습니다.',
-    requirements: [
-      'Computer Science 전공 또는 관련 분야 학위',
-      'JavaScript, React에 대한 기본적인 이해',
-      'Git 사용 경험',
-      '팀워크와 커뮤니케이션 능력'
-    ],
-    preferredSkills: [
-      'TypeScript 사용 경험',
-      'Node.js, Express.js 경험',
-      '개인 프로젝트 또는 포트폴리오 보유',
-      'AWS 클라우드 서비스 경험'
-    ]
   };
 
   // 지원자 목록 (실제로는 API에서 가져와야 함)
@@ -97,6 +96,8 @@ const RecruitingDetailPage = () => {
       aiScore: 85,
       university: '서울대학교',
       major: '컴퓨터공학과',
+      age: 24,
+      gender: '남성',
       gpa: '3.8/4.5',
       experience: '인턴 6개월',
       skills: ['React', 'JavaScript', 'Node.js'],
@@ -125,6 +126,8 @@ const RecruitingDetailPage = () => {
       aiScore: 92,
       university: '연세대학교',
       major: '소프트웨어학과',
+      age: 23,
+      gender: '여성',
       gpa: '4.2/4.5',
       experience: '프리랜서 1년',
       skills: ['React', 'TypeScript', 'Python', 'AWS'],
@@ -151,6 +154,8 @@ const RecruitingDetailPage = () => {
       aiScore: 68,
       university: '고려대학교',
       major: '전자공학과',
+      age: 25,
+      gender: '남성',
       gpa: '3.2/4.5',
       experience: '신입',
       skills: ['JavaScript', 'HTML', 'CSS'],
@@ -199,7 +204,7 @@ const RecruitingDetailPage = () => {
     averageScore: Math.round(allApplicants.reduce((sum, a) => sum + a.score, 0) / allApplicants.length)
   }), []);
 
-  const handleBackClick = () => {
+  const handleHeaderClick = () => {
     navigate('/admin/recruiting');
   };
 
@@ -232,18 +237,47 @@ const RecruitingDetailPage = () => {
     }));
   };
 
+  const handleShowEmailModal = () => {
+    setShowEmailModal(true);
+  };
+
+  const handleCloseEmailModal = () => {
+    setShowEmailModal(false);
+    setEmailContent({
+      subject: '',
+      message: ''
+    });
+  };
+
+  const handleEmailContentChange = (field, value) => {
+    setEmailContent(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSendEmail = () => {
+    // 실제로는 API 호출로 이메일 전송
+    console.log('이메일 전송:', {
+      recruitingId: id,
+      subject: emailContent.subject,
+      message: emailContent.message,
+      recipients: '리쿠르팅 알림 신청자들'
+    });
+    
+    // 성공 후 모달 닫기
+    handleCloseEmailModal();
+    alert('이메일이 성공적으로 전송되었습니다.');
+  };
+
   return (
     <div className="recruiting-detail-page">
-      <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" />
+      <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" onClick={handleHeaderClick} />
       
       <main className="recruiting-detail-main">
         <div className="recruiting-detail-container">
-          {/* 뒤로가기 및 제목 */}
+          {/* 제목 및 액션 */}
           <div className="detail-header">
-            <button className="back-btn" onClick={handleBackClick}>
-              <ArrowLeft size={20} />
-              뒤로가기
-            </button>
             <div className="recruiting-title-section">
               <h1 className="recruiting-main-title">{recruitingInfo.title}</h1>
               <div className="recruiting-meta">
@@ -256,6 +290,10 @@ const RecruitingDetailPage = () => {
                 </span>
               </div>
             </div>
+            <button className="bulk-email-btn" onClick={handleShowEmailModal}>
+              <Mail size={20} />
+              일괄 이메일 전송
+            </button>
           </div>
 
 
@@ -368,18 +406,28 @@ const RecruitingDetailPage = () => {
                       </div>
                       
                       <div className="applicant-content">
-                        <div className="applicant-header">
-                          <h3 className="applicant-name">{applicant.name}</h3>
-                          <span className={`status-badge ${applicant.statusColor}`}>
-                            {applicant.status}
-                          </span>
+                        <div className="applicant-left-info">
+                          <div className="applicant-main-row">
+                            <h3 className="applicant-name">{applicant.name}</h3>
+                            <span className={`status-badge ${applicant.statusColor}`}>
+                              {applicant.status}
+                            </span>
+                            <span className="applicant-university">
+                              <MapPin size={14} />
+                              {applicant.university}
+                            </span>
+                            <span className="applicant-major">
+                              <GraduationCap size={14} />
+                              {applicant.major}
+                            </span>
+                            <span className="applicant-demographics">
+                              <Users2 size={14} />
+                              {applicant.age}세·{applicant.gender}
+                            </span>
+                          </div>
                         </div>
-                        <div className="applicant-info">
-                          <span className="applicant-university">{applicant.university}</span>
-                          <span className="applicant-major">{applicant.major}</span>
-                        </div>
-                        <div className="applicant-meta">
-                          <span className="applied-date">지원일: {applicant.appliedDate}</span>
+                        <div className="applicant-right-info">
+                          <span className="applied-date">{applicant.appliedDate}</span>
                           <span className="applicant-score">AI 점수: {applicant.aiScore}점</span>
                           {evaluation && (
                             <span className="evaluation-score">평가: {evaluation.score}점</span>
@@ -460,6 +508,107 @@ const RecruitingDetailPage = () => {
           </div>
         </div>
       </main>
+
+      {/* 일괄 이메일 전송 모달 */}
+      {showEmailModal && (
+        <div className="modal-overlay email-modal-overlay" onClick={handleCloseEmailModal}>
+          <div className="modal-content email-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="email-modal-header">
+              <div className="email-header-content">
+                <div className="email-header-icon">
+                  <Mail size={20} />
+                </div>
+                <div className="email-header-text">
+                  <h2>일괄 이메일 전송</h2>
+                  <p>리쿠르팅 알림 신청자들에게 이메일을 보내세요</p>
+                </div>
+              </div>
+              <button className="email-close-btn" onClick={handleCloseEmailModal}>×</button>
+            </div>
+            
+            <div className="bulk-email-modal-body">
+              <div className="bulk-email-form">
+                <div className="bulk-email-recipients-card">
+                  <div className="bulk-recipients-header">
+                    <div className='bulk-recipients-logo'>
+                    <UsersIcon size={20} />
+                    <span>수신자 정보</span>
+                    </div>
+                    <span className="bulk-count-badge">예상 수신자: 247명</span>
+                  </div>
+                  <p>이 이메일은 <strong>리쿠르팅 알림을 신청한 모든 사용자</strong>에게 전송됩니다.</p>
+                </div>
+                
+                <div className="bulk-email-field-group">
+                  <div className="bulk-email-field">
+                    <div className="bulk-field-label">
+                      <Type size={16} />
+                      <label htmlFor="bulk-email-subject">제목</label>
+                    </div>
+                    <div className="bulk-input-wrapper">
+                      <input
+                        id="bulk-email-subject"
+                        type="text"
+                        value={emailContent.subject}
+                        onChange={(e) => handleEmailContentChange('subject', e.target.value)}
+                        placeholder="예: [피로그래밍] 2024년 여름기 신입 개발자 채용 공지"
+                        className="bulk-email-input"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="bulk-email-field">
+                    <div className="bulk-field-label">
+                      <MessageCircle size={16} />
+                      <label htmlFor="bulk-email-message">내용</label>
+                    </div>
+                    <div className="bulk-input-wrapper">
+                      <textarea
+                        id="bulk-email-message"
+                        value={emailContent.message}
+                        onChange={(e) => {
+                          handleEmailContentChange('message', e.target.value);
+                          // 자동 높이 조절
+                          e.target.style.height = 'auto';
+                          e.target.style.height = Math.max(160, e.target.scrollHeight) + 'px';
+                        }}
+                        placeholder="안녕하세요, 피로그래밍입니다.&#10;&#10;2024년 여름기 신입 개발자 채용에 대한 안내드립니다.&#10;&#10;자세한 내용은 아래를 확인해주세요."
+                        className="bulk-email-textarea"
+                        rows={6}
+                        style={{ minHeight: '160px' }}
+                      />
+                      <div className="bulk-textarea-footer">
+                        <span className="bulk-char-count">
+                          {emailContent.message.length} / 2000자
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="email-modal-footer">
+              <div className="footer-info">
+                <span className="send-time">전송 예정: 즉시</span>
+              </div>
+              <div className="footer-actions">
+                <button className="email-cancel-btn" onClick={handleCloseEmailModal}>
+                  취소
+                </button>
+                <button 
+                  className="email-send-btn" 
+                  onClick={handleSendEmail}
+                  disabled={!emailContent.subject.trim() || !emailContent.message.trim()}
+                >
+                  <Send size={16} />
+                  <span>전송하기</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 지원서 원본 모달 */}
       {selectedApplicant && (
