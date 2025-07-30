@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoImage from '../assets/pirologo.png';
+import { ROUTES } from '../constants/routes';
 import './MainPage.css';
 
 const PiroMainPage = () => {
@@ -24,7 +25,7 @@ const PiroMainPage = () => {
   };
 
   const handleApply = () => {
-    navigate('/application');
+    navigate(ROUTES.APPLICATION);
   };
 
   const handleCheckApplication = () => {
@@ -42,24 +43,24 @@ const PiroMainPage = () => {
         <header className="header">
           <nav className="nav">
             <div className="logo">
-              <a href="https://www.pirogramming.com/">
+              <a href={ROUTES.PIROGRAMMING.HOME}>
                 <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
               </a>
             </div>
             <div className="nav-links">
-              <a href="https://www.pirogramming.com/">
+              <a href={ROUTES.PIROGRAMMING.HOME}>
                 Home
               </a>
-              <a href="https://www.pirogramming.com/about/">
+              <a href={ROUTES.PIROGRAMMING.ABOUT}>
                 About Us
               </a>
-              <a href="https://www.pirogramming.com/portfolio/">
+              <a href={ROUTES.PIROGRAMMING.PORTFOLIO}>
                 Portfolio
               </a>
-              <a href="https://www.pirogramming.com/interview/">
+              <a href={ROUTES.PIROGRAMMING.INTERVIEW}>
                 Interview
               </a>
-              <a href="https://www.pirogramming.com/gallery/">
+              <a href={ROUTES.PIROGRAMMING.GALLERY}>
                 Gallery
               </a>
               <a href="#" className="active">Recruit</a>
@@ -160,7 +161,7 @@ const PiroMainPage = () => {
 
             <div className="contact-links">
               <a
-                  href="https://www.instagram.com/pirogramming_official/"
+                  href={ROUTES.SOCIAL.INSTAGRAM}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="contact-link instagram"
@@ -170,7 +171,7 @@ const PiroMainPage = () => {
               </a>
 
               <a
-                  href="https://pf.kakao.com/_xdHxdXK"
+                  href={ROUTES.SOCIAL.KAKAO}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="contact-link kakao"
@@ -180,7 +181,7 @@ const PiroMainPage = () => {
               </a>
 
               <a
-                  href="mailto:pirogramming.official@gmail.com"
+                  href={ROUTES.SOCIAL.EMAIL}
                   className="contact-link email"
               >
                 <Mail className="contact-icon" />
@@ -196,21 +197,21 @@ const PiroMainPage = () => {
               <span className="footer-brand">PIROGRAMMING</span>
               <div className="footer-socials">
                 <a 
-                  href="https://github.com/pirogramming" 
+                  href={ROUTES.SOCIAL.GITHUB} 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
                   <Github className="footer-social-icon" />
                 </a>
                 <a 
-                  href="https://pirogramming.com" 
+                  href={ROUTES.PIROGRAMMING.HOME} 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
                   <Globe className="footer-social-icon" />
                 </a>
                 <a 
-                  href="https://www.instagram.com/pirogramming_official/" 
+                  href={ROUTES.SOCIAL.INSTAGRAM} 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
@@ -218,7 +219,7 @@ const PiroMainPage = () => {
                 </a>
               </div>
               <a 
-                href="mailto:pirogramming.official@gmail.com"
+                href={ROUTES.SOCIAL.EMAIL}
                 className="footer-email"
               >
                 pirogramming.official@gmail.com
@@ -226,19 +227,19 @@ const PiroMainPage = () => {
             </div>
 
             <div className="footer-links">
-              <a href="https://www.pirogramming.com/">
+              <a href={ROUTES.PIROGRAMMING.HOME}>
                 Home
               </a>
-              <a href="https://www.pirogramming.com/about/">
+              <a href={ROUTES.PIROGRAMMING.ABOUT}>
                 About Us
               </a>
-              <a href="https://www.pirogramming.com/portfolio/">
+              <a href={ROUTES.PIROGRAMMING.PORTFOLIO}>
                 Portfolio
               </a>
-              <a href="https://www.pirogramming.com/interview/">
+              <a href={ROUTES.PIROGRAMMING.INTERVIEW}>
                 Interview
               </a>
-              <a href="https://www.pirogramming.com/gallery/">
+              <a href={ROUTES.PIROGRAMMING.GALLERY}>
                 Gallery
               </a>
               <a href="#">Recruit</a>

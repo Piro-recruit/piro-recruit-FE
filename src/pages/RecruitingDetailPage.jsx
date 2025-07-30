@@ -29,6 +29,10 @@ import {
 } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import { mockRecruitingInfo, mockApplicants } from '../data/mockData';
+import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
+import { ROUTES } from '../constants/routes';
+import { calculateApplicantStats } from '../utils/evaluation';
+import { sortApplicants } from '../utils/sort';
 import './RecruitingDetailPage.css';
 
 // 평가 폼 컴포넌트
@@ -89,7 +93,7 @@ const RecruitingDetailPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('전체 상태');
-  const [sortBy, setSortBy] = useState('지원순');
+  const [sortBy, setSortBy] = useState(SORT_OPTIONS.APPLICATION_DATE);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedApplicants, setExpandedApplicants] = useState(new Set());
@@ -129,25 +133,13 @@ const RecruitingDetailPage = () => {
     }
 
     // 정렬
-    if (sortBy === 'AI스코어순') {
-      filtered = [...filtered].sort((a, b) => b.aiScore - a.aiScore);
-    } else if (sortBy === '채점스코어순') {
-      filtered = [...filtered].sort((a, b) => {
-        const aScore = evaluations[a.id]?.score || 0;
-        const bScore = evaluations[b.id]?.score || 0;
-        return bScore - aScore;
-      });
-    } else if (sortBy === '이름순') {
-      filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortBy === '지원순') {
-      filtered = [...filtered].sort((a, b) => new Date(a.appliedDate) - new Date(b.appliedDate));
-    }
+    filtered = sortApplicants(filtered, sortBy, evaluations);
 
     return filtered;
   }, [searchTerm, statusFilter, sortBy, evaluations]);
 
   // 페이지네이션 관련 계산
-  const itemsPerPage = 5;
+  const itemsPerPage = RECRUITMENT_CONFIG.ITEMS_PER_PAGE;
   const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -160,29 +152,11 @@ const RecruitingDetailPage = () => {
 
   // 통계 계산
   const stats = useMemo(() => {
-    const recruitmentLimit = 30; // 모집 인원
-    
-    // 평가된 지원자들의 점수를 가져와서 정렬 (내림차순)
-    const evaluatedScores = Object.values(evaluations)
-      .map(evaluation => evaluation.score)
-      .sort((a, b) => b - a);
-    
-    // 30등의 점수를 커트라인으로 설정 (평가된 지원자가 30명 미만이면 0점)
-    const cutlineScore = evaluatedScores.length >= recruitmentLimit 
-      ? evaluatedScores[recruitmentLimit - 1] 
-      : 0;
-    
-    return {
-      total: allApplicants.length,
-      reviewing: allApplicants.filter(a => a.status === '검토중').length,
-      passed: allApplicants.filter(a => a.status === '합격').length,
-      failed: allApplicants.filter(a => a.status === '불합격').length,
-      cutlineScore: cutlineScore
-    };
+    return calculateApplicantStats(allApplicants, evaluations);
   }, [evaluations]);
 
   const handleHeaderClick = () => {
-    navigate('/admin/recruiting');
+    navigate(ROUTES.ADMIN_RECRUITING);
   };
 
   const handleToggleApplicant = (applicantId) => {
@@ -302,7 +276,7 @@ const RecruitingDetailPage = () => {
                   <Clock size={24} />
                 </div>
                 <div className="stat-info">
-                  <div className="stat-label">검토중</div>
+                  <div className="stat-label">{APPLICANT_STATUS.REVIEWING}</div>
                   <div className="stat-value">{stats.reviewing}</div>
                 </div>
               </div>
@@ -312,7 +286,7 @@ const RecruitingDetailPage = () => {
                   <CheckCircle size={24} />
                 </div>
                 <div className="stat-info">
-                  <div className="stat-label">합격</div>
+                  <div className="stat-label">{APPLICANT_STATUS.PASSED}</div>
                   <div className="stat-value">{stats.passed}</div>
                 </div>
               </div>
@@ -322,7 +296,7 @@ const RecruitingDetailPage = () => {
                   <XCircle size={24} />
                 </div>
                 <div className="stat-info">
-                  <div className="stat-label">불합격</div>
+                  <div className="stat-label">{APPLICANT_STATUS.FAILED}</div>
                   <div className="stat-value">{stats.failed}</div>
                 </div>
               </div>
@@ -362,19 +336,19 @@ const RecruitingDetailPage = () => {
                   className="status-filter"
                 >
                   <option>전체 상태</option>
-                  <option>검토중</option>
-                  <option>합격</option>
-                  <option>불합격</option>
+                  <option>{APPLICANT_STATUS.REVIEWING}</option>
+                  <option>{APPLICANT_STATUS.PASSED}</option>
+                  <option>{APPLICANT_STATUS.FAILED}</option>
                 </select>
                 <select 
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="sort-filter"
                 >
-                  <option value="지원순">지원순</option>
-                  <option value="AI스코어순">AI 스코어순</option>
-                  <option value="채점스코어순">채점 스코어순</option>
-                  <option value="이름순">이름순</option>
+                  <option value={SORT_OPTIONS.APPLICATION_DATE}>지원순</option>
+                  <option value={SORT_OPTIONS.AI_SCORE}>AI 스코어순</option>
+                  <option value={SORT_OPTIONS.EVALUATION_SCORE}>채점 스코어순</option>
+                  <option value={SORT_OPTIONS.NAME}>이름순</option>
                 </select>
               </div>
             </div>

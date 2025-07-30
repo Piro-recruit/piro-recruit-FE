@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
+import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
+import { ROUTES } from '../constants/routes';
 import './RecruitingManagePage.css';
 
 const RecruitingManagePage = () => {
@@ -9,11 +11,11 @@ const RecruitingManagePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('전체 상태');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = RECRUITMENT_CONFIG.ITEMS_PER_PAGE;
 
   const handleRecruitingClick = (recruitingId) => {
     // 추후 구현할 상세 페이지로 이동
-    navigate(`/admin/recruiting/${recruitingId}`);
+    navigate(ROUTES.ADMIN_RECRUITING_DETAIL.replace(':id', recruitingId));
   };
 
   // 확장된 모의 데이터
@@ -22,7 +24,7 @@ const RecruitingManagePage = () => {
       id: 1,
       title: '2024년 여름기 신입 개발자 채용',
       period: '2024.07.01 ~ 2024.07.31',
-      status: '모집중',
+      status: RECRUITMENT_STATUS.ACTIVE,
       statusColor: 'green',
       applicants: 127,
       comments: 3
@@ -31,7 +33,7 @@ const RecruitingManagePage = () => {
       id: 2,
       title: '2024년 여름기 디자이너 채용',
       period: '2024.06.01 ~ 2024.06.31',
-      status: '작성중',
+      status: RECRUITMENT_STATUS.PENDING,
       statusColor: 'yellow',
       applicants: 0,
       comments: 2
@@ -40,7 +42,7 @@ const RecruitingManagePage = () => {
       id: 3,
       title: '2024년 상반기 마케터 채용',
       period: '2024.03.01 ~ 2024.03.31',
-      status: '마감',
+      status: RECRUITMENT_STATUS.INACTIVE,
       statusColor: 'red',
       applicants: 89,
       comments: 3
@@ -49,7 +51,7 @@ const RecruitingManagePage = () => {
       id: 4,
       title: '2024년 봄학기 백엔드 개발자 채용',
       period: '2024.04.01 ~ 2024.04.30',
-      status: '모집중',
+      status: RECRUITMENT_STATUS.ACTIVE,
       statusColor: 'green',
       applicants: 45,
       comments: 1
@@ -58,7 +60,7 @@ const RecruitingManagePage = () => {
       id: 5,
       title: '2024년 인턴십 프로그램',
       period: '2024.02.01 ~ 2024.02.28',
-      status: '마감',
+      status: RECRUITMENT_STATUS.INACTIVE,
       statusColor: 'red',
       applicants: 203,
       comments: 8
@@ -67,7 +69,7 @@ const RecruitingManagePage = () => {
       id: 6,
       title: '2024년 하반기 프론트엔드 개발자 채용',
       period: '2024.08.01 ~ 2024.08.31',
-      status: '작성중',
+      status: RECRUITMENT_STATUS.PENDING,
       statusColor: 'yellow',
       applicants: 12,
       comments: 0
@@ -76,7 +78,7 @@ const RecruitingManagePage = () => {
       id: 7,
       title: '2024년 겨울기 UI/UX 디자이너 채용',
       period: '2024.12.01 ~ 2024.12.31',
-      status: '작성중',
+      status: RECRUITMENT_STATUS.PENDING,
       statusColor: 'yellow',
       applicants: 0,
       comments: 0
@@ -85,7 +87,7 @@ const RecruitingManagePage = () => {
       id: 8,
       title: '2024년 데이터 사이언티스트 채용',
       period: '2024.05.01 ~ 2024.05.31',
-      status: '마감',
+      status: RECRUITMENT_STATUS.INACTIVE,
       statusColor: 'red',
       applicants: 67,
       comments: 4
@@ -94,7 +96,7 @@ const RecruitingManagePage = () => {
       id: 9,
       title: '2024년 풀스택 개발자 채용',
       period: '2024.09.01 ~ 2024.09.30',
-      status: '모집중',
+      status: RECRUITMENT_STATUS.ACTIVE,
       statusColor: 'green',
       applicants: 89,
       comments: 6
@@ -103,7 +105,7 @@ const RecruitingManagePage = () => {
       id: 10,
       title: '2024년 모바일 앱 개발자 채용',
       period: '2024.10.01 ~ 2024.10.31',
-      status: '작성중',
+      status: RECRUITMENT_STATUS.PENDING,
       statusColor: 'yellow',
       applicants: 34,
       comments: 2
@@ -112,7 +114,7 @@ const RecruitingManagePage = () => {
       id: 11,
       title: '2024년 DevOps 엔지니어 채용',
       period: '2024.11.01 ~ 2024.11.30',
-      status: '모집중',
+      status: RECRUITMENT_STATUS.ACTIVE,
       statusColor: 'green',
       applicants: 23,
       comments: 1
@@ -121,7 +123,7 @@ const RecruitingManagePage = () => {
       id: 12,
       title: '2024년 QA 엔지니어 채용',
       period: '2024.01.01 ~ 2024.01.31',
-      status: '마감',
+      status: RECRUITMENT_STATUS.INACTIVE,
       statusColor: 'red',
       applicants: 156,
       comments: 9
@@ -156,9 +158,9 @@ const RecruitingManagePage = () => {
   // 통계 계산
   const stats = useMemo(() => ({
     totalRecruitings: allRecruitings.length,
-    active: allRecruitings.filter(r => r.status === '작성중').length,
-    recruiting: allRecruitings.filter(r => r.status === '모집중').length,
-    closed: allRecruitings.filter(r => r.status === '마감').length,
+    active: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.PENDING).length,
+    recruiting: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.ACTIVE).length,
+    closed: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.INACTIVE).length,
     totalApplicants: allRecruitings.reduce((sum, r) => sum + r.applicants, 0)
   }), []);
 
@@ -209,9 +211,9 @@ const RecruitingManagePage = () => {
                   className="status-filter"
                 >
                   <option>전체 상태</option>
-                  <option>모집중</option>
-                  <option>작성중</option>
-                  <option>마감</option>
+                  <option>{RECRUITMENT_STATUS.ACTIVE}</option>
+                  <option>{RECRUITMENT_STATUS.PENDING}</option>
+                  <option>{RECRUITMENT_STATUS.INACTIVE}</option>
                 </select>
                 <button className="filter-btn">
                   <Filter size={16} />
