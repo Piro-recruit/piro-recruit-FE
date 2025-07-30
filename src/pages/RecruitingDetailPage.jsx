@@ -9,8 +9,6 @@ import {
   CheckCircle, 
   XCircle, 
   User,
-  Eye,
-  MessageSquare,
   FileText,
   ChevronDown,
   ChevronUp,
@@ -22,38 +20,61 @@ import {
   Send,
   Users as UsersIcon,
   Type,
-  MessageCircle
+  MessageCircle,
+  Edit,
+  Save,
+  X
 } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import './RecruitingDetailPage.css';
 
 // 평가 폼 컴포넌트
-const EvaluationForm = ({ applicantId, onSubmit }) => {
-  const [score, setScore] = useState('');
+const EvaluationForm = ({ applicantId, onSubmit, initialData = null }) => {
+  const [score, setScore] = useState(initialData?.score?.toString() || '');
+  const [comment, setComment] = useState(initialData?.comment || '');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (score && score >= 0 && score <= 100) {
-      onSubmit(applicantId, parseInt(score));
+      onSubmit(applicantId, {
+        score: parseInt(score),
+        comment: comment.trim()
+      });
     }
   };
 
   return (
     <form className="evaluation-form" onSubmit={handleSubmit}>
-      <div className="score-input-group">
-        <label htmlFor={`score-${applicantId}`}>점수 (0-100)</label>
-        <input
-          id={`score-${applicantId}`}
-          type="number"
-          min="0"
-          max="100"
-          value={score}
-          onChange={(e) => setScore(e.target.value)}
-          placeholder="점수 입력"
-          className="score-input"
-        />
-        <button type="submit" className="submit-evaluation-btn">
-          평가 제출
+      <div className="evaluation-fields">
+        <div className="score-input-group">
+          <label htmlFor={`score-${applicantId}`}>점수 (0-100)</label>
+          <input
+            id={`score-${applicantId}`}
+            type="number"
+            min="0"
+            max="100"
+            value={score}
+            onChange={(e) => setScore(e.target.value)}
+            placeholder="점수 입력"
+            className="score-input"
+          />
+        </div>
+        
+        <div className="comment-input-group">
+          <label htmlFor={`comment-${applicantId}`}>코멘트</label>
+          <textarea
+            id={`comment-${applicantId}`}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="지원자에 대한 평가 코멘트를 작성해주세요..."
+            className="comment-textarea"
+            rows={3}
+          />
+        </div>
+        
+        <button type="submit" className="submit-evaluation-btn" disabled={!score}>
+          <Save size={16} />
+          {initialData ? '수정 완료' : '평가 제출'}
         </button>
       </div>
     </form>
@@ -68,6 +89,7 @@ const RecruitingDetailPage = () => {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [expandedApplicants, setExpandedApplicants] = useState(new Set());
   const [evaluations, setEvaluations] = useState({});
+  const [editingEvaluation, setEditingEvaluation] = useState(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailContent, setEmailContent] = useState({
     subject: '',
@@ -89,7 +111,6 @@ const RecruitingDetailPage = () => {
       id: 1,
       name: '김철수',
       email: 'kim@example.com',
-      phone: '010-1234-5678',
       status: '검토중',
       statusColor: 'blue',
       appliedDate: '2024.07.02',
@@ -98,8 +119,6 @@ const RecruitingDetailPage = () => {
       major: '컴퓨터공학과',
       age: 24,
       gender: '남성',
-      gpa: '3.8/4.5',
-      experience: '인턴 6개월',
       skills: ['React', 'JavaScript', 'Node.js'],
       portfolio: 'https://github.com/kimcs',
       // AI 요약 정보
@@ -119,7 +138,6 @@ const RecruitingDetailPage = () => {
       id: 2,
       name: '이영희',
       email: 'lee@example.com',
-      phone: '010-2345-6789',
       status: '합격',
       statusColor: 'green',
       appliedDate: '2024.07.01',
@@ -128,8 +146,6 @@ const RecruitingDetailPage = () => {
       major: '소프트웨어학과',
       age: 23,
       gender: '여성',
-      gpa: '4.2/4.5',
-      experience: '프리랜서 1년',
       skills: ['React', 'TypeScript', 'Python', 'AWS'],
       portfolio: 'https://github.com/leeyh',
       aiSummary: {
@@ -147,7 +163,6 @@ const RecruitingDetailPage = () => {
       id: 3,
       name: '박민수',
       email: 'park@example.com',
-      phone: '010-3456-7890',
       status: '검토중',
       statusColor: 'blue',
       appliedDate: '2024.07.03',
@@ -156,8 +171,6 @@ const RecruitingDetailPage = () => {
       major: '전자공학과',
       age: 25,
       gender: '남성',
-      gpa: '3.2/4.5',
-      experience: '신입',
       skills: ['JavaScript', 'HTML', 'CSS'],
       portfolio: 'https://github.com/parkms',
       aiSummary: {
@@ -226,15 +239,25 @@ const RecruitingDetailPage = () => {
     setSelectedApplicant(null);
   };
 
-  const handleEvaluationSubmit = (applicantId, score) => {
+  const handleEvaluationSubmit = (applicantId, evaluationData) => {
     setEvaluations(prev => ({
       ...prev,
       [applicantId]: {
-        score: score,
+        score: evaluationData.score,
+        comment: evaluationData.comment,
         evaluator: '운영진A', // 실제로는 로그인한 사용자 정보
         evaluatedAt: new Date().toISOString()
       }
     }));
+    setEditingEvaluation(null); // 편집 모드 종료
+  };
+
+  const handleEditEvaluation = (applicantId) => {
+    setEditingEvaluation(applicantId);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEvaluation(null);
   };
 
   const handleShowEmailModal = () => {
@@ -466,19 +489,48 @@ const RecruitingDetailPage = () => {
                             </div>
                           </div>
                           
-                          {evaluation ? (
+                          {evaluation && editingEvaluation !== applicant.id ? (
                             <div className="evaluation-completed">
                               <div className="evaluation-score-display">
                                 <span className="score-label">내 평가:</span>
-                                <span className="score-value">{evaluation.score}점</span>
+                                <span className="recruit-score-value">{evaluation.score}점</span>
                                 <span className="evaluator">by {evaluation.evaluator}</span>
+                              </div>
+                              
+                              {evaluation.comment && (
+                                <div className="evaluation-comment">
+                                  <div className="comment-label">코멘트:</div>
+                                  <div className="comment-content">{evaluation.comment}</div>
+                                </div>
+                              )}
+                              
+                              <div className="evaluation-actions">
+                                <button 
+                                  className="edit-evaluation-btn"
+                                  onClick={() => handleEditEvaluation(applicant.id)}
+                                >
+                                  <Edit size={14} />
+                                  수정
+                                </button>
                               </div>
                             </div>
                           ) : (
-                            <EvaluationForm 
-                              applicantId={applicant.id}
-                              onSubmit={handleEvaluationSubmit}
-                            />
+                            <div className="evaluation-form-container">
+                              <EvaluationForm 
+                                applicantId={applicant.id}
+                                onSubmit={handleEvaluationSubmit}
+                                initialData={evaluation}
+                              />
+                              {editingEvaluation === applicant.id && (
+                                <button 
+                                  className="cancel-edit-btn"
+                                  onClick={handleCancelEdit}
+                                >
+                                  <X size={14} />
+                                  취소
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
 
@@ -637,6 +689,14 @@ const RecruitingDetailPage = () => {
                   <div className="info-row">
                     <span className="info-label">전공:</span>
                     <span className="info-value">{selectedApplicant.major}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">나이:</span>
+                    <span className="info-value">{selectedApplicant.age}세</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">성별:</span>
+                    <span className="info-value">{selectedApplicant.gender}</span>
                   </div>
                 </div>
 
