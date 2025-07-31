@@ -153,7 +153,11 @@ const RecruitingManagePage = () => {
         filtered = filtered.sort((a, b) => b.applicants - a.applicants);
         break;
       case '최신순':
-        filtered = filtered.sort((a, b) => b.id - a.id);
+        filtered = filtered.sort((a, b) => {
+          const dateA = new Date(a.period.split(' ~ ')[0]);
+          const dateB = new Date(b.period.split(' ~ ')[0]);
+          return dateB - dateA;
+        });
         break;
       case '이름순':
         filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
@@ -193,6 +197,25 @@ const RecruitingManagePage = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleStatCardClick = (filterType) => {
+    switch (filterType) {
+      case 'all':
+        setStatusFilter('전체 상태');
+        break;
+      case 'pending':
+        setStatusFilter(RECRUITMENT_STATUS.PENDING);
+        break;
+      case 'active':
+        setStatusFilter(RECRUITMENT_STATUS.ACTIVE);
+        break;
+      case 'inactive':
+        setStatusFilter(RECRUITMENT_STATUS.INACTIVE);
+        break;
+      default:
+        break;
     }
   };
 
@@ -255,7 +278,7 @@ const RecruitingManagePage = () => {
 
           {/* 통계 카드 영역 */}
           <div className="stats-grid">
-            <div className="stat-card">
+            <div className="stat-card clickable" onClick={() => handleStatCardClick('all')}>
               <div className="stat-icon blue">
                 <Clock size={24} />
               </div>
@@ -265,7 +288,7 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             
-            <div className="stat-card">
+            <div className="stat-card clickable" onClick={() => handleStatCardClick('pending')}>
               <div className="stat-icon yellow">
                 <Clock size={24} />
               </div>
@@ -275,7 +298,7 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             
-            <div className="stat-card">
+            <div className="stat-card clickable" onClick={() => handleStatCardClick('active')}>
               <div className="stat-icon green">
                 <CheckCircle size={24} />
               </div>
@@ -285,7 +308,7 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             
-            <div className="stat-card">
+            <div className="stat-card clickable" onClick={() => handleStatCardClick('inactive')}>
               <div className="stat-icon red">
                 <XCircle size={24} />
               </div>
