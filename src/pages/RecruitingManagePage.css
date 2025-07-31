@@ -111,7 +111,8 @@
   align-items: center;
 }
 
-.status-filter {
+.status-filter,
+.sort-select {
   padding: 0.75rem 1rem;
   background-color: var(--color-gray-7);
   border: 1px solid var(--color-gray-6);
@@ -122,11 +123,13 @@
   cursor: pointer;
 }
 
-.status-filter:focus {
+.status-filter:focus,
+.sort-select:focus {
   border-color: var(--color-green-0);
 }
 
-.filter-btn {
+.filter-btn,
+.sort-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -140,7 +143,8 @@
   transition: all 0.3s;
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.sort-btn:hover {
   background-color: var(--color-gray-6);
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Filter, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, ArrowUpDown, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
@@ -10,6 +10,7 @@ const RecruitingManagePage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('전체 상태');
+  const [sortBy, setSortBy] = useState('지원자순');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = RECRUITMENT_CONFIG.ITEMS_PER_PAGE;
 
@@ -130,7 +131,7 @@ const RecruitingManagePage = () => {
     }
   ];
 
-  // 필터링된 데이터
+  // 필터링 및 정렬된 데이터
   const filteredRecruitings = useMemo(() => {
     let filtered = allRecruitings;
 
@@ -146,8 +147,23 @@ const RecruitingManagePage = () => {
       filtered = filtered.filter(recruiting => recruiting.status === statusFilter);
     }
 
+    // 정렬
+    switch (sortBy) {
+      case '지원자순':
+        filtered = filtered.sort((a, b) => b.applicants - a.applicants);
+        break;
+      case '최신순':
+        filtered = filtered.sort((a, b) => b.id - a.id);
+        break;
+      case '이름순':
+        filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      default:
+        break;
+    }
+
     return filtered;
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm, statusFilter, sortBy]);
 
   // 페이지네이션
   const totalPages = Math.ceil(filteredRecruitings.length / itemsPerPage);
@@ -180,10 +196,10 @@ const RecruitingManagePage = () => {
     }
   };
 
-  // 검색어나 필터가 변경되면 첫 페이지로 돌아가기
+  // 검색어나 필터, 정렬이 변경되면 첫 페이지로 돌아가기
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm, statusFilter, sortBy]);
 
   return (
     <div className="recruiting-manage-page">
@@ -215,10 +231,15 @@ const RecruitingManagePage = () => {
                   <option>{RECRUITMENT_STATUS.PENDING}</option>
                   <option>{RECRUITMENT_STATUS.INACTIVE}</option>
                 </select>
-                <button className="filter-btn">
-                  <Filter size={16} />
-                  필터
-                </button>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="sort-select"
+                >
+                  <option>지원자순</option>
+                  <option>최신순</option>
+                  <option>이름순</option>
+                </select>
               </div>
             </div>
             <div className="top-actions">
