@@ -111,8 +111,9 @@
   align-items: center;
 }
 
-.status-filter {
-  padding: 0.75rem 1rem;
+.status-filter,
+.sort-select {
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   background-color: var(--color-gray-7);
   border: 1px solid var(--color-gray-6);
   border-radius: 8px;
@@ -120,13 +121,22 @@
   font-size: 0.875rem;
   outline: none;
   cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
-.status-filter:focus {
+.status-filter:focus,
+.sort-select:focus {
   border-color: var(--color-green-0);
 }
 
-.filter-btn {
+.filter-btn,
+.sort-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -140,7 +150,8 @@
   transition: all 0.3s;
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.sort-btn:hover {
   background-color: var(--color-gray-6);
 }
 
@@ -165,6 +176,16 @@
 
 .stat-card:hover {
   background-color: var(--color-gray-6);
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+}
+
+.stat-card.clickable:hover {
+  background-color: var(--color-gray-6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .stat-icon {
