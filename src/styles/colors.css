@@ -1,0 +1,40 @@
+/* CSS Variables from colors.js */
+:root {
+  /* 기본 색상 */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  
+  /* Gray Scale */
+  --color-gray-0: #EDEDED;
+  --color-gray-1: #D3D3D3;
+  --color-gray-2: #B9B9B9;
+  --color-gray-3: #9F9F9F;
+  --color-gray-4: #858585;
+  --color-gray-5: #6B6B6B;
+  --color-gray-6: #515151;
+  --color-gray-7: #373737;
+  --color-gray-8: #1F1F1F;
+  
+  /* Green */
+  --color-green--3: #CAFFCC;
+  --color-green--2: #93FF96;
+  --color-green--1: #1CFF23;
+  --color-green-0: #0BEC12;
+  --color-green-1: #08BC0E;
+  --color-green-2: #0C9A10;
+  --color-green-3: #056A09;
+  --color-green-4: #056A09;
+  --color-green-5: #012403;
+  
+  /* Blue */
+  --color-blue-0: #E6F2FF;
+  --color-blue-1: #CCE5FF;
+  --color-blue-2: #B3D9FF;
+  --color-blue-3: #99CCFF;
+  --color-blue-4: #7FB8FF;
+  --color-blue-5: #66A3FF;
+  --color-blue-6: #4D8FFF;
+  --color-blue-7: #337AFF;
+  --color-blue-8: #1A66FF;
+  --color-blue-9: #0052FF;
+}

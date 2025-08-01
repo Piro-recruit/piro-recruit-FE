@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '../components/common/Button';
+import AdminHeader from '../components/common/AdminHeader';
 import './AdminLoginPage.css';
 
 const AdminLoginPage = () => {
@@ -42,46 +42,39 @@ const AdminLoginPage = () => {
 
   return (
     <div className="admin-login-page">
-      <div className="login-container">
-        <div className="login-header">
-          <h1>관리자 로그인</h1>
-          <p>관리자 코드를 입력해주세요</p>
-        </div>
+      <AdminHeader pageType="지원자 관리 시스템" title="admin 로그인" />
+      
+      <main className="admin-main">
+        <div className="login-container">
+          <div className="login-form-wrapper">
+            <h2 className="login-title">로그인 코드</h2>
+            
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="input-wrapper">
+                <input
+                  type="password"
+                  id="loginCode"
+                  value={loginCode}
+                  onChange={(e) => setLoginCode(e.target.value)}
+                  placeholder=""
+                  disabled={isLoading}
+                  className="login-input"
+                />
+              </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="loginCode">로그인 코드</label>
-            <input
-              type="password"
-              id="loginCode"
-              value={loginCode}
-              onChange={(e) => setLoginCode(e.target.value)}
-              placeholder="관리자 코드를 입력하세요"
-              disabled={isLoading}
-            />
+              {error && <div className="error-message">{error}</div>}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="login-btn"
+              >
+                {isLoading ? '로그인 중...' : '로그인'}
+              </button>
+            </form>
           </div>
-
-          {error && <div className="error-message">{error}</div>}
-
-          <Button
-            type="submit"
-            size="large"
-            disabled={isLoading}
-            className="login-btn"
-          >
-            {isLoading ? '로그인 중...' : '로그인'}
-          </Button>
-        </form>
-
-        <div className="login-info">
-          <p>
-            <strong>Root Admin:</strong> 전체 리쿠르팅 관리 권한
-          </p>
-          <p>
-            <strong>일반 Admin:</strong> 배정된 리쿠르팅 관리 권한
-          </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
