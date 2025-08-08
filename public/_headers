@@ -1,0 +1,42 @@
+/*
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# JavaScript files
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/*.mjs
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/assets/js/*
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/assets/*-*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/assets/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+# CSS files
+/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/assets/css/*
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/assets/*-*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000
+
+/assets/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000
