@@ -120,6 +120,18 @@
   color: var(--color-gray-3);
 }
 
+/* 숫자 input의 spinner 버튼 숨기기 (Chrome, Safari, Edge) */
+.modal-input[type="number"]::-webkit-outer-spin-button,
+.modal-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 숫자 input의 spinner 버튼 숨기기 (Firefox) */
+.modal-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .input-hint {
   display: block;
   margin-top: 4px;

@@ -49,30 +49,61 @@
   color: #ff6b6b;
 }
 
-.delete-expired-btn {
+.delete-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.delete-expired-btn,
+.delete-all-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
   border-radius: 6px;
-  color: #ff6b6b;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
-  margin-left: auto;
+}
+
+.delete-expired-btn {
+  background-color: rgba(220, 38, 38, 0.5);
+  border: 1px solid rgba(220, 38, 38, 0.7);
+  color: var(--color-gray-0);
+  font-weight: 600;
 }
 
 .delete-expired-btn:hover:not(:disabled) {
-  background-color: rgba(220, 38, 38, 0.2);
-  border-color: rgba(220, 38, 38, 0.5);
+  background-color: rgba(220, 38, 38, 0.35);
+  border-color: rgba(220, 38, 38, 0.8);
+  color: var(--color-white);
 }
 
 .delete-expired-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  color: var(--color-gray-3);
+}
+
+.delete-all-btn {
+  background-color: rgba(220, 38, 38, 0.5);
+  border: 1px solid rgba(220, 38, 38, 0.7);
+  color: var(--color-gray-0);
+  font-weight: 600;
+}
+
+.delete-all-btn:hover:not(:disabled) {
+  background-color: rgba(220, 38, 38, 0.35);
+  border-color: rgba(220, 38, 38, 0.8);
+  color: var(--color-white);
+}
+
+.delete-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--color-gray-3);
 }
 
 .admin-list-container {
@@ -210,6 +241,7 @@
   color: #ff6b6b;
 }
 
+
 .close-admin-btn {
   padding: 10px 24px;
   background-color: var(--color-green-0);
@@ -245,9 +277,10 @@
     gap: 16px;
   }
   
-  .delete-expired-btn {
+  .delete-buttons {
     margin-left: 0;
     align-self: flex-start;
+    flex-wrap: wrap;
   }
   
   .table-header,
@@ -255,6 +288,7 @@
     grid-template-columns: 1fr;
     gap: 8px;
   }
+  
   
   .header-cell {
     display: none;

@@ -213,6 +213,33 @@ export const authService = {
         error: error.response?.data || error.message
       };
     }
+  },
+
+  /**
+   * 모든 일반 관리자 계정 삭제
+   * @returns {Promise} API 응답
+   */
+  async deleteAllAdmins() {
+    try {
+      console.log('모든 관리자 계정 삭제 요청');
+      const response = await apiClient.delete('/api/admin/general');
+      
+      console.log('모든 관리자 계정 삭제 성공 응답:', response.data);
+      
+      return {
+        success: true,
+        data: response.data,
+        message: '모든 관리자 계정이 성공적으로 삭제되었습니다.'
+      };
+    } catch (error) {
+      console.error('모든 관리자 계정 삭제 실패:', error);
+      
+      return {
+        success: false,
+        message: error.response?.data?.message || '모든 관리자 계정 삭제 중 오류가 발생했습니다.',
+        error: error.response?.data || error.message
+      };
+    }
   }
 };
 

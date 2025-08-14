@@ -8,6 +8,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -61,6 +62,27 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!window.confirm('모든 관리자 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    setDeletingAll(true);
+    setError('');
+
+    try {
+      const result = await authService.deleteAllAdmins();
+      alert('모든 관리자 계정이 삭제되었습니다.');
+      await loadAdmins(); // 목록 새로고침
+    } catch (err) {
+      setError('모든 관리자 계정 삭제에 실패했습니다.');
+      console.error('Delete all admins error:', err);
+    } finally {
+      setDeletingAll(false);
+    }
+  };
+
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('ko-KR', {
       year: 'numeric',
@@ -79,7 +101,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     if (!Array.isArray(admins)) {
       return 0;
     }
-    return admins.filter(admin => isExpired(admin.expirationDate)).length;
+    return admins.filter(admin => isExpired(admin.expiredAt)).length;
   };
 
   if (!isOpen) return null;
@@ -114,16 +136,24 @@ const AdminManageModal = ({ isOpen, onClose }) => {
               <span className="summary-label">만료된 계정</span>
               <span className="summary-value expired">{getExpiredCount()}명</span>
             </div>
-            {getExpiredCount() > 0 && (
+            <div className="delete-buttons">
               <button 
                 className="delete-expired-btn"
                 onClick={handleDeleteExpired}
-                disabled={deleting}
+                disabled={deleting || getExpiredCount() === 0}
               >
                 <Trash2 size={16} />
-                {deleting ? '삭제 중...' : '만료 계정 삭제'}
+                {deleting ? '삭제 중...' : getExpiredCount() === 0 ? '만료 계정 없음' : '만료 계정 삭제'}
               </button>
-            )}
+              <button 
+                className="delete-all-btn"
+                onClick={handleDeleteAll}
+                disabled={deletingAll || !Array.isArray(admins) || admins.length === 0}
+              >
+                <Trash2 size={16} />
+                {deletingAll ? '삭제 중...' : '전체 삭제'}
+              </button>
+            </div>
           </div>
 
           <div className="admin-list-container">
@@ -150,7 +180,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
                   {admins.map((admin, index) => (
                     <div 
                       key={admin.loginCode || index} 
-                      className={`admin-row ${isExpired(admin.expirationDate) ? 'expired' : ''}`}
+                      className={`admin-row ${isExpired(admin.expiredAt) ? 'expired' : ''}`}
                     >
                       <div className="cell admin-code-cell">
                         <span className="admin-code-display">{admin.loginCode}</span>
@@ -164,12 +194,12 @@ const AdminManageModal = ({ isOpen, onClose }) => {
                       <div className="cell">
                         <div className="date-info">
                           <Clock size={14} />
-                          {formatDate(admin.expirationDate)}
+                          {formatDate(admin.expiredAt)}
                         </div>
                       </div>
                       <div className="cell">
-                        <span className={`status-badge ${isExpired(admin.expirationDate) ? 'expired' : 'active'}`}>
-                          {isExpired(admin.expirationDate) ? '만료됨' : '활성'}
+                        <span className={`status-badge ${isExpired(admin.expiredAt) ? 'expired' : 'active'}`}>
+                          {isExpired(admin.expiredAt) ? '만료됨' : '활성'}
                         </span>
                       </div>
                     </div>
