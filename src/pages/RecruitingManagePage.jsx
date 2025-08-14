@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, ArrowUpDown, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, ArrowUpDown, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import AdminCodeModal from '../components/common/AdminCodeModal';
 import AdminCodeResultModal from '../components/common/AdminCodeResultModal';
+import AdminManageModal from '../components/common/AdminManageModal';
 import { authService } from '../services/authService';
 import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
@@ -20,6 +21,7 @@ const RecruitingManagePage = () => {
   // 관리자 코드 모달 상태
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [codeGenerationResult, setCodeGenerationResult] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -51,6 +53,11 @@ const RecruitingManagePage = () => {
     setIsCodeModalOpen(true);
   };
 
+  // 관리자 관리 버튼 클릭 핸들러
+  const handleManageAdminClick = () => {
+    setIsManageModalOpen(true);
+  };
+
   // 모달 닫기 핸들러들
   const handleCloseCodeModal = () => {
     setIsCodeModalOpen(false);
@@ -59,6 +66,10 @@ const RecruitingManagePage = () => {
   const handleCloseResultModal = () => {
     setIsResultModalOpen(false);
     setCodeGenerationResult(null);
+  };
+
+  const handleCloseManageModal = () => {
+    setIsManageModalOpen(false);
   };
 
   // 확장된 모의 데이터
@@ -311,6 +322,10 @@ const RecruitingManagePage = () => {
               <button className="code-create-btn" onClick={handleCodeCreateClick}>
                 코드 생성
               </button>
+              <button className="admin-manage-btn" onClick={handleManageAdminClick}>
+                <Settings size={16} />
+                관리자 관리
+              </button>
               <button className="create-btn">
                 <Plus size={16} />
                 새 리쿠르팅 생성
@@ -460,6 +475,12 @@ const RecruitingManagePage = () => {
         isOpen={isResultModalOpen}
         onClose={handleCloseResultModal}
         result={codeGenerationResult}
+      />
+
+      {/* 관리자 관리 모달 */}
+      <AdminManageModal
+        isOpen={isManageModalOpen}
+        onClose={handleCloseManageModal}
       />
     </div>
   );

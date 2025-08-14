@@ -39,6 +39,7 @@
 }
 
 .code-create-btn,
+.admin-manage-btn,
 .create-btn {
   display: flex;
   align-items: center;
@@ -59,6 +60,16 @@
 }
 
 .code-create-btn:hover {
+  background-color: var(--color-gray-5);
+}
+
+.admin-manage-btn {
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
+  border: 1px solid var(--color-gray-5);
+}
+
+.admin-manage-btn:hover {
   background-color: var(--color-gray-5);
 }
 

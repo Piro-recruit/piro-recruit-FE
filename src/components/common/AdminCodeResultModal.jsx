@@ -16,11 +16,11 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
   };
 
   const handleCopyAllCodes = async () => {
-    if (!result?.data?.created) return;
+    if (!result?.data?.createdAdmins) return;
     
     try {
-      const allCodes = result.data.created
-        .map((admin, index) => `${index + 1}. ${admin.username} (만료일: ${new Date(admin.expiresAt).toLocaleDateString()})`)
+      const allCodes = result.data.createdAdmins
+        .map((admin, index) => `${index + 1}. ${admin.loginCode} (만료일: ${new Date(admin.expiresAt).toLocaleDateString()})`)
         .join('\n');
       
       await navigator.clipboard.writeText(allCodes);
@@ -39,7 +39,7 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
   if (!isOpen || !result) return null;
 
   const { data } = result;
-  const hasSuccess = data?.created && data.created.length > 0;
+  const hasSuccess = data?.createdAdmins && data.createdAdmins.length > 0;
   const hasFailures = data?.failed && data.failed.length > 0;
 
   return (
@@ -61,9 +61,9 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
               <div className="section-header">
                 <h3>
                   <Check size={18} className="success-icon" />
-                  생성 성공 ({data.created.length}개)
+                  생성 성공 ({data.createdAdmins.length}개)
                 </h3>
-                {data.created.length > 1 && (
+                {data.createdAdmins.length > 1 && (
                   <button
                     onClick={handleCopyAllCodes}
                     className="copy-all-btn"
@@ -84,19 +84,19 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
               </div>
 
               <div className="admin-codes-list">
-                {data.created.map((admin, index) => (
+                {data.createdAdmins.map((admin, index) => (
                   <div key={admin.id || index} className="admin-code-item">
                     <div className="admin-info">
-                      <div className="admin-header">
+                      <div className="admin-info-header">
                         <User size={16} />
                         <span className="admin-title">관리자 #{index + 1}</span>
                       </div>
                       <div className="admin-details">
                         <div className="code-display">
                           <span className="code-label">로그인 코드:</span>
-                          <code className="admin-code">{admin.username}</code>
+                          <code className="admin-code">{admin.loginCode}</code>
                           <button
-                            onClick={() => handleCopyCode(admin.username, index)}
+                            onClick={() => handleCopyCode(admin.loginCode, index)}
                             className="copy-btn"
                           >
                             {copiedIndex === index ? (
@@ -138,7 +138,7 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
 
           <div className="result-summary">
             <p className="summary-text">
-              총 {hasSuccess ? data.created.length : 0}개의 관리자 코드가 생성되었습니다.
+              총 {hasSuccess ? data.createdAdmins.length : 0}개의 관리자 코드가 생성되었습니다.
               {hasFailures && ` ${data.failed.length}개 실패.`}
             </p>
             <p className="usage-hint">
