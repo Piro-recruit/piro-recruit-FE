@@ -2,6 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, ArrowUpDown, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
+import AdminCodeModal from '../components/common/AdminCodeModal';
+import AdminCodeResultModal from '../components/common/AdminCodeResultModal';
+import { authService } from '../services/authService';
 import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import './RecruitingManagePage.css';
@@ -14,9 +17,48 @@ const RecruitingManagePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = RECRUITMENT_CONFIG.ITEMS_PER_PAGE;
 
+  // 관리자 코드 모달 상태
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [codeGenerationResult, setCodeGenerationResult] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const handleRecruitingClick = (recruitingId) => {
     // 추후 구현할 상세 페이지로 이동
     navigate(ROUTES.ADMIN_RECRUITING_DETAIL.replace(':id', recruitingId));
+  };
+
+  // 관리자 코드 생성 함수
+  const handleGenerateAdminCodes = async (count, expirationDays) => {
+    setIsGenerating(true);
+    
+    try {
+      const result = await authService.createGeneralAdmins(count, expirationDays);
+      
+      setCodeGenerationResult(result);
+      setIsCodeModalOpen(false);
+      setIsResultModalOpen(true);
+    } catch (error) {
+      console.error('관리자 코드 생성 실패:', error);
+      alert('관리자 코드 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // 코드 생성 버튼 클릭 핸들러
+  const handleCodeCreateClick = () => {
+    setIsCodeModalOpen(true);
+  };
+
+  // 모달 닫기 핸들러들
+  const handleCloseCodeModal = () => {
+    setIsCodeModalOpen(false);
+  };
+
+  const handleCloseResultModal = () => {
+    setIsResultModalOpen(false);
+    setCodeGenerationResult(null);
   };
 
   // 확장된 모의 데이터
@@ -266,7 +308,7 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             <div className="top-actions">
-              <button className="code-create-btn">
+              <button className="code-create-btn" onClick={handleCodeCreateClick}>
                 코드 생성
               </button>
               <button className="create-btn">
@@ -404,6 +446,21 @@ const RecruitingManagePage = () => {
           )}
         </div>
       </main>
+
+      {/* 관리자 코드 생성 모달 */}
+      <AdminCodeModal
+        isOpen={isCodeModalOpen}
+        onClose={handleCloseCodeModal}
+        onGenerate={handleGenerateAdminCodes}
+        isLoading={isGenerating}
+      />
+
+      {/* 관리자 코드 생성 결과 모달 */}
+      <AdminCodeResultModal
+        isOpen={isResultModalOpen}
+        onClose={handleCloseResultModal}
+        result={codeGenerationResult}
+      />
     </div>
   );
 };

@@ -119,6 +119,100 @@ export const authService = {
    */
   getAccessToken() {
     return localStorage.getItem('accessToken');
+  },
+
+  /**
+   * 일반 관리자 계정 일괄 생성
+   * @param {number} count - 생성할 관리자 계정 수
+   * @param {number} expirationDays - 만료 기간(일), 기본값 30일
+   * @returns {Promise} API 응답
+   */
+  async createGeneralAdmins(count, expirationDays = 30) {
+    try {
+      console.log('관리자 계정 일괄 생성 요청:', { count, expirationDays });
+      
+      // 만료 날짜 계산 (현재 시간 + expirationDays)
+      const now = new Date();
+      const expiredAt = new Date(now.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+      const expiredAtISOString = expiredAt.toISOString();
+
+      const response = await apiClient.post('/api/admin/general/batch', {
+        count: count,
+        expiredAt: expiredAtISOString
+      });
+      
+      console.log('관리자 계정 생성 성공 응답:', response.data);
+      
+      return {
+        success: true,
+        data: response.data,
+        message: `${count}개의 관리자 계정이 성공적으로 생성되었습니다.`
+      };
+    } catch (error) {
+      console.error('관리자 계정 생성 실패:', error);
+      console.error('에러 상태 코드:', error.response?.status);
+      console.error('에러 응답 데이터:', error.response?.data);
+      
+      return {
+        success: false,
+        message: error.response?.data?.message || '관리자 계정 생성 중 오류가 발생했습니다.',
+        error: error.response?.data || error.message
+      };
+    }
+  },
+
+  /**
+   * 모든 일반 관리자 계정 조회
+   * @returns {Promise} API 응답
+   */
+  async getAllGeneralAdmins() {
+    try {
+      console.log('관리자 계정 전체 조회 요청');
+      const response = await apiClient.get('/api/admin/general');
+      
+      console.log('관리자 계정 조회 성공 응답:', response.data);
+      
+      return {
+        success: true,
+        data: response.data,
+        message: '관리자 계정 목록을 성공적으로 조회했습니다.'
+      };
+    } catch (error) {
+      console.error('관리자 계정 조회 실패:', error);
+      
+      return {
+        success: false,
+        message: error.response?.data?.message || '관리자 계정 조회 중 오류가 발생했습니다.',
+        error: error.response?.data || error.message
+      };
+    }
+  },
+
+  /**
+   * 만료된 일반 관리자 계정 삭제
+   * @returns {Promise} API 응답
+   */
+  async deleteExpiredAdmins() {
+    try {
+      console.log('만료된 관리자 계정 삭제 요청');
+      const response = await apiClient.delete('/api/admin/general/expired');
+      
+      console.log('만료된 관리자 계정 삭제 성공 응답:', response.data);
+      
+      return {
+        success: true,
+        data: response.data,
+        message: '만료된 관리자 계정이 성공적으로 삭제되었습니다.'
+      };
+    } catch (error) {
+      console.error('만료된 관리자 계정 삭제 실패:', error);
+      
+      return {
+        success: false,
+        message: error.response?.data?.message || '만료된 관리자 계정 삭제 중 오류가 발생했습니다.',
+        error: error.response?.data || error.message
+      };
+    }
   }
 };
 
