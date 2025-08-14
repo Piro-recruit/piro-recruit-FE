@@ -172,19 +172,17 @@ export const authService = {
       
       console.log('관리자 계정 조회 성공 응답:', response.data);
       
-      return {
-        success: true,
-        data: response.data,
-        message: '관리자 계정 목록을 성공적으로 조회했습니다.'
-      };
+      // 실제 데이터 반환 (배열 형태)
+      return response.data;
     } catch (error) {
       console.error('관리자 계정 조회 실패:', error);
       
-      return {
-        success: false,
-        message: error.response?.data?.message || '관리자 계정 조회 중 오류가 발생했습니다.',
-        error: error.response?.data || error.message
-      };
+      // 권한 오류의 경우 에러를 다시 throw해서 상위에서 처리하도록 함
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw error;
+      }
+      
+      throw new Error(error.response?.data?.message || '관리자 계정 조회 중 오류가 발생했습니다.');
     }
   },
 
@@ -199,19 +197,16 @@ export const authService = {
       
       console.log('만료된 관리자 계정 삭제 성공 응답:', response.data);
       
-      return {
-        success: true,
-        data: response.data,
-        message: '만료된 관리자 계정이 성공적으로 삭제되었습니다.'
-      };
+      return response.data;
     } catch (error) {
       console.error('만료된 관리자 계정 삭제 실패:', error);
       
-      return {
-        success: false,
-        message: error.response?.data?.message || '만료된 관리자 계정 삭제 중 오류가 발생했습니다.',
-        error: error.response?.data || error.message
-      };
+      // 권한 오류의 경우 에러를 다시 throw
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw error;
+      }
+      
+      throw new Error(error.response?.data?.message || '만료된 관리자 계정 삭제 중 오류가 발생했습니다.');
     }
   },
 
@@ -222,23 +217,20 @@ export const authService = {
   async deleteAllAdmins() {
     try {
       console.log('모든 관리자 계정 삭제 요청');
-      const response = await apiClient.delete('/api/admin/general');
+      const response = await apiClient.delete('/api/admin/general/all');
       
       console.log('모든 관리자 계정 삭제 성공 응답:', response.data);
       
-      return {
-        success: true,
-        data: response.data,
-        message: '모든 관리자 계정이 성공적으로 삭제되었습니다.'
-      };
+      return response.data;
     } catch (error) {
       console.error('모든 관리자 계정 삭제 실패:', error);
       
-      return {
-        success: false,
-        message: error.response?.data?.message || '모든 관리자 계정 삭제 중 오류가 발생했습니다.',
-        error: error.response?.data || error.message
-      };
+      // 권한 오류의 경우 에러를 다시 throw
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw error;
+      }
+      
+      throw new Error(error.response?.data?.message || '모든 관리자 계정 삭제 중 오류가 발생했습니다.');
     }
   }
 };

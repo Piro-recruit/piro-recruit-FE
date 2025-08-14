@@ -24,18 +24,24 @@ const AdminManageModal = ({ isOpen, onClose }) => {
       const response = await authService.getAllGeneralAdmins();
       console.log('관리자 계정 조회 성공 응답:', response);
       
-      // API 응답이 배열인지 확인하고 설정
+      // 응답이 직접 배열 형태로 오는 경우
       if (Array.isArray(response)) {
         setAdmins(response);
-      } else if (response && Array.isArray(response.data)) {
-        setAdmins(response.data);
       } else {
         setAdmins([]);
         console.warn('API 응답이 예상된 배열 형태가 아닙니다:', response);
       }
     } catch (err) {
-      setError('관리자 계정 목록을 불러오는데 실패했습니다.');
       console.error('Admin list loading error:', err);
+      
+      if (err.response?.status === 401) {
+        setError('권한이 없습니다. 관리자 계정 조회는 루트 관리자만 가능합니다.');
+      } else if (err.response?.status === 403) {
+        setError('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        setError(err.message || '관리자 계정 목록을 불러오는데 실패했습니다.');
+      }
+      
       setAdmins([]);
     } finally {
       setLoading(false);
@@ -51,12 +57,19 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     setError('');
 
     try {
-      const result = await authService.deleteExpiredAdmins();
-      alert(`${result.deletedCount}개의 만료된 관리자 계정이 삭제되었습니다.`);
+      await authService.deleteExpiredAdmins();
+      alert('만료된 관리자 계정이 삭제되었습니다.');
       await loadAdmins(); // 목록 새로고침
     } catch (err) {
-      setError('만료된 관리자 계정 삭제에 실패했습니다.');
       console.error('Delete expired admins error:', err);
+      
+      if (err.response?.status === 401) {
+        setError('권한이 없습니다. 관리자 계정 삭제는 루트 관리자만 가능합니다.');
+      } else if (err.response?.status === 403) {
+        setError('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        setError(err.message || '만료된 관리자 계정 삭제에 실패했습니다.');
+      }
     } finally {
       setDeleting(false);
     }
@@ -71,12 +84,19 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     setError('');
 
     try {
-      const result = await authService.deleteAllAdmins();
+      await authService.deleteAllAdmins();
       alert('모든 관리자 계정이 삭제되었습니다.');
       await loadAdmins(); // 목록 새로고침
     } catch (err) {
-      setError('모든 관리자 계정 삭제에 실패했습니다.');
       console.error('Delete all admins error:', err);
+      
+      if (err.response?.status === 401) {
+        setError('권한이 없습니다. 관리자 계정 삭제는 루트 관리자만 가능합니다.');
+      } else if (err.response?.status === 403) {
+        setError('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        setError(err.message || '모든 관리자 계정 삭제에 실패했습니다.');
+      }
     } finally {
       setDeletingAll(false);
     }
