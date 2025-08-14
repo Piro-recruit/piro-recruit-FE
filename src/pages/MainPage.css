@@ -124,6 +124,23 @@
   color: var(--color-white);
 }
 
+.email-btn:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.email-success-message {
+  color: var(--color-green-1, #0bec12);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: rgba(11, 236, 18, 0.1);
+  border: 1px solid rgba(11, 236, 18, 0.2);
+}
+
 /* Recruitment Actions */
 .recruitment-actions {
   display: flex;

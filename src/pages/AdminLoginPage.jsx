@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminHeader from '../components/common/AdminHeader';
+import { authService } from '../services/authService';
+import { ROUTES } from '../constants/routes';
 import './AdminLoginPage.css';
 
 const AdminLoginPage = () => {
   const [loginCode, setLoginCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,22 +23,21 @@ const AdminLoginPage = () => {
     }
 
     try {
-      // TODO: API 호출
       console.log('Admin login attempt with code:', loginCode);
       
-      // 임시 로직 - 실제로는 API 응답에 따라 분기
-      if (loginCode === 'root') {
-        // Root admin 로그인
-        alert('Root Admin으로 로그인되었습니다.');
-        // TODO: Navigate to admin dashboard
+      // API 호출
+      const result = await authService.login(loginCode);
+      
+      if (result.success) {
+        console.log('로그인 성공:', result.data);
+        // 로그인 성공 시 RecruitingManagePage로 이동
+        navigate(ROUTES.ADMIN_RECRUITING);
       } else {
-        // 일반 admin 코드 검증
-        alert('Admin으로 로그인되었습니다.');
-        // TODO: Navigate to admin dashboard
+        setError(result.message || '로그인에 실패했습니다.');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('잘못된 로그인 코드입니다.');
+      setError('로그인 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }

@@ -33,6 +33,7 @@ import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants
 import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
+import { mailService } from '../services/mailService';
 import './RecruitingDetailPage.css';
 
 // 평가 폼 컴포넌트
@@ -104,6 +105,26 @@ const RecruitingDetailPage = () => {
     subject: '',
     message: ''
   });
+  const [isEmailSending, setIsEmailSending] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(247); // 초기값
+
+  // 구독자 수 조회
+  const fetchSubscriberCount = async () => {
+    try {
+      const result = await mailService.getSubscriberCount();
+      if (result.success) {
+        setSubscriberCount(result.count);
+      }
+    } catch (error) {
+      console.error('구독자 수 조회 실패:', error);
+    }
+  };
+
+  // 모달이 열릴 때 구독자 수 조회
+  const handleShowEmailModal = () => {
+    setShowEmailModal(true);
+    fetchSubscriberCount();
+  };
 
   // 리쿠르팅 정보 및 지원자 목록 (목업 데이터 사용)
   const recruitingInfo = {
@@ -198,9 +219,6 @@ const RecruitingDetailPage = () => {
     setEditingEvaluation(null);
   };
 
-  const handleShowEmailModal = () => {
-    setShowEmailModal(true);
-  };
 
   const handleCloseEmailModal = () => {
     setShowEmailModal(false);
@@ -217,18 +235,36 @@ const RecruitingDetailPage = () => {
     }));
   };
 
-  const handleSendEmail = () => {
-    // 실제로는 API 호출로 이메일 전송
-    console.log('이메일 전송:', {
-      recruitingId: id,
-      subject: emailContent.subject,
-      message: emailContent.message,
-      recipients: '리쿠르팅 알림 신청자들'
-    });
+  const handleSendEmail = async () => {
+    if (!emailContent.subject.trim() || !emailContent.message.trim()) {
+      alert('제목과 내용을 모두 입력해주세요.');
+      return;
+    }
+
+    setIsEmailSending(true);
     
-    // 성공 후 모달 닫기
-    handleCloseEmailModal();
-    alert('이메일이 성공적으로 전송되었습니다.');
+    try {
+      const result = await mailService.sendBulkEmail({
+        subject: emailContent.subject,
+        content: emailContent.message
+      });
+
+      if (result.success) {
+        alert(result.message || '이메일이 성공적으로 전송되었습니다.');
+        handleCloseEmailModal();
+      } else {
+        alert(result.message || '메일 전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('이메일 전송 중 예상치 못한 오류:', error);
+      alert('메일 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsEmailSending(false);
+    }
+  };
+
+  const handleStatCardClick = (status) => {
+    setStatusFilter(status);
   };
 
   return (
@@ -261,7 +297,10 @@ const RecruitingDetailPage = () => {
           {/* 통계 카드 */}
           <div className="applicant-stats-section">
             <div className="stats-grid">
-              <div className="stat-card">
+              <div 
+                className={`stat-card clickable ${statusFilter === '전체 상태' ? 'active' : ''}`}
+                onClick={() => handleStatCardClick('전체 상태')}
+              >
                 <div className="stat-icon blue">
                   <Users size={24} />
                 </div>
@@ -271,7 +310,10 @@ const RecruitingDetailPage = () => {
                 </div>
               </div>
               
-              <div className="stat-card">
+              <div 
+                className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.REVIEWING ? 'active' : ''}`}
+                onClick={() => handleStatCardClick(APPLICANT_STATUS.REVIEWING)}
+              >
                 <div className="stat-icon yellow">
                   <Clock size={24} />
                 </div>
@@ -281,7 +323,10 @@ const RecruitingDetailPage = () => {
                 </div>
               </div>
               
-              <div className="stat-card">
+              <div 
+                className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.PASSED ? 'active' : ''}`}
+                onClick={() => handleStatCardClick(APPLICANT_STATUS.PASSED)}
+              >
                 <div className="stat-icon green">
                   <CheckCircle size={24} />
                 </div>
@@ -291,7 +336,10 @@ const RecruitingDetailPage = () => {
                 </div>
               </div>
               
-              <div className="stat-card">
+              <div 
+                className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.FAILED ? 'active' : ''}`}
+                onClick={() => handleStatCardClick(APPLICANT_STATUS.FAILED)}
+              >
                 <div className="stat-icon red">
                   <XCircle size={24} />
                 </div>
@@ -571,7 +619,7 @@ const RecruitingDetailPage = () => {
                     <UsersIcon size={20} />
                     <span>수신자 정보</span>
                     </div>
-                    <span className="bulk-count-badge">예상 수신자: 247명</span>
+                    <span className="bulk-count-badge">예상 수신자: {subscriberCount}명</span>
                   </div>
                   <p>이 이메일은 <strong>리쿠르팅 알림을 신청한 모든 사용자</strong>에게 전송됩니다.</p>
                 </div>
@@ -636,10 +684,10 @@ const RecruitingDetailPage = () => {
                 <button 
                   className="email-send-btn" 
                   onClick={handleSendEmail}
-                  disabled={!emailContent.subject.trim() || !emailContent.message.trim()}
+                  disabled={!emailContent.subject.trim() || !emailContent.message.trim() || isEmailSending}
                 >
                   <Send size={16} />
-                  <span>전송하기</span>
+                  <span>{isEmailSending ? '전송 중...' : '전송하기'}</span>
                 </button>
               </div>
             </div>

@@ -3,24 +3,42 @@ import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'luci
 import { useNavigate } from 'react-router-dom';
 import logoImage from '../assets/pirologo.png';
 import { ROUTES } from '../constants/routes';
+import { mailService } from '../services/mailService';
 import './MainPage.css';
 
 const PiroMainPage = () => {
   const [email, setEmail] = useState('');
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [isEmailSubmitting, setIsEmailSubmitting] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
   const navigate = useNavigate();
   
   // 모집 기간 상태 (실제로는 API나 설정에서 가져와야 함)
-  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(true); // 임시로 true로 설정
+  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(false); // 임시로 true로 설정
 
-  const handleEmailSubmit = () => {
-    if (email && email.includes('@')) {
-      // 이메일 알림 신청 로직
-      console.log('Email submitted:', email);
-      alert('알림 신청이 완료되었습니다!');
-      setEmail('');
-    } else {
+  const handleEmailSubmit = async () => {
+    if (!email || !email.includes('@')) {
       alert('올바른 이메일 주소를 입력해주세요.');
+      return;
+    }
+
+    setIsEmailSubmitting(true);
+    setEmailMessage('');
+    
+    try {
+      const result = await mailService.registerSubscriber(email);
+      
+      if (result.success) {
+        setEmailMessage(result.message || '알림 신청이 완료되었습니다!');
+        setEmail('');
+      } else {
+        alert(result.message || '알림 신청 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('구독자 등록 중 예상치 못한 오류:', error);
+      alert('알림 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsEmailSubmitting(false);
     }
   };
 
@@ -106,14 +124,21 @@ const PiroMainPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="메일을 입력해주세요"
                     className="email-input"
+                    disabled={isEmailSubmitting}
                   />
                   <button
                     onClick={handleEmailSubmit}
                     className="email-btn"
+                    disabled={isEmailSubmitting}
                   >
-                    알림받기
+                    {isEmailSubmitting ? '처리중...' : '알림받기'}
                   </button>
                 </div>
+                {emailMessage && (
+                  <p className="email-success-message">
+                    {emailMessage}
+                  </p>
+                )}
               </>
             )}
           </div>
