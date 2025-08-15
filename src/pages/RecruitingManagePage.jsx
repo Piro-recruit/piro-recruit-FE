@@ -193,123 +193,16 @@ const RecruitingManagePage = () => {
     originalData: form
   }));
 
-  // 모의 데이터 (테스트용)
-  const mockRecruitings = [
-    {
-      id: 1,
-      title: '2024년 여름기 신입 개발자 채용',
-      period: '2024.07.01 ~ 2024.07.31',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 127,
-      comments: 3
-    },
-    {
-      id: 2,
-      title: '2024년 여름기 디자이너 채용',
-      period: '2024.06.01 ~ 2024.06.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 0,
-      comments: 2
-    },
-    {
-      id: 3,
-      title: '2024년 상반기 마케터 채용',
-      period: '2024.03.01 ~ 2024.03.31',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 89,
-      comments: 3
-    },
-    {
-      id: 4,
-      title: '2024년 봄학기 백엔드 개발자 채용',
-      period: '2024.04.01 ~ 2024.04.30',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 45,
-      comments: 1
-    },
-    {
-      id: 5,
-      title: '2024년 인턴십 프로그램',
-      period: '2024.02.01 ~ 2024.02.28',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 203,
-      comments: 8
-    },
-    {
-      id: 6,
-      title: '2024년 하반기 프론트엔드 개발자 채용',
-      period: '2024.08.01 ~ 2024.08.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 12,
-      comments: 0
-    },
-    {
-      id: 7,
-      title: '2024년 겨울기 UI/UX 디자이너 채용',
-      period: '2024.12.01 ~ 2024.12.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 0,
-      comments: 0
-    },
-    {
-      id: 8,
-      title: '2024년 데이터 사이언티스트 채용',
-      period: '2024.05.01 ~ 2024.05.31',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 67,
-      comments: 4
-    },
-    {
-      id: 9,
-      title: '2024년 풀스택 개발자 채용',
-      period: '2024.09.01 ~ 2024.09.30',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 89,
-      comments: 6
-    },
-    {
-      id: 10,
-      title: '2024년 모바일 앱 개발자 채용',
-      period: '2024.10.01 ~ 2024.10.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 34,
-      comments: 2
-    },
-    {
-      id: 11,
-      title: '2024년 DevOps 엔지니어 채용',
-      period: '2024.11.01 ~ 2024.11.30',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 23,
-      comments: 1
-    },
-    {
-      id: 12,
-      title: '2024년 QA 엔지니어 채용',
-      period: '2024.01.01 ~ 2024.01.31',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 156,
-      comments: 9
-    }
-  ];
-
-  // 모든 리크루팅 데이터 (구글폼 + 모의 데이터)
-  const allRecruitings = [...googleFormsRecruitings, ...mockRecruitings];
+  // 모든 리쿠르팅 데이터 (구글폼만 사용)
+  const allRecruitings = googleFormsRecruitings;
 
   // 필터링 및 정렬된 데이터
   const filteredRecruitings = useMemo(() => {
+    // 데이터가 로딩 중이거나 없으면 빈 배열 반환
+    if (isLoadingForms || !googleForms.length) {
+      return [];
+    }
+
     let filtered = allRecruitings;
 
     // 검색 필터
@@ -344,7 +237,7 @@ const RecruitingManagePage = () => {
     }
 
     return filtered;
-  }, [searchTerm, statusFilter, sortBy]);
+  }, [searchTerm, statusFilter, sortBy, googleForms, isLoadingForms]);
 
   // 페이지네이션
   const totalPages = Math.ceil(filteredRecruitings.length / itemsPerPage);
@@ -355,11 +248,10 @@ const RecruitingManagePage = () => {
   // 통계 계산
   const stats = useMemo(() => ({
     totalRecruitings: allRecruitings.length,
-    active: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.PENDING).length,
-    recruiting: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.ACTIVE).length,
-    closed: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.INACTIVE).length,
+    active: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.ACTIVE).length,
+    inactive: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.INACTIVE).length,
     totalApplicants: allRecruitings.reduce((sum, r) => sum + r.applicants, 0)
-  }), []);
+  }), [googleForms]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -381,9 +273,6 @@ const RecruitingManagePage = () => {
     switch (filterType) {
       case 'all':
         setStatusFilter('전체 상태');
-        break;
-      case 'pending':
-        setStatusFilter(RECRUITMENT_STATUS.PENDING);
         break;
       case 'active':
         setStatusFilter(RECRUITMENT_STATUS.ACTIVE);
@@ -428,7 +317,6 @@ const RecruitingManagePage = () => {
                 >
                   <option>전체 상태</option>
                   <option>{RECRUITMENT_STATUS.ACTIVE}</option>
-                  <option>{RECRUITMENT_STATUS.PENDING}</option>
                   <option>{RECRUITMENT_STATUS.INACTIVE}</option>
                 </select>
                 <select 
@@ -469,23 +357,13 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             
-            <div className="stat-card clickable" onClick={() => handleStatCardClick('pending')}>
-              <div className="stat-icon yellow">
-                <Clock size={24} />
-              </div>
-              <div className="stat-info">
-                <div className="stat-label">작성중</div>
-                <div className="stat-value">{stats.active}</div>
-              </div>
-            </div>
-            
             <div className="stat-card clickable" onClick={() => handleStatCardClick('active')}>
               <div className="stat-icon green">
                 <CheckCircle size={24} />
               </div>
               <div className="stat-info">
-                <div className="stat-label">모집중</div>
-                <div className="stat-value">{stats.recruiting}</div>
+                <div className="stat-label">활성</div>
+                <div className="stat-value">{stats.active}</div>
               </div>
             </div>
             
@@ -494,8 +372,8 @@ const RecruitingManagePage = () => {
                 <XCircle size={24} />
               </div>
               <div className="stat-info">
-                <div className="stat-label">마감</div>
-                <div className="stat-value">{stats.closed}</div>
+                <div className="stat-label">비활성</div>
+                <div className="stat-value">{stats.inactive}</div>
               </div>
             </div>
             
@@ -518,8 +396,9 @@ const RecruitingManagePage = () => {
           )}
 
           {/* 리쿠르팅 목록 */}
-          <div className="recruiting-list">
-            {currentRecruitings.map((recruiting) => (
+          {!isLoadingForms && (
+            <div className="recruiting-list">
+              {currentRecruitings.map((recruiting) => (
               <div 
                 key={recruiting.id} 
                 className="recruiting-item clickable"
@@ -553,11 +432,12 @@ const RecruitingManagePage = () => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* 페이지네이션 */}
-          {totalPages > 1 && (
+          {!isLoadingForms && totalPages > 1 && (
             <div className="pagination">
               <button 
                 className="pagination-btn prev"
@@ -590,7 +470,13 @@ const RecruitingManagePage = () => {
           )}
 
           {/* 결과 없음 표시 */}
-          {filteredRecruitings.length === 0 && (
+          {!isLoadingForms && filteredRecruitings.length === 0 && googleForms.length === 0 && (
+            <div className="no-results">
+              <p>등록된 리쿠르팅이 없습니다.</p>
+            </div>
+          )}
+          
+          {!isLoadingForms && filteredRecruitings.length === 0 && googleForms.length > 0 && (
             <div className="no-results">
               <p>검색 결과가 없습니다.</p>
             </div>

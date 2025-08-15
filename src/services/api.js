@@ -73,6 +73,17 @@ export const googleFormsAPI = {
     }
   },
 
+  // 활성화된 구글 폼 조회
+  getActiveForms: async () => {
+    try {
+      const response = await apiClient.get('/api/google-forms/active');
+      return response.data;
+    } catch (error) {
+      console.error('활성화된 구글 폼 조회 실패:', error);
+      throw error;
+    }
+  },
+
   // 새 구글 폼 생성
   createForm: async (formData) => {
     try {
