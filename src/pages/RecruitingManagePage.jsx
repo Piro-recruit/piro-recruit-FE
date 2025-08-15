@@ -412,12 +412,7 @@ const RecruitingManagePage = () => {
                 
                 <div className="recruiting-content">
                   <div className="recruiting-header">
-                    <h3 className="recruiting-title">
-                      {recruiting.title}
-                      {recruiting.isGoogleForm && (
-                        <span className="google-form-badge">Google Form</span>
-                      )}
-                    </h3>
+                    <h3 className="recruiting-title">{recruiting.title}</h3>
                     <span className={`status-badge ${recruiting.statusColor}`}>
                       {recruiting.status}
                     </span>
