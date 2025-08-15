@@ -60,4 +60,29 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Google Forms API 함수들
+export const googleFormsAPI = {
+  // 구글 폼 목록 조회
+  getForms: async () => {
+    try {
+      const response = await apiClient.get('/api/google-forms');
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 목록 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 새 구글 폼 생성
+  createForm: async (formData) => {
+    try {
+      const response = await apiClient.post('/api/google-forms', formData);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 생성 실패:', error);
+      throw error;
+    }
+  }
+};
+
 export default apiClient;

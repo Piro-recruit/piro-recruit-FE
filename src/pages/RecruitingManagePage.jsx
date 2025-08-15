@@ -5,7 +5,9 @@ import AdminHeader from '../components/common/AdminHeader';
 import AdminCodeModal from '../components/common/AdminCodeModal';
 import AdminCodeResultModal from '../components/common/AdminCodeResultModal';
 import AdminManageModal from '../components/common/AdminManageModal';
+import CreateRecruitingModal from '../components/common/CreateRecruitingModal';
 import { authService } from '../services/authService';
+import { googleFormsAPI } from '../services/api';
 import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import './RecruitingManagePage.css';
@@ -24,6 +26,10 @@ const RecruitingManagePage = () => {
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [codeGenerationResult, setCodeGenerationResult] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [googleForms, setGoogleForms] = useState([]);
+  const [isLoadingForms, setIsLoadingForms] = useState(false);
 
   const handleRecruitingClick = (recruitingId) => {
     // 추후 구현할 상세 페이지로 이동
@@ -105,8 +111,90 @@ const RecruitingManagePage = () => {
     setIsManageModalOpen(false);
   };
 
-  // 확장된 모의 데이터
-  const allRecruitings = [
+  // 새 리쿠르팅 생성 함수
+  const handleCreateRecruiting = async (formData) => {
+    setIsCreating(true);
+    
+    try {
+      const response = await googleFormsAPI.createForm(formData);
+      
+      if (response.success) {
+        alert('리쿠르팅이 성공적으로 생성되었습니다.');
+        setIsCreateModalOpen(false);
+        // 구글 폼 리스트 업데이트
+        await fetchGoogleForms();
+      } else {
+        alert(response.message || '리쿠르팅 생성 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('리쿠르팅 생성 실패:', error);
+      
+      if (error.response?.status === 401) {
+        alert('권한이 없습니다. 로그인을 확인해주세요.');
+      } else if (error.response?.status === 403) {
+        alert('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        alert('리쿠르팅 생성 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // 새 리쿠르팅 생성 버튼 클릭 핸들러
+  const handleCreateClick = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  // 새 리쿠르팅 생성 모달 닫기 핸들러
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  // 구글 폼 데이터 로드
+  const fetchGoogleForms = async () => {
+    setIsLoadingForms(true);
+    try {
+      const response = await googleFormsAPI.getForms();
+      if (response.success && response.data) {
+        setGoogleForms(response.data);
+      } else {
+        console.error('구글 폼 조회 실패:', response.message);
+        setGoogleForms([]);
+      }
+    } catch (error) {
+      console.error('구글 폼 조회 중 오류:', error);
+      setGoogleForms([]);
+    } finally {
+      setIsLoadingForms(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 구글 폼 데이터 로드
+  useEffect(() => {
+    fetchGoogleForms();
+  }, []);
+
+  // 구글 폼 데이터를 recruitings 형태로 변환
+  const googleFormsRecruitings = googleForms.map((form) => ({
+    id: `form-${form.id}`,
+    title: form.title || '제목 없는 폼',
+    period: form.recruitingStartDate && form.recruitingEndDate 
+      ? `${new Date(form.recruitingStartDate).toLocaleDateString()} ~ ${new Date(form.recruitingEndDate).toLocaleDateString()}`
+      : form.createdAt 
+      ? `${new Date(form.createdAt).toLocaleDateString()} ~ 진행중`
+      : '기간 미정',
+    status: form.isActive ? RECRUITMENT_STATUS.ACTIVE : RECRUITMENT_STATUS.INACTIVE,
+    statusColor: form.isActive ? 'green' : 'red',
+    applicants: form.applicationCount || 0,
+    comments: 0,
+    formId: form.formId,
+    isGoogleForm: true,
+    originalData: form
+  }));
+
+  // 모의 데이터 (테스트용)
+  const mockRecruitings = [
     {
       id: 1,
       title: '2024년 여름기 신입 개발자 채용',
@@ -216,6 +304,9 @@ const RecruitingManagePage = () => {
       comments: 9
     }
   ];
+
+  // 모든 리크루팅 데이터 (구글폼 + 모의 데이터)
+  const allRecruitings = [...googleFormsRecruitings, ...mockRecruitings];
 
   // 필터링 및 정렬된 데이터
   const filteredRecruitings = useMemo(() => {
@@ -359,7 +450,7 @@ const RecruitingManagePage = () => {
                 <Settings size={16} />
                 관리자 관리
               </button>
-              <button className="create-btn">
+              <button className="create-btn" onClick={handleCreateClick}>
                 <Plus size={16} />
                 새 리쿠르팅 생성
               </button>
@@ -419,6 +510,13 @@ const RecruitingManagePage = () => {
             </div>
           </div>
 
+          {/* 로딩 상태 표시 */}
+          {isLoadingForms && (
+            <div className="loading-indicator">
+              <p>구글 폼 데이터를 불러오는 중...</p>
+            </div>
+          )}
+
           {/* 리쿠르팅 목록 */}
           <div className="recruiting-list">
             {currentRecruitings.map((recruiting) => (
@@ -435,7 +533,12 @@ const RecruitingManagePage = () => {
                 
                 <div className="recruiting-content">
                   <div className="recruiting-header">
-                    <h3 className="recruiting-title">{recruiting.title}</h3>
+                    <h3 className="recruiting-title">
+                      {recruiting.title}
+                      {recruiting.isGoogleForm && (
+                        <span className="google-form-badge">Google Form</span>
+                      )}
+                    </h3>
                     <span className={`status-badge ${recruiting.statusColor}`}>
                       {recruiting.status}
                     </span>
@@ -514,6 +617,14 @@ const RecruitingManagePage = () => {
       <AdminManageModal
         isOpen={isManageModalOpen}
         onClose={handleCloseManageModal}
+      />
+
+      {/* 새 리쿠르팅 생성 모달 */}
+      <CreateRecruitingModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onSubmit={handleCreateRecruiting}
+        isLoading={isCreating}
       />
     </div>
   );
