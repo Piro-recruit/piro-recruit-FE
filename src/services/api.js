@@ -219,6 +219,17 @@ export const googleFormsAPI = {
       console.error('기수 업데이트 실패:', error);
       throw error;
     }
+  },
+
+  // 현재 활성화된 기수 조회
+  getCurrentGeneration: async () => {
+    try {
+      const response = await apiClient.get('/api/google-forms/current-generation');
+      return response.data;
+    } catch (error) {
+      console.error('현재 기수 조회 실패:', error);
+      throw error;
+    }
   }
 };
 

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoImage from '../assets/pirologo.png';
 import { ROUTES } from '../constants/routes';
 import { mailService } from '../services/mailService';
+import { googleFormsAPI } from '../services/api';
 import './MainPage.css';
 
 const PiroMainPage = () => {
@@ -11,10 +12,51 @@ const PiroMainPage = () => {
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
+  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(false);
+  const [isLoadingRecruitmentStatus, setIsLoadingRecruitmentStatus] = useState(true);
+  const [activeFormUrl, setActiveFormUrl] = useState('');
   const navigate = useNavigate();
-  
-  // 모집 기간 상태 (실제로는 API나 설정에서 가져와야 함)
-  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(false); // 임시로 true로 설정
+
+  // 리쿠르팅 활성화 상태 확인
+  const fetchRecruitmentStatus = async () => {
+    try {
+      setIsLoadingRecruitmentStatus(true);
+      
+      // 활성화된 구글 폼 조회
+      const activeFormResult = await googleFormsAPI.getActiveForms();
+      
+      if (activeFormResult.success && activeFormResult.data) {
+        setIsRecruitmentPeriod(true);
+        setActiveFormUrl(activeFormResult.data.formUrl);
+        console.log('현재 활성화된 폼:', activeFormResult.data.title);
+        console.log('폼 URL:', activeFormResult.data.formUrl);
+      } else {
+        setIsRecruitmentPeriod(false);
+        setActiveFormUrl('');
+      }
+    } catch (error) {
+      console.error('리쿠르팅 상태 확인 실패:', error);
+      
+      // 404 에러는 활성화된 폼이 없음을 의미
+      if (error.response?.status === 404) {
+        setIsRecruitmentPeriod(false);
+        setActiveFormUrl('');
+        console.log('현재 활성화된 리쿠르팅이 없습니다.');
+      } else {
+        // 다른 에러의 경우 기본값(false) 유지
+        setIsRecruitmentPeriod(false);
+        setActiveFormUrl('');
+        console.error('리쿠르팅 상태 확인 중 오류:', error.message);
+      }
+    } finally {
+      setIsLoadingRecruitmentStatus(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 리쿠르팅 상태 확인
+  useEffect(() => {
+    fetchRecruitmentStatus();
+  }, []);
 
   const handleEmailSubmit = async () => {
     if (!email || !email.includes('@')) {
@@ -43,7 +85,13 @@ const PiroMainPage = () => {
   };
 
   const handleApply = () => {
-    navigate(ROUTES.APPLICATION);
+    if (activeFormUrl) {
+      // 활성화된 구글 폼 URL로 리다이렉트
+      window.open(activeFormUrl, '_blank');
+    } else {
+      // 폴백: 기존 지원 페이지로 이동
+      navigate(ROUTES.APPLICATION);
+    }
   };
 
   const handleCheckApplication = () => {
@@ -88,7 +136,14 @@ const PiroMainPage = () => {
 
         <section className="hero">
           <div className="hero-content">
-            {isRecruitmentPeriod ? (
+            {isLoadingRecruitmentStatus ? (
+              <div className="loading-status">
+                <p className="hero-subtitle">
+                  모집 상태를 확인 중입니다...
+                </p>
+                <div className="loading-spinner">⏳</div>
+              </div>
+            ) : isRecruitmentPeriod ? (
               <>
                 <p className="hero-subtitle">
                   현재 <span className="highlight">모집</span> 중입니다.<br/>
