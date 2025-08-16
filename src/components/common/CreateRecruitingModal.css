@@ -233,3 +233,14 @@
     width: 100%;
   }
 }
+
+/* 숫자 입력 필드의 스피너 제거 */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
