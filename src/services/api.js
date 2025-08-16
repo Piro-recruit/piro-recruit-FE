@@ -147,6 +147,78 @@ export const googleFormsAPI = {
       console.error('구글 폼 조회 실패:', error);
       throw error;
     }
+  },
+
+  // 구글 폼 활성화
+  activateForm: async (id) => {
+    try {
+      const response = await apiClient.put(`/api/google-forms/${id}/activate`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 활성화 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼 비활성화
+  deactivateForm: async (id) => {
+    try {
+      const response = await apiClient.put(`/api/google-forms/${id}/deactivate`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 비활성화 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼 삭제
+  deleteForm: async (id) => {
+    try {
+      const response = await apiClient.delete(`/api/google-forms/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 삭제 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼 URL 업데이트
+  updateFormUrl: async (id, formUrl) => {
+    try {
+      const response = await apiClient.put(`/api/google-forms/${id}/form-url`, {
+        formUrl: formUrl
+      });
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 URL 업데이트 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 시트 URL 업데이트
+  updateSheetUrl: async (id, sheetUrl) => {
+    try {
+      const response = await apiClient.put(`/api/google-forms/${id}/sheet-url`, {
+        sheetUrl: sheetUrl
+      });
+      return response.data;
+    } catch (error) {
+      console.error('구글 시트 URL 업데이트 실패:', error);
+      throw error;
+    }
+  },
+
+  // 기수 업데이트
+  updateGeneration: async (id, generation) => {
+    try {
+      const response = await apiClient.put(`/api/google-forms/${id}/generation`, {
+        generation: parseInt(generation, 10)
+      });
+      return response.data;
+    } catch (error) {
+      console.error('기수 업데이트 실패:', error);
+      throw error;
+    }
   }
 };
 

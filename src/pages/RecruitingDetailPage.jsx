@@ -36,6 +36,15 @@ const RecruitingDetailPage = () => {
   const [subscriberCount, setSubscriberCount] = useState(247);
   const [isCSVExporting, setIsCSVExporting] = useState(false);
   
+  // 리쿠르팅 관리 상태
+  const [isToggling, setIsToggling] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showRecruitingDetails, setShowRecruitingDetails] = useState(false);
+  const [editingField, setEditingField] = useState(null);
+  const [editingValue, setEditingValue] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+  
   // API 데이터 상태
   const [recruitingInfo, setRecruitingInfo] = useState(null);
   const [allApplicants, setAllApplicants] = useState([]);
@@ -84,6 +93,7 @@ const RecruitingDetailPage = () => {
           statusColor: formData.isActive ? 'green' : 'red',
           formId: formData.formId,
           formUrl: formData.formUrl,
+          sheetUrl: formData.sheetUrl,
           description: formData.description,
           generation: formData.generation
         });
@@ -455,6 +465,154 @@ const RecruitingDetailPage = () => {
     }
   };
 
+  // 리쿠르팅 활성화/비활성화 토글 핸들러
+  const handleToggleActivation = async () => {
+    if (!recruitingInfo?.id || isToggling) return;
+
+    setIsToggling(true);
+    
+    try {
+      const isCurrentlyActive = recruitingInfo.status === '활성';
+      let result;
+
+      if (isCurrentlyActive) {
+        // 비활성화
+        result = await googleFormsAPI.deactivateForm(recruitingInfo.id);
+      } else {
+        // 활성화
+        result = await googleFormsAPI.activateForm(recruitingInfo.id);
+      }
+
+      if (result.success) {
+        // 성공적으로 토글되었으면 리쿠르팅 정보 새로고침
+        await fetchRecruitingInfo();
+        
+        const newStatus = isCurrentlyActive ? '비활성화' : '활성화';
+        alert(`리쿠르팅이 성공적으로 ${newStatus}되었습니다.`);
+      } else {
+        alert(result.message || '상태 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('활성화/비활성화 실패:', error);
+      
+      if (error.response?.status === 400) {
+        alert('활성화된 리쿠르팅은 삭제할 수 없습니다.');
+      } else if (error.response?.status === 404) {
+        alert('리쿠르팅을 찾을 수 없습니다.');
+      } else {
+        alert(error.response?.data?.message || '상태 변경 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
+  // 삭제 모달 표시
+  const handleShowDeleteModal = () => {
+    if (recruitingInfo.status === '활성') {
+      alert('활성화된 리쿠르팅은 삭제할 수 없습니다. 먼저 비활성화해주세요.');
+      return;
+    }
+    setShowDeleteModal(true);
+  };
+
+  // 삭제 모달 닫기
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
+  // 리쿠르팅 삭제 확인 핸들러
+  const handleConfirmDelete = async () => {
+    if (!recruitingInfo?.id || isDeleting) return;
+
+    setIsDeleting(true);
+    
+    try {
+      const result = await googleFormsAPI.deleteForm(recruitingInfo.id);
+      
+      if (result.success) {
+        alert('리쿠르팅이 성공적으로 삭제되었습니다.');
+        // 삭제 후 목록 페이지로 이동
+        navigate(ROUTES.ADMIN_RECRUITING);
+      } else {
+        alert(result.message || '삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('삭제 실패:', error);
+      
+      if (error.response?.status === 400) {
+        alert('활성화된 리쿠르팅은 삭제할 수 없습니다.');
+      } else if (error.response?.status === 404) {
+        alert('삭제할 리쿠르팅을 찾을 수 없습니다.');
+      } else {
+        alert(error.response?.data?.message || '삭제 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  // 편집 시작
+  const handleStartEdit = (field, currentValue) => {
+    setEditingField(field);
+    setEditingValue(currentValue || '');
+  };
+
+  // 편집 취소
+  const handleCancelFieldEdit = () => {
+    setEditingField(null);
+    setEditingValue('');
+  };
+
+  // 편집 저장
+  const handleSaveEdit = async () => {
+    if (!editingField || !recruitingInfo?.id || isUpdating) return;
+
+    setIsUpdating(true);
+    
+    try {
+      let result;
+      
+      switch (editingField) {
+        case 'formUrl':
+          result = await googleFormsAPI.updateFormUrl(recruitingInfo.id, editingValue);
+          break;
+        case 'sheetUrl':
+          result = await googleFormsAPI.updateSheetUrl(recruitingInfo.id, editingValue);
+          break;
+        case 'generation':
+          result = await googleFormsAPI.updateGeneration(recruitingInfo.id, editingValue);
+          break;
+        default:
+          alert('지원하지 않는 필드입니다.');
+          return;
+      }
+
+      if (result.success) {
+        // 성공적으로 업데이트되었으면 리쿠르팅 정보 새로고침
+        await fetchRecruitingInfo();
+        alert('성공적으로 업데이트되었습니다.');
+        setEditingField(null);
+        setEditingValue('');
+      } else {
+        alert(result.message || '업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('업데이트 실패:', error);
+      
+      if (error.response?.status === 400) {
+        alert('잘못된 형식입니다. 올바른 값을 입력해주세요.');
+      } else if (error.response?.status === 404) {
+        alert('리쿠르팅을 찾을 수 없습니다.');
+      } else {
+        alert(error.response?.data?.message || '업데이트 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // 에러 상태 처리
   if (error || (!isLoadingRecruiting && !recruitingInfo)) {
     return (
@@ -514,6 +672,228 @@ const RecruitingDetailPage = () => {
                     일괄 이메일 전송
                   </button>
                 </div>
+              </div>
+
+              {/* 리쿠르팅 정보 및 관리 */}
+              <div className="recruiting-overview-section">
+                <div className="overview-header">
+                  <h2 className="section-title">리쿠르팅 설정</h2>
+                  <button 
+                    className="details-toggle-btn"
+                    onClick={() => setShowRecruitingDetails(!showRecruitingDetails)}
+                  >
+                    {showRecruitingDetails ? '닫기' : '정보 및 관리'}
+                  </button>
+                </div>
+
+                {/* 정보 및 관리 토글 영역 */}
+                {showRecruitingDetails && (
+                  <div className="recruiting-details-area">
+                    {/* 상세 정보 */}
+                    <div className="info-section">
+                      <h3 className="subsection-title">리쿠르팅 정보</h3>
+                      <div className="recruiting-info-grid">
+                        <div className="info-item">
+                          <span className="info-label">기수</span>
+                          {editingField === 'generation' ? (
+                            <div className="edit-field">
+                              <input
+                                type="number"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                className="edit-input"
+                                min="1"
+                                disabled={isUpdating}
+                              />
+                              <div className="edit-actions">
+                                <button 
+                                  className="save-btn"
+                                  onClick={handleSaveEdit}
+                                  disabled={isUpdating}
+                                >
+                                  {isUpdating ? '저장 중...' : '저장'}
+                                </button>
+                                <button 
+                                  className="cancel-btn"
+                                  onClick={handleCancelFieldEdit}
+                                  disabled={isUpdating}
+                                >
+                                  취소
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <span 
+                              className="info-value editable"
+                              onClick={() => handleStartEdit('generation', recruitingInfo.generation)}
+                              title="클릭하여 편집"
+                            >
+                              {recruitingInfo.generation}기
+                            </span>
+                          )}
+                        </div>
+                        <div className="info-item">
+                          <span className="info-label">폼 ID</span>
+                          <span className="info-value">{recruitingInfo.formId}</span>
+                        </div>
+                        <div className="info-item">
+                          <span className="info-label">상태</span>
+                          <span className={`info-value status-${recruitingInfo.statusColor}`}>
+                            {recruitingInfo.status}
+                          </span>
+                        </div>
+                        <div className="info-item">
+                          <span className="info-label">지원자 수</span>
+                          <span className="info-value">{allApplicants.length}명</span>
+                        </div>
+                        {recruitingInfo.description && (
+                          <div className="info-item full-width">
+                            <span className="info-label">설명</span>
+                            <span className="info-value">{recruitingInfo.description}</span>
+                          </div>
+                        )}
+                        <div className="info-item full-width">
+                          <span className="info-label">구글 폼 URL</span>
+                          {editingField === 'formUrl' ? (
+                            <div className="edit-field">
+                              <input
+                                type="url"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                className="edit-input"
+                                placeholder="https://forms.google.com/..."
+                                disabled={isUpdating}
+                              />
+                              <div className="edit-actions">
+                                <button 
+                                  className="save-btn"
+                                  onClick={handleSaveEdit}
+                                  disabled={isUpdating}
+                                >
+                                  {isUpdating ? '저장 중...' : '저장'}
+                                </button>
+                                <button 
+                                  className="cancel-btn"
+                                  onClick={handleCancelFieldEdit}
+                                  disabled={isUpdating}
+                                >
+                                  취소
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="url-field">
+                              <a href={recruitingInfo.formUrl} target="_blank" rel="noopener noreferrer" className="form-url-link">
+                                {recruitingInfo.formUrl}
+                              </a>
+                              <button 
+                                className="edit-url-btn"
+                                onClick={() => handleStartEdit('formUrl', recruitingInfo.formUrl)}
+                                title="클릭하여 편집"
+                              >
+                                편집
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <div className="info-item full-width">
+                          <span className="info-label">구글 시트 URL</span>
+                          {editingField === 'sheetUrl' ? (
+                            <div className="edit-field">
+                              <input
+                                type="url"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                className="edit-input"
+                                placeholder="https://docs.google.com/spreadsheets/..."
+                                disabled={isUpdating}
+                              />
+                              <div className="edit-actions">
+                                <button 
+                                  className="save-btn"
+                                  onClick={handleSaveEdit}
+                                  disabled={isUpdating}
+                                >
+                                  {isUpdating ? '저장 중...' : '저장'}
+                                </button>
+                                <button 
+                                  className="cancel-btn"
+                                  onClick={handleCancelFieldEdit}
+                                  disabled={isUpdating}
+                                >
+                                  취소
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="url-field">
+                              {recruitingInfo.sheetUrl ? (
+                                <a href={recruitingInfo.sheetUrl} target="_blank" rel="noopener noreferrer" className="form-url-link">
+                                  {recruitingInfo.sheetUrl}
+                                </a>
+                              ) : (
+                                <span className="no-url">시트 URL이 설정되지 않음</span>
+                              )}
+                              <button 
+                                className="edit-url-btn"
+                                onClick={() => handleStartEdit('sheetUrl', recruitingInfo.sheetUrl || '')}
+                                title="클릭하여 편집"
+                              >
+                                {recruitingInfo.sheetUrl ? '편집' : '추가'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 관리 기능 */}
+                    <div className="management-section">
+                      <h3 className="subsection-title">리쿠르팅 관리</h3>
+                      <div className="management-actions">
+                        <div className="toggle-section">
+                          <div className="toggle-info">
+                            <span className="toggle-label">활성화 상태</span>
+                            <span className="toggle-description">
+                              {recruitingInfo.status === '활성' 
+                                ? '현재 활성화된 리쿠르팅입니다. 비활성화하면 지원을 받을 수 없습니다.'
+                                : '현재 비활성화된 리쿠르팅입니다. 활성화하면 다른 활성 리쿠르팅이 자동으로 비활성화됩니다.'
+                              }
+                            </span>
+                          </div>
+                          <label className="toggle-switch">
+                            <input
+                              type="checkbox"
+                              checked={recruitingInfo.status === '활성'}
+                              onChange={handleToggleActivation}
+                              disabled={isToggling}
+                            />
+                            <span className="toggle-slider"></span>
+                          </label>
+                        </div>
+                        
+                        <div className="delete-section">
+                          <div className="delete-info">
+                            <span className="delete-label">리쿠르팅 삭제</span>
+                            <span className="delete-description">
+                              {recruitingInfo.status === '활성'
+                                ? '활성화된 리쿠르팅은 삭제할 수 없습니다. 먼저 비활성화해주세요.'
+                                : '리쿠르팅을 삭제하면 복구할 수 없습니다. 신중하게 결정해주세요.'
+                              }
+                            </span>
+                          </div>
+                          <button 
+                            className="delete-recruiting-btn"
+                            disabled={recruitingInfo.status === '활성' || isDeleting}
+                            onClick={handleShowDeleteModal}
+                          >
+                            {isDeleting ? '삭제 중...' : '리쿠르팅 삭제'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 통계 카드 */}
@@ -655,6 +1035,41 @@ const RecruitingDetailPage = () => {
         selectedApplicant={selectedApplicant}
         onClose={handleCloseModal}
       />
+
+      {/* 삭제 확인 모달 */}
+      {showDeleteModal && (
+        <div className="delete-modal-overlay">
+          <div className="delete-modal-container">
+            <div className="delete-modal-header">
+              <h3 className="delete-modal-title">리쿠르팅 삭제 확인</h3>
+            </div>
+            <div className="delete-modal-content">
+              <p className="delete-modal-message">
+                <strong>"{recruitingInfo?.title}"</strong> 리쿠르팅을 정말 삭제하시겠습니까?
+              </p>
+              <p className="delete-modal-warning">
+                이 작업은 되돌릴 수 없으며, 관련된 모든 데이터가 영구적으로 삭제됩니다.
+              </p>
+            </div>
+            <div className="delete-modal-actions">
+              <button
+                className="delete-modal-cancel-btn"
+                onClick={handleCloseDeleteModal}
+                disabled={isDeleting}
+              >
+                취소
+              </button>
+              <button
+                className="delete-modal-confirm-btn"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
