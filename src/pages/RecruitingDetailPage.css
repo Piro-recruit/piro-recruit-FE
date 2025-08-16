@@ -382,8 +382,10 @@
 }
 
 .applicant-university,
+.applicant-department,
+.applicant-grade,
 .applicant-major,
-.applicant-demographics {
+.applicant-major-status {
   display: flex;
   align-items: center;
   gap: 0.375rem;

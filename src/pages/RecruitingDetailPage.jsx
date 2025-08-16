@@ -216,15 +216,19 @@ const RecruitingDetailPage = () => {
             ...formData // 추가 질문들 (각오, 경력 등)
           };
           
+          console.log('API 데이터:', app);
+          console.log('app.major 값:', app.major);
+          
           return {
             id: app.id,
             name: app.applicantName || '이름 없음',
             email: app.applicantEmail || '이메일 없음',
             university: app.school || 'Unknown',
-            major: `${app.department || 'Unknown'} (${app.grade || 'Unknown'})`,
-            age: 'Unknown', // API에 나이 정보 없음
-            gender: 'Unknown', // API에 성별 정보 없음
-            appliedDate: app.submissionTimestamp ? new Date(app.submissionTimestamp).toLocaleDateString() : '날짜 없음',
+            department: app.department || 'Unknown', // 학과
+            grade: app.grade || 'Unknown', // 학년
+            major: `${app.department || 'Unknown'} (${app.grade || 'Unknown'})`, // 기존 호환성을 위해 유지
+            majorStatus: app.major || 'Unknown', // 전공자 여부
+            appliedDate: app.updatedAt ? new Date(app.updatedAt).toLocaleDateString() : '날짜 없음',
             // API status를 UI status로 매핑
             status: app.status === 'COMPLETED' ? APPLICANT_STATUS.REVIEWING : 
                    app.status === 'PENDING' ? APPLICANT_STATUS.REVIEWING :
@@ -258,7 +262,10 @@ const RecruitingDetailPage = () => {
         });
         
         console.log('변환된 지원자 수:', transformedApplicants.length);
-        console.log('변환된 첫 번째 지원자:', transformedApplicants[0]);
+        if (transformedApplicants.length > 0) {
+          console.log('변환된 첫 번째 지원자:', transformedApplicants[0]);
+          console.log('첫 번째 지원자 majorStatus:', transformedApplicants[0].majorStatus);
+        }
         setAllApplicants(transformedApplicants);
         console.log('setAllApplicants 완료');
       } else {
@@ -621,13 +628,17 @@ const RecruitingDetailPage = () => {
                               <MapPin size={14} />
                               {applicant.university}
                             </span>
-                            <span className="applicant-major">
+                            <span className="applicant-department">
                               <GraduationCap size={14} />
-                              {applicant.major}
+                              {applicant.department}
                             </span>
-                            <span className="applicant-demographics">
+                            <span className="applicant-grade">
+                              <Users size={14} />
+                              {applicant.grade}
+                            </span>
+                            <span className="applicant-major-status">
                               <Users2 size={14} />
-                              {applicant.age}세·{applicant.gender}
+                              {applicant.majorStatus}
                             </span>
                           </div>
                         </div>
@@ -917,12 +928,8 @@ const RecruitingDetailPage = () => {
                     <span className="info-value">{selectedApplicant.major}</span>
                   </div>
                   <div className="info-row">
-                    <span className="info-label">나이:</span>
-                    <span className="info-value">{selectedApplicant.age}세</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">성별:</span>
-                    <span className="info-value">{selectedApplicant.gender}</span>
+                    <span className="info-label">전공자 여부:</span>
+                    <span className="info-value">{selectedApplicant.majorStatus}</span>
                   </div>
                 </div>
 
@@ -937,16 +944,6 @@ const RecruitingDetailPage = () => {
                   ))}
                 </div>
 
-                {selectedApplicant.skills && (
-                  <div className="question-section">
-                    <h3 className="question-title">기술 스택</h3>
-                    <div className="skills-display">
-                      {selectedApplicant.skills.map((skill, index) => (
-                        <span key={index} className="skill-tag">{skill}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {selectedApplicant.portfolio && (
                   <div className="question-section">
