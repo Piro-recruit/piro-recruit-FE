@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Search, Calendar, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Calendar, Mail, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
 import StatsSection from '../components/recruiting/StatsSection';
 import ApplicantCard from '../components/recruiting/ApplicantCard';
@@ -11,7 +11,8 @@ import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
-import { googleFormsAPI, applicationsAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI, integrationAPI } from '../services/api';
+import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
 import './RecruitingDetailPage.css';
 
 
@@ -33,6 +34,7 @@ const RecruitingDetailPage = () => {
   });
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(247);
+  const [isCSVExporting, setIsCSVExporting] = useState(false);
   
   // API 데이터 상태
   const [recruitingInfo, setRecruitingInfo] = useState(null);
@@ -361,6 +363,98 @@ const RecruitingDetailPage = () => {
     setStatusFilter(status);
   };
 
+  // CSV 내보내기 핸들러
+  const handleCSVExport = async () => {
+    if (!recruitingInfo?.id) {
+      alert('구글 폼 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    // 토큰 확인
+    const token = localStorage.getItem('accessToken');
+    const expiresIn = localStorage.getItem('expiresIn');
+    console.log('현재 저장된 토큰:', token ? '토큰 존재' : '토큰 없음');
+    console.log('만료 시간:', expiresIn);
+    console.log('현재 시간:', new Date().getTime());
+    
+    if (!token) {
+      alert('로그인이 필요합니다. 다시 로그인해주세요.');
+      return;
+    }
+
+    // 토큰 만료 확인 (expiresIn이 초 단위일 경우 밀리초로 변환)
+    if (expiresIn) {
+      const expiresInMs = parseInt(expiresIn) * 1000; // 초를 밀리초로 변환
+      const currentTime = new Date().getTime();
+      console.log('만료 시간 (밀리초):', expiresInMs);
+      console.log('현재 시간 (밀리초):', currentTime);
+      console.log('토큰 유효 여부:', currentTime < expiresInMs);
+      
+      if (currentTime > expiresInMs) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken'); 
+        localStorage.removeItem('expiresIn');
+        window.location.href = '/admin';
+        return;
+      }
+    }
+
+    // 토큰이 유효한지 다른 API로 테스트
+    try {
+      console.log('토큰 유효성 테스트 - 구글폼 목록 조회');
+      const testResult = await googleFormsAPI.getForms();
+      console.log('토큰 유효성 테스트 성공:', testResult?.success);
+    } catch (testError) {
+      console.error('토큰 유효성 테스트 실패:', testError);
+      if (testError.response?.status === 401) {
+        alert('토큰이 만료되었습니다. 다시 로그인해주세요.');
+        return;
+      }
+    }
+
+    setIsCSVExporting(true);
+    
+    try {
+      console.log('CSV 내보내기 시작 - googleFormId:', recruitingInfo.id);
+      console.log('Google Form 문자열 ID:', recruitingInfo.formId);
+      console.log('현재 지원자 수:', allApplicants.length);
+      
+      // 우선 테스트로 현재 필터된 지원자 데이터를 CSV로 변환
+      if (allApplicants.length === 0) {
+        alert('내보낼 지원자 데이터가 없습니다.');
+        return;
+      }
+      
+      const csvDownloader = createCSVDownloader(
+        integrationAPI.exportApplicantsCSV,
+        generateApplicantsCSVFilename(recruitingInfo.id)
+      );
+      
+      const result = await csvDownloader.download(recruitingInfo.id);
+      
+      if (result.success) {
+        console.log(`CSV 파일이 다운로드되었습니다: ${result.filename}`);
+      }
+    } catch (error) {
+      console.error('CSV 내보내기 실패:', error);
+      console.error('에러 상세:', error.response?.data);
+      
+      // 상세한 에러 메시지 표시
+      if (error.response?.status === 401) {
+        alert('인증이 만료되었습니다. 다시 로그인해주세요.');
+      } else if (error.response?.status === 403) {
+        alert('CSV 내보내기 권한이 없습니다.');
+      } else if (error.response?.status === 404) {
+        alert('CSV 내보내기 API를 찾을 수 없습니다. 백엔드 구현을 확인해주세요.');
+      } else {
+        alert(error.message || 'CSV 내보내기 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsCSVExporting(false);
+    }
+  };
+
   // 에러 상태 처리
   if (error || (!isLoadingRecruiting && !recruitingInfo)) {
     return (
@@ -410,10 +504,16 @@ const RecruitingDetailPage = () => {
                     </span>
                   </div>
                 </div>
-                <button className="bulk-email-btn" onClick={handleShowEmailModal}>
-                  <Mail size={20} />
-                  일괄 이메일 전송
-                </button>
+                <div className="action-buttons">
+                  <button className="csv-export-btn" onClick={handleCSVExport} disabled={isCSVExporting}>
+                    <Download size={20} />
+                    {isCSVExporting ? 'CSV 내보내는 중...' : 'CSV 내보내기'}
+                  </button>
+                  <button className="bulk-email-btn" onClick={handleShowEmailModal}>
+                    <Mail size={20} />
+                    일괄 이메일 전송
+                  </button>
+                </div>
               </div>
 
               {/* 통계 카드 */}

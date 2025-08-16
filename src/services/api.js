@@ -19,11 +19,22 @@ apiClient.interceptors.request.use(
     if (config.url !== '/api/admin/login' && config.url !== '/api/admin/token/exchange') {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        // Authorization 헤더가 없는 경우에만 추가 (중복 방지)
+        if (!config.headers.Authorization) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        console.log('토큰 추가됨:', token.substring(0, 20) + '...');
+        console.log('최종 Authorization 헤더:', config.headers.Authorization.substring(0, 30) + '...');
+      } else {
+        console.log('토큰이 없음');
       }
     }
     console.log('API 요청:', config.method?.toUpperCase(), config.url);
-    console.log('요청 헤더:', config.headers);
+    console.log('요청 헤더들:', {
+      'Authorization': config.headers.Authorization ? '있음' : '없음',
+      'Accept': config.headers.Accept,
+      'Content-Type': config.headers['Content-Type']
+    });
     return config;
   },
   (error) => {
@@ -36,21 +47,53 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     console.log('API 응답 성공:', response.status, response.config.url);
+    console.log('응답 타입:', response.config.responseType);
     return response;
   },
-  (error) => {
-    console.error('API 응답 에러:', error.response?.status, error.response?.data);
+  async (error) => {
+    console.error('API 응답 에러:', error.response?.status);
+    console.error('요청 URL:', error.config?.url);
+    console.error('요청 헤더:', error.config?.headers);
+    
+    // Blob 응답인 경우 에러 내용 읽기
+    if (error.response?.data instanceof Blob) {
+      try {
+        const errorText = await error.response.data.text();
+        console.error('Blob 에러 내용:', errorText);
+        
+        // JSON 형태라면 파싱 시도
+        try {
+          const errorJson = JSON.parse(errorText);
+          console.error('파싱된 에러 JSON:', errorJson);
+          error.response.data = errorJson;
+        } catch (jsonError) {
+          console.error('JSON 파싱 실패, 텍스트로 유지:', errorText);
+          error.response.data = { message: errorText };
+        }
+      } catch (blobError) {
+        console.error('Blob 읽기 실패:', blobError);
+      }
+    } else {
+      console.error('일반 에러 응답:', error.response?.data);
+    }
     
     // 공통 에러 처리
     if (error.response?.status === 401) {
       // 인증 에러 처리 - 토큰 만료 또는 잘못된 토큰
-      console.log('인증 에러 - 로그인이 필요합니다.');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('expiresIn');
-      // 로그인 페이지로 리다이렉트 (필요시)
-      if (window.location.pathname !== '/admin') {
-        window.location.href = '/admin';
+      console.log('401 인증 에러 발생');
+      console.log('현재 토큰:', localStorage.getItem('accessToken') ? '존재' : '없음');
+      
+      // CSV 내보내기는 별도 처리하고 자동 로그아웃하지 않음
+      const isCSVExport = error.config?.url?.includes('/api/integration/export');
+      
+      if (!isCSVExport) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('expiresIn');
+        // 로그인 페이지로 리다이렉트 (필요시)
+        if (window.location.pathname !== '/admin') {
+          window.location.href = '/admin';
+        }
       }
     } else if (error.response?.status === 500) {
       console.log('서버 내부 에러가 발생했습니다.');
@@ -171,6 +214,90 @@ export const applicationsAPI = {
       return response.data;
     } catch (error) {
       console.error('구글 폼별 통계 조회 실패:', error);
+      throw error;
+    }
+  }
+};
+
+// Integration API 함수들 (CSV 내보내기)
+export const integrationAPI = {
+  // 지원자 CSV 내보내기
+  exportApplicantsCSV: async (googleFormId) => {
+    try {
+      const url = googleFormId 
+        ? `/api/integration/export/applicants/csv?googleFormId=${googleFormId}`
+        : '/api/integration/export/applicants/csv';
+      
+      console.log('CSV API 호출 URL:', url);
+      
+      const response = await apiClient.get(url, {
+        responseType: 'blob',
+        headers: {
+          'Accept': 'text/csv, application/octet-stream, */*'
+        }
+      });
+      
+      return {
+        success: true,
+        data: response.data,
+        headers: response.headers
+      };
+    } catch (error) {
+      console.error('지원자 CSV 내보내기 실패:', error);
+      console.error('에러 응답:', error.response?.data);
+      console.error('에러 상태:', error.response?.status);
+      console.error('요청 헤더:', error.config?.headers);
+      throw error;
+    }
+  },
+
+  // 지원자 CSV 미리보기
+  previewApplicantsCSV: async (googleFormId, limit = 10) => {
+    try {
+      const params = new URLSearchParams();
+      if (googleFormId) params.append('googleFormId', googleFormId);
+      params.append('limit', limit.toString());
+      
+      const response = await apiClient.get(`/api/integration/preview/applicants?${params}`);
+      return response.data;
+    } catch (error) {
+      console.error('지원자 CSV 미리보기 실패:', error);
+      throw error;
+    }
+  },
+
+  // CSV 내보내기 통계
+  getExportStatistics: async (googleFormId) => {
+    try {
+      const url = googleFormId 
+        ? `/api/integration/export/statistics?googleFormId=${googleFormId}`
+        : '/api/integration/export/statistics';
+      
+      const response = await apiClient.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('CSV 내보내기 통계 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // Admin 코드 CSV 내보내기
+  exportAdminsCSV: async () => {
+    try {
+      const response = await apiClient.get('/api/integration/export/admins/csv', {
+        responseType: 'blob',
+        headers: {
+          'Accept': 'text/csv'
+        }
+      });
+      
+      return {
+        success: true,
+        data: response.data,
+        headers: response.headers
+      };
+    } catch (error) {
+      console.error('관리자 CSV 내보내기 실패:', error);
       throw error;
     }
   }
