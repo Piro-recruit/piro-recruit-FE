@@ -168,21 +168,9 @@
 }
 
 .apply-btn.primary:hover {
-  background-color: var(--color-green-1);
+  background-color: var(--color-green-2);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(11, 236, 18, 0.3);
-}
-
-.apply-btn.secondary {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.apply-btn.secondary:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
 }
 
 /* Categories Section */

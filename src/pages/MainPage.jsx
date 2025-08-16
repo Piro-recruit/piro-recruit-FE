@@ -94,12 +94,6 @@ const PiroMainPage = () => {
     }
   };
 
-  const handleCheckApplication = () => {
-    // 지원서 확인 및 수정 페이지로 이동 (추후 구현)
-    alert('지원서 확인 및 수정 기능은 추후 구현됩니다.');
-  };
-
-
   const toggleFaq = (id) => {
     setExpandedFaq(expandedFaq === id ? null : id);
   };
@@ -156,12 +150,6 @@ const PiroMainPage = () => {
                     className="apply-btn primary"
                   >
                     지원하기
-                  </button>
-                  <button
-                    onClick={handleCheckApplication}
-                    className="apply-btn secondary"
-                  >
-                    지원기록 조회하기
                   </button>
                 </div>
               </>
