@@ -8,8 +8,8 @@
   font-family: var(--font-family);
 }
 
-/* Header */
-.header {
+/* MainPage Header */
+.main-header {
   background: linear-gradient(to top, transparent 0%, var(--color-black) 100%);
   padding: 1rem 1.5rem;
   box-shadow: none;
@@ -23,7 +23,7 @@
   align-items: center;
 }
 
-.logo {
+.main-logo {
   display: flex;
   align-items: center;
 }

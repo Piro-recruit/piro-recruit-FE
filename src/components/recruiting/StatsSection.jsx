@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, Clock, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { APPLICANT_STATUS } from '../../constants/recruitment';
+import './StatsSection.css';
 
 const StatsSection = ({ stats, statusFilter, onStatCardClick }) => {
   return (

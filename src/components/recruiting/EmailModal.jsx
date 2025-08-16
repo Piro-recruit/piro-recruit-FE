@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Send, Users as UsersIcon, Type, MessageCircle } from 'lucide-react';
+import './EmailModal.css';
 
 const EmailModal = ({ 
   isOpen, 

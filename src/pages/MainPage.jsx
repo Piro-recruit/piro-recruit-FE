@@ -58,9 +58,9 @@ const PiroMainPage = () => {
 
   return (
       <div className="piro-main">
-        <header className="header">
+        <header className="main-header">
           <nav className="nav">
-            <div className="logo">
+            <div className="main-logo">
               <a href={ROUTES.PIROGRAMMING.HOME}>
                 <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
               </a>

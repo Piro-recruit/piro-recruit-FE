@@ -1,4 +1,5 @@
 import React from 'react';
+import './ApplicantModal.css';
 
 const ApplicantModal = ({ selectedApplicant, onClose }) => {
   if (!selectedApplicant) return null;
