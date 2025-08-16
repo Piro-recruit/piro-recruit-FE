@@ -1,33 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Filter, 
-  Users, 
-  Calendar, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  User,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-  Star,
-  MapPin,
-  GraduationCap,
-  Users2,
-  Mail,
-  Send,
-  Users as UsersIcon,
-  Type,
-  MessageCircle,
-  Edit,
-  Save,
-  X,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+import { Search, Calendar, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
+import StatsSection from '../components/recruiting/StatsSection';
+import ApplicantCard from '../components/recruiting/ApplicantCard';
+import ApplicantModal from '../components/recruiting/ApplicantModal';
+import EmailModal from '../components/recruiting/EmailModal';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
@@ -36,58 +14,6 @@ import { mailService } from '../services/mailService';
 import { googleFormsAPI, applicationsAPI } from '../services/api';
 import './RecruitingDetailPage.css';
 
-// 평가 폼 컴포넌트
-const EvaluationForm = ({ applicantId, onSubmit, initialData = null }) => {
-  const [score, setScore] = useState(initialData?.score?.toString() || '');
-  const [comment, setComment] = useState(initialData?.comment || '');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (score && score >= 0 && score <= 100) {
-      onSubmit(applicantId, {
-        score: parseInt(score),
-        comment: comment.trim()
-      });
-    }
-  };
-
-  return (
-    <form className="evaluation-form" onSubmit={handleSubmit}>
-      <div className="evaluation-fields">
-        <div className="score-input-group">
-          <label htmlFor={`score-${applicantId}`}>점수 (0-100)</label>
-          <input
-            id={`score-${applicantId}`}
-            type="number"
-            min="0"
-            max="100"
-            value={score}
-            onChange={(e) => setScore(e.target.value)}
-            placeholder="점수 입력"
-            className="score-input"
-          />
-        </div>
-        
-        <div className="comment-input-group">
-          <label htmlFor={`comment-${applicantId}`}>코멘트</label>
-          <textarea
-            id={`comment-${applicantId}`}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="지원자에 대한 평가 코멘트를 작성해주세요..."
-            className="comment-textarea"
-            rows={3}
-          />
-        </div>
-        
-        <button type="submit" className="submit-evaluation-btn" disabled={!score}>
-          <Save size={16} />
-          {initialData ? '수정 완료' : '평가 제출'}
-        </button>
-      </div>
-    </form>
-  );
-};
 
 const RecruitingDetailPage = () => {
   const { id } = useParams();
@@ -255,8 +181,6 @@ const RecruitingDetailPage = () => {
             errorMessage: app.errorMessage,
             // 새로운 필드들
             school: app.school,
-            department: app.department,
-            grade: app.grade,
             phoneNumber: app.phoneNumber
           };
         });
@@ -493,71 +417,11 @@ const RecruitingDetailPage = () => {
               </div>
 
               {/* 통계 카드 */}
-              <div className="applicant-stats-section">
-                <div className="stats-grid">
-                  <div 
-                    className={`stat-card clickable ${statusFilter === '전체 상태' ? 'active' : ''}`}
-                    onClick={() => handleStatCardClick('전체 상태')}
-                  >
-                    <div className="stat-icon blue">
-                      <Users size={24} />
-                    </div>
-                    <div className="stat-info">
-                      <div className="stat-label">총 지원자</div>
-                      <div className="stat-value">{stats.total}</div>
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.REVIEWING ? 'active' : ''}`}
-                    onClick={() => handleStatCardClick(APPLICANT_STATUS.REVIEWING)}
-                  >
-                    <div className="stat-icon yellow">
-                      <Clock size={24} />
-                    </div>
-                    <div className="stat-info">
-                      <div className="stat-label">{APPLICANT_STATUS.REVIEWING}</div>
-                      <div className="stat-value">{stats.reviewing}</div>
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.PASSED ? 'active' : ''}`}
-                    onClick={() => handleStatCardClick(APPLICANT_STATUS.PASSED)}
-                  >
-                    <div className="stat-icon green">
-                      <CheckCircle size={24} />
-                    </div>
-                    <div className="stat-info">
-                      <div className="stat-label">{APPLICANT_STATUS.PASSED}</div>
-                      <div className="stat-value">{stats.passed}</div>
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.FAILED ? 'active' : ''}`}
-                    onClick={() => handleStatCardClick(APPLICANT_STATUS.FAILED)}
-                  >
-                    <div className="stat-icon red">
-                      <XCircle size={24} />
-                    </div>
-                    <div className="stat-info">
-                      <div className="stat-label">{APPLICANT_STATUS.FAILED}</div>
-                      <div className="stat-value">{stats.failed}</div>
-                    </div>
-                  </div>
-
-                  <div className="stat-card">
-                    <div className="stat-icon purple">
-                      <FileText size={24} />
-                    </div>
-                    <div className="stat-info">
-                      <div className="stat-label">합격 커트라인</div>
-                      <div className="stat-value">{stats.cutlineScore}점</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <StatsSection 
+                stats={stats}
+                statusFilter={statusFilter}
+                onStatCardClick={handleStatCardClick}
+              />
 
               {/* 지원자 목록 */}
               <div className="applicants-section">
@@ -601,146 +465,23 @@ const RecruitingDetailPage = () => {
 
                 <div className="applicants-list">
                   {currentApplicants.map((applicant) => {
-                const isExpanded = expandedApplicants.has(applicant.id);
-                const evaluation = evaluations[applicant.id];
-                
-                return (
-                  <div key={applicant.id} className="applicant-card">
-                    {/* 기본 지원자 정보 박스 */}
-                    <div 
-                      className="applicant-summary"
-                      onClick={() => handleToggleApplicant(applicant.id)}
-                    >
-                      <div className="applicant-icon">
-                        <div className="icon-wrapper">
-                          <User size={20} />
-                        </div>
-                      </div>
-                      
-                      <div className="applicant-content">
-                        <div className="applicant-left-info">
-                          <div className="applicant-main-row">
-                            <h3 className="applicant-name">{applicant.name}</h3>
-                            <span className={`status-badge ${applicant.statusColor}`}>
-                              {applicant.status}
-                            </span>
-                            <span className="applicant-university">
-                              <MapPin size={14} />
-                              {applicant.university}
-                            </span>
-                            <span className="applicant-department">
-                              <GraduationCap size={14} />
-                              {applicant.department}
-                            </span>
-                            <span className="applicant-grade">
-                              <Users size={14} />
-                              {applicant.grade}
-                            </span>
-                            <span className="applicant-major-status">
-                              <Users2 size={14} />
-                              {applicant.majorStatus}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="applicant-right-info">
-                          <span className="applied-date">{applicant.appliedDate}</span>
-                          <span className="applicant-score">AI 점수: {applicant.aiScore}점</span>
-                          {evaluation && (
-                            <span className="evaluation-score">평가: {evaluation.score}점</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="toggle-btn">
-                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                      </div>
-                    </div>
-
-                    {/* 토글 확장 영역 - AI 요약 및 평가 */}
-                    {isExpanded && (
-                      <div className="applicant-details-toggle">
-                        {/* AI 요약 섹션 */}
-                        <div className="ai-summary-section">
-                          <h4 className="section-subtitle">AI 요약</h4>
-                          <div className="summary-items">
-                            {Object.entries(applicant.aiSummary).map(([question, summary]) => (
-                              <div key={question} className="summary-item">
-                                <div className="summary-question">{question}</div>
-                                <div className="summary-answer">{summary}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* 평가 섹션 */}
-                        <div className="evaluation-section">
-                          <div className="evaluation-header">
-                            <h4 className="section-subtitle">평가</h4>
-                            <div className="ai-score">
-                              <Star size={16} className="star-icon" />
-                              <span>AI 점수: {applicant.aiScore}점</span>
-                            </div>
-                          </div>
-                          
-                          {evaluation && editingEvaluation !== applicant.id ? (
-                            <div className="evaluation-completed">
-                              <div className="evaluation-score-display">
-                                <span className="score-label">내 평가:</span>
-                                <span className="recruit-score-value">{evaluation.score}점</span>
-                                <span className="evaluator">by {evaluation.evaluator}</span>
-                              </div>
-                              
-                              {evaluation.comment && (
-                                <div className="evaluation-comment">
-                                  <div className="comment-label">코멘트:</div>
-                                  <div className="comment-content">{evaluation.comment}</div>
-                                </div>
-                              )}
-                              
-                              <div className="evaluation-actions">
-                                <button 
-                                  className="edit-evaluation-btn"
-                                  onClick={() => handleEditEvaluation(applicant.id)}
-                                >
-                                  <Edit size={14} />
-                                  수정
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="evaluation-form-container">
-                              <EvaluationForm 
-                                applicantId={applicant.id}
-                                onSubmit={handleEvaluationSubmit}
-                                initialData={evaluation}
-                              />
-                              {editingEvaluation === applicant.id && (
-                                <button 
-                                  className="cancel-edit-btn"
-                                  onClick={handleCancelEdit}
-                                >
-                                  <X size={14} />
-                                  취소
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* 액션 버튼 */}
-                        <div className="detail-actions">
-                          <button 
-                            className="view-original-btn"
-                            onClick={() => handleShowOriginal(applicant)}
-                          >
-                            <FileText size={16} />
-                            지원서 원본 보기
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
+                    const isExpanded = expandedApplicants.has(applicant.id);
+                    const evaluation = evaluations[applicant.id];
+                    
+                    return (
+                      <ApplicantCard
+                        key={applicant.id}
+                        applicant={applicant}
+                        isExpanded={isExpanded}
+                        evaluation={evaluation}
+                        editingEvaluation={editingEvaluation}
+                        onToggle={handleToggleApplicant}
+                        onShowOriginal={handleShowOriginal}
+                        onEvaluationSubmit={handleEvaluationSubmit}
+                        onEditEvaluation={handleEditEvaluation}
+                        onCancelEdit={handleCancelEdit}
+                      />
+                    );
                   })}
                 </div>
 
@@ -799,171 +540,21 @@ const RecruitingDetailPage = () => {
       </main>
 
       {/* 일괄 이메일 전송 모달 */}
-      {showEmailModal && (
-        <div className="modal-overlay email-modal-overlay" onClick={handleCloseEmailModal}>
-          <div className="modal-content email-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="email-modal-header">
-              <div className="email-header-content">
-                <div className="email-header-icon">
-                  <Mail size={20} />
-                </div>
-                <div className="email-header-text">
-                  <h2>일괄 이메일 전송</h2>
-                  <p>리쿠르팅 알림 신청자들에게 이메일을 보내세요</p>
-                </div>
-              </div>
-              <button className="email-close-btn" onClick={handleCloseEmailModal}>×</button>
-            </div>
-            
-            <div className="bulk-email-modal-body">
-              <div className="bulk-email-form">
-                <div className="bulk-email-recipients-card">
-                  <div className="bulk-recipients-header">
-                    <div className='bulk-recipients-logo'>
-                    <UsersIcon size={20} />
-                    <span>수신자 정보</span>
-                    </div>
-                    <span className="bulk-count-badge">예상 수신자: {subscriberCount}명</span>
-                  </div>
-                  <p>이 이메일은 <strong>리쿠르팅 알림을 신청한 모든 사용자</strong>에게 전송됩니다.</p>
-                </div>
-                
-                <div className="bulk-email-field-group">
-                  <div className="bulk-email-field">
-                    <div className="bulk-field-label">
-                      <Type size={16} />
-                      <label htmlFor="bulk-email-subject">제목</label>
-                    </div>
-                    <div className="bulk-input-wrapper">
-                      <input
-                        id="bulk-email-subject"
-                        type="text"
-                        value={emailContent.subject}
-                        onChange={(e) => handleEmailContentChange('subject', e.target.value)}
-                        placeholder="예: [피로그래밍] 2024년 여름기 신입 개발자 채용 공지"
-                        className="bulk-email-input"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="bulk-email-field">
-                    <div className="bulk-field-label">
-                      <MessageCircle size={16} />
-                      <label htmlFor="bulk-email-message">내용</label>
-                    </div>
-                    <div className="bulk-input-wrapper">
-                      <textarea
-                        id="bulk-email-message"
-                        value={emailContent.message}
-                        onChange={(e) => {
-                          handleEmailContentChange('message', e.target.value);
-                          // 자동 높이 조절
-                          e.target.style.height = 'auto';
-                          e.target.style.height = Math.max(160, e.target.scrollHeight) + 'px';
-                        }}
-                        placeholder="안녕하세요, 피로그래밍입니다.&#10;&#10;2024년 여름기 신입 개발자 채용에 대한 안내드립니다.&#10;&#10;자세한 내용은 아래를 확인해주세요."
-                        className="bulk-email-textarea"
-                        rows={6}
-                        style={{ minHeight: '160px' }}
-                      />
-                      <div className="bulk-textarea-footer">
-                        <span className="bulk-char-count">
-                          {emailContent.message.length} / 2000자
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="email-modal-footer">
-              <div className="footer-info">
-                <span className="send-time">전송 예정: 즉시</span>
-              </div>
-              <div className="footer-actions">
-                <button className="email-cancel-btn" onClick={handleCloseEmailModal}>
-                  취소
-                </button>
-                <button 
-                  className="email-send-btn" 
-                  onClick={handleSendEmail}
-                  disabled={!emailContent.subject.trim() || !emailContent.message.trim() || isEmailSending}
-                >
-                  <Send size={16} />
-                  <span>{isEmailSending ? '전송 중...' : '전송하기'}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EmailModal
+        isOpen={showEmailModal}
+        onClose={handleCloseEmailModal}
+        emailContent={emailContent}
+        onEmailContentChange={handleEmailContentChange}
+        onSendEmail={handleSendEmail}
+        isEmailSending={isEmailSending}
+        subscriberCount={subscriberCount}
+      />
 
       {/* 지원서 원본 모달 */}
-      {selectedApplicant && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content original-application-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{selectedApplicant.name}님의 지원서 원본</h2>
-              <button className="close-btn" onClick={handleCloseModal}>×</button>
-            </div>
-            
-            <div className="modal-body">
-              <div className="original-application">
-                <div className="applicant-basic-info">
-                  <div className="info-row">
-                    <span className="info-label">이름:</span>
-                    <span className="info-value">{selectedApplicant.name}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">이메일:</span>
-                    <span className="info-value">{selectedApplicant.email}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">대학교:</span>
-                    <span className="info-value">{selectedApplicant.university}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">전공:</span>
-                    <span className="info-value">{selectedApplicant.major}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">전공자 여부:</span>
-                    <span className="info-value">{selectedApplicant.majorStatus}</span>
-                  </div>
-                </div>
-
-                <div className="application-questions">
-                  {Object.entries(selectedApplicant.application).map(([question, answer]) => (
-                    <div key={question} className="question-section">
-                      <h3 className="question-title">{question}</h3>
-                      <div className="answer-content">
-                        {answer}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-
-                {selectedApplicant.portfolio && (
-                  <div className="question-section">
-                    <h3 className="question-title">포트폴리오</h3>
-                    <div className="answer-content">
-                      <a href={selectedApplicant.portfolio} target="_blank" rel="noopener noreferrer" className="portfolio-link">
-                        {selectedApplicant.portfolio}
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button className="close-modal-btn" onClick={handleCloseModal}>닫기</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ApplicantModal
+        selectedApplicant={selectedApplicant}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
