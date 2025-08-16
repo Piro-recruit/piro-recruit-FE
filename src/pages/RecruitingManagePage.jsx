@@ -32,8 +32,12 @@ const RecruitingManagePage = () => {
   const [isLoadingForms, setIsLoadingForms] = useState(false);
 
   const handleRecruitingClick = (recruitingId) => {
-    // 추후 구현할 상세 페이지로 이동
-    navigate(ROUTES.ADMIN_RECRUITING_DETAIL.replace(':id', recruitingId));
+    // recruitingId가 'form-{id}' 형태인 경우 실제 Google Form ID 추출
+    let actualId = recruitingId;
+    if (recruitingId.startsWith('form-')) {
+      actualId = recruitingId.replace('form-', '');
+    }
+    navigate(ROUTES.ADMIN_RECRUITING_DETAIL.replace(':id', actualId));
   };
 
   // 관리자 코드 생성 함수

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -28,12 +28,12 @@ import {
   ChevronRight
 } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
-import { mockRecruitingInfo, mockApplicants } from '../data/mockData';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
+import { googleFormsAPI, applicationsAPI } from '../services/api';
 import './RecruitingDetailPage.css';
 
 // 평가 폼 컴포넌트
@@ -106,7 +106,14 @@ const RecruitingDetailPage = () => {
     message: ''
   });
   const [isEmailSending, setIsEmailSending] = useState(false);
-  const [subscriberCount, setSubscriberCount] = useState(247); // 초기값
+  const [subscriberCount, setSubscriberCount] = useState(247);
+  
+  // API 데이터 상태
+  const [recruitingInfo, setRecruitingInfo] = useState(null);
+  const [allApplicants, setAllApplicants] = useState([]);
+  const [isLoadingRecruiting, setIsLoadingRecruiting] = useState(true);
+  const [isLoadingApplications, setIsLoadingApplications] = useState(true);
+  const [error, setError] = useState(null);
 
   // 구독자 수 조회
   const fetchSubscriberCount = async () => {
@@ -126,16 +133,172 @@ const RecruitingDetailPage = () => {
     fetchSubscriberCount();
   };
 
-  // 리쿠르팅 정보 및 지원자 목록 (목업 데이터 사용)
-  const recruitingInfo = {
-    ...mockRecruitingInfo,
-    id: id
+  // API 데이터 로드 함수
+  const fetchRecruitingInfo = async () => {
+    if (!id) return;
+    
+    setIsLoadingRecruiting(true);
+    setError(null);
+    
+    try {
+      const response = await googleFormsAPI.getFormById(id);
+      if (response.success && response.data) {
+        const formData = response.data;
+        setRecruitingInfo({
+          id: formData.id,
+          title: formData.title,
+          period: formData.recruitingStartDate && formData.recruitingEndDate 
+            ? `${new Date(formData.recruitingStartDate).toLocaleDateString()} ~ ${new Date(formData.recruitingEndDate).toLocaleDateString()}`
+            : formData.createdAt 
+            ? `${new Date(formData.createdAt).toLocaleDateString()} ~ 진행중`
+            : '기간 미정',
+          status: formData.isActive ? '활성' : '비활성',
+          statusColor: formData.isActive ? 'green' : 'red',
+          formId: formData.formId,
+          formUrl: formData.formUrl,
+          description: formData.description,
+          generation: formData.generation
+        });
+      } else {
+        setError('리쿠르팅 정보를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('리쿠르팅 정보 로드 실패:', error);
+      setError('리쿠르팅 정보를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoadingRecruiting(false);
+    }
   };
 
-  const allApplicants = mockApplicants;
+  const fetchApplications = async () => {
+    if (!id) return;
+    
+    setIsLoadingApplications(true);
+    
+    try {
+      // 먼저 전체 지원서를 조회해서 디버깅
+      console.log('지원서 조회 시작, Google Form ID:', id);
+      
+      let response;
+      try {
+        // Google Form ID로 조회 시도
+        response = await applicationsAPI.getApplicationsByGoogleFormId(id);
+        console.log('Google Form ID로 조회 응답:', response);
+      } catch (error) {
+        console.log('Google Form ID 조회 실패, 전체 조회 시도:', error);
+        // 실패하면 전체 지원서 조회
+        response = await applicationsAPI.getAllApplications();
+        console.log('전체 지원서 조회 응답:', response);
+      }
+      
+      if (response.success && response.data) {
+        console.log('조회된 지원서 수:', response.data.length);
+        if (response.data.length > 0) {
+          console.log('첫 번째 지원서 샘플:', response.data[0]);
+        }
+        
+        // 최신 API 응답 구조에 맞춰서 데이터 변환
+        const transformedApplicants = response.data.map((app, index) => {
+          console.log(`지원서 ${index + 1} 변환 중:`, app);
+          
+          // formData는 추가 질문들만 포함
+          const formData = app.formData || {};
+          
+          // 기본 정보 + 추가 질문들을 합친 전체 지원서 데이터
+          const fullApplication = {
+            '이름': app.applicantName,
+            '이메일': app.applicantEmail,
+            '학교': app.school,
+            '학과': app.department,
+            '학년': app.grade,
+            '전공여부': app.major,
+            '전화번호': app.phoneNumber,
+            ...formData // 추가 질문들 (각오, 경력 등)
+          };
+          
+          return {
+            id: app.id,
+            name: app.applicantName || '이름 없음',
+            email: app.applicantEmail || '이메일 없음',
+            university: app.school || 'Unknown',
+            major: `${app.department || 'Unknown'} (${app.grade || 'Unknown'})`,
+            age: 'Unknown', // API에 나이 정보 없음
+            gender: 'Unknown', // API에 성별 정보 없음
+            appliedDate: app.submissionTimestamp ? new Date(app.submissionTimestamp).toLocaleDateString() : '날짜 없음',
+            // API status를 UI status로 매핑
+            status: app.status === 'COMPLETED' ? APPLICANT_STATUS.REVIEWING : 
+                   app.status === 'PENDING' ? APPLICANT_STATUS.REVIEWING :
+                   app.status === 'FAILED' ? APPLICANT_STATUS.FAILED : 
+                   APPLICANT_STATUS.REVIEWING,
+            statusColor: app.status === 'COMPLETED' ? 'yellow' :
+                        app.status === 'PENDING' ? 'yellow' :
+                        app.status === 'FAILED' ? 'red' : 'yellow',
+            aiScore: Math.floor(Math.random() * 40) + 60, // 임시 AI 점수
+            skills: [app.major, app.department].filter(Boolean), // 전공여부와 학과를 스킬로 표시
+            portfolio: formData['포트폴리오'] || formData['포트폴리오 링크'] || '',
+            application: fullApplication, // 전체 지원서 데이터
+            // AI 분석 데이터가 있으면 사용, 없으면 기본 데이터 기반으로 생성
+            aiSummary: app.aiAnalysis || {
+              '학력 정보': `${app.school} ${app.department} ${app.grade} (${app.major})`,
+              '각오': formData['각오'] ? formData['각오'].substring(0, 50) + '...' : '데이터 미제공',
+              '경력': formData['경력'] || '데이터 미제공'
+            },
+            // 추가 정보
+            formTitle: app.formTitle,
+            googleFormId: app.googleFormId,
+            formResponseId: app.formResponseId,
+            originalStatus: app.status,
+            errorMessage: app.errorMessage,
+            // 새로운 필드들
+            school: app.school,
+            department: app.department,
+            grade: app.grade,
+            phoneNumber: app.phoneNumber
+          };
+        });
+        
+        console.log('변환된 지원자 수:', transformedApplicants.length);
+        console.log('변환된 첫 번째 지원자:', transformedApplicants[0]);
+        setAllApplicants(transformedApplicants);
+        console.log('setAllApplicants 완료');
+      } else {
+        console.log('응답 데이터가 없음:', response);
+        setAllApplicants([]);
+      }
+    } catch (error) {
+      console.error('지원서 로드 실패:', error);
+      setAllApplicants([]);
+    } finally {
+      setIsLoadingApplications(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 데이터 로드
+  useEffect(() => {
+    console.log('컴포넌트 마운트, id:', id);
+    fetchRecruitingInfo();
+    fetchApplications();
+  }, [id]);
+
+  // 상태 변화 디버깅
+  useEffect(() => {
+    console.log('상태 변화:', {
+      isLoadingRecruiting,
+      isLoadingApplications,
+      allApplicantsLength: allApplicants.length,
+      recruitingInfo: !!recruitingInfo
+    });
+  }, [isLoadingRecruiting, isLoadingApplications, allApplicants.length, recruitingInfo]);
 
   // 필터링 및 정렬된 지원자 목록
   const filteredApplicants = useMemo(() => {
+    // 로딩 중이면 빈 배열 반환
+    if (isLoadingApplications) {
+      console.log('로딩 중이므로 빈 배열 반환');
+      return [];
+    }
+    
+    console.log('필터링 시작 - allApplicants:', allApplicants.length);
     let filtered = allApplicants;
 
     // 검색 필터
@@ -157,7 +320,7 @@ const RecruitingDetailPage = () => {
     filtered = sortApplicants(filtered, sortBy, evaluations);
 
     return filtered;
-  }, [searchTerm, statusFilter, sortBy, evaluations]);
+  }, [allApplicants, searchTerm, statusFilter, sortBy, evaluations, isLoadingApplications]);
 
   // 페이지네이션 관련 계산
   const itemsPerPage = RECRUITMENT_CONFIG.ITEMS_PER_PAGE;
@@ -267,142 +430,170 @@ const RecruitingDetailPage = () => {
     setStatusFilter(status);
   };
 
+  // 에러 상태 처리
+  if (error || (!isLoadingRecruiting && !recruitingInfo)) {
+    return (
+      <div className="recruiting-detail-page">
+        <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" onClick={handleHeaderClick} />
+        <main className="recruiting-detail-main">
+          <div className="recruiting-detail-container">
+            <div className="error-indicator">
+              <p>{error || '리쿠르팅 정보를 찾을 수 없습니다.'}</p>
+              <button onClick={() => navigate(ROUTES.ADMIN_RECRUITING)} className="back-btn">
+                목록으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="recruiting-detail-page">
       <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" onClick={handleHeaderClick} />
       
       <main className="recruiting-detail-main">
         <div className="recruiting-detail-container">
-          {/* 제목 및 액션 */}
-          <div className="detail-header">
-            <div className="recruiting-title-section">
-              <h1 className="recruiting-main-title">{recruitingInfo.title}</h1>
-              <div className="recruiting-meta">
-                <span className="recruiting-period">
-                  <Calendar size={16} />
-                  {recruitingInfo.period}
-                </span>
-                <span className={`status-badge ${recruitingInfo.statusColor}`}>
-                  {recruitingInfo.status}
-                </span>
-              </div>
+          {/* 로딩 상태 표시 */}
+          {(isLoadingRecruiting || isLoadingApplications) && (
+            <div className="loading-indicator">
+              <p>데이터를 불러오는 중...</p>
             </div>
-            <button className="bulk-email-btn" onClick={handleShowEmailModal}>
-              <Mail size={20} />
-              일괄 이메일 전송
-            </button>
-          </div>
+          )}
 
-
-          {/* 통계 카드 */}
-          <div className="applicant-stats-section">
-            <div className="stats-grid">
-              <div 
-                className={`stat-card clickable ${statusFilter === '전체 상태' ? 'active' : ''}`}
-                onClick={() => handleStatCardClick('전체 상태')}
-              >
-                <div className="stat-icon blue">
-                  <Users size={24} />
+          {/* 실제 콘텐츠 - 로딩 완료 후에만 표시 */}
+          {!isLoadingRecruiting && !isLoadingApplications && recruitingInfo && (
+            <>
+              {/* 제목 및 액션 */}
+              <div className="detail-header">
+                <div className="recruiting-title-section">
+                  <h1 className="recruiting-main-title">{recruitingInfo.title}</h1>
+                  <div className="recruiting-meta">
+                    <span className="recruiting-period">
+                      <Calendar size={16} />
+                      {recruitingInfo.period}
+                    </span>
+                    <span className={`status-badge ${recruitingInfo.statusColor}`}>
+                      {recruitingInfo.status}
+                    </span>
+                  </div>
                 </div>
-                <div className="stat-info">
-                  <div className="stat-label">총 지원자</div>
-                  <div className="stat-value">{stats.total}</div>
-                </div>
-              </div>
-              
-              <div 
-                className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.REVIEWING ? 'active' : ''}`}
-                onClick={() => handleStatCardClick(APPLICANT_STATUS.REVIEWING)}
-              >
-                <div className="stat-icon yellow">
-                  <Clock size={24} />
-                </div>
-                <div className="stat-info">
-                  <div className="stat-label">{APPLICANT_STATUS.REVIEWING}</div>
-                  <div className="stat-value">{stats.reviewing}</div>
-                </div>
-              </div>
-              
-              <div 
-                className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.PASSED ? 'active' : ''}`}
-                onClick={() => handleStatCardClick(APPLICANT_STATUS.PASSED)}
-              >
-                <div className="stat-icon green">
-                  <CheckCircle size={24} />
-                </div>
-                <div className="stat-info">
-                  <div className="stat-label">{APPLICANT_STATUS.PASSED}</div>
-                  <div className="stat-value">{stats.passed}</div>
-                </div>
-              </div>
-              
-              <div 
-                className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.FAILED ? 'active' : ''}`}
-                onClick={() => handleStatCardClick(APPLICANT_STATUS.FAILED)}
-              >
-                <div className="stat-icon red">
-                  <XCircle size={24} />
-                </div>
-                <div className="stat-info">
-                  <div className="stat-label">{APPLICANT_STATUS.FAILED}</div>
-                  <div className="stat-value">{stats.failed}</div>
-                </div>
+                <button className="bulk-email-btn" onClick={handleShowEmailModal}>
+                  <Mail size={20} />
+                  일괄 이메일 전송
+                </button>
               </div>
 
-              <div className="stat-card">
-                <div className="stat-icon purple">
-                  <FileText size={24} />
-                </div>
-                <div className="stat-info">
-                  <div className="stat-label">합격 커트라인</div>
-                  <div className="stat-value">{stats.cutlineScore}점</div>
+              {/* 통계 카드 */}
+              <div className="applicant-stats-section">
+                <div className="stats-grid">
+                  <div 
+                    className={`stat-card clickable ${statusFilter === '전체 상태' ? 'active' : ''}`}
+                    onClick={() => handleStatCardClick('전체 상태')}
+                  >
+                    <div className="stat-icon blue">
+                      <Users size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <div className="stat-label">총 지원자</div>
+                      <div className="stat-value">{stats.total}</div>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.REVIEWING ? 'active' : ''}`}
+                    onClick={() => handleStatCardClick(APPLICANT_STATUS.REVIEWING)}
+                  >
+                    <div className="stat-icon yellow">
+                      <Clock size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <div className="stat-label">{APPLICANT_STATUS.REVIEWING}</div>
+                      <div className="stat-value">{stats.reviewing}</div>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.PASSED ? 'active' : ''}`}
+                    onClick={() => handleStatCardClick(APPLICANT_STATUS.PASSED)}
+                  >
+                    <div className="stat-icon green">
+                      <CheckCircle size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <div className="stat-label">{APPLICANT_STATUS.PASSED}</div>
+                      <div className="stat-value">{stats.passed}</div>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`stat-card clickable ${statusFilter === APPLICANT_STATUS.FAILED ? 'active' : ''}`}
+                    onClick={() => handleStatCardClick(APPLICANT_STATUS.FAILED)}
+                  >
+                    <div className="stat-icon red">
+                      <XCircle size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <div className="stat-label">{APPLICANT_STATUS.FAILED}</div>
+                      <div className="stat-value">{stats.failed}</div>
+                    </div>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="stat-icon purple">
+                      <FileText size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <div className="stat-label">합격 커트라인</div>
+                      <div className="stat-value">{stats.cutlineScore}점</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* 지원자 목록 */}
-          <div className="applicants-section">
-            <div className="applicants-header">
-              <h2 className="section-title">지원자 목록</h2>
-              
-              {/* 검색 및 필터 */}
-              <div className="applicant-controls">
-                <div className="search-box">
-                  <Search size={20} className="search-icon" />
-                  <input
-                    type="text"
-                    placeholder="이름, 이메일, 학교로 검색..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                  />
+              {/* 지원자 목록 */}
+              <div className="applicants-section">
+                <div className="applicants-header">
+                  <h2 className="section-title">지원자 목록</h2>
+                  
+                  {/* 검색 및 필터 */}
+                  <div className="applicant-controls">
+                    <div className="search-box">
+                      <Search size={20} className="search-icon" />
+                      <input
+                        type="text"
+                        placeholder="이름, 이메일, 학교로 검색..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="search-input"
+                      />
+                    </div>
+                    <select 
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="status-filter"
+                    >
+                      <option>전체 상태</option>
+                      <option>{APPLICANT_STATUS.REVIEWING}</option>
+                      <option>{APPLICANT_STATUS.PASSED}</option>
+                      <option>{APPLICANT_STATUS.FAILED}</option>
+                    </select>
+                    <select 
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="sort-filter"
+                    >
+                      <option value={SORT_OPTIONS.APPLICATION_DATE}>지원순</option>
+                      <option value={SORT_OPTIONS.AI_SCORE}>AI 스코어순</option>
+                      <option value={SORT_OPTIONS.EVALUATION_SCORE}>채점 스코어순</option>
+                      <option value={SORT_OPTIONS.NAME}>이름순</option>
+                    </select>
+                  </div>
                 </div>
-                <select 
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="status-filter"
-                >
-                  <option>전체 상태</option>
-                  <option>{APPLICANT_STATUS.REVIEWING}</option>
-                  <option>{APPLICANT_STATUS.PASSED}</option>
-                  <option>{APPLICANT_STATUS.FAILED}</option>
-                </select>
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-filter"
-                >
-                  <option value={SORT_OPTIONS.APPLICATION_DATE}>지원순</option>
-                  <option value={SORT_OPTIONS.AI_SCORE}>AI 스코어순</option>
-                  <option value={SORT_OPTIONS.EVALUATION_SCORE}>채점 스코어순</option>
-                  <option value={SORT_OPTIONS.NAME}>이름순</option>
-                </select>
-              </div>
-            </div>
 
-            <div className="applicants-list">
-              {currentApplicants.map((applicant) => {
+                <div className="applicants-list">
+                  {currentApplicants.map((applicant) => {
                 const isExpanded = expandedApplicants.has(applicant.id);
                 const evaluation = evaluations[applicant.id];
                 
@@ -539,18 +730,18 @@ const RecruitingDetailPage = () => {
                     )}
                   </div>
                 );
-              })}
-            </div>
+                  })}
+                </div>
 
-            {/* 결과 없음 */}
-            {filteredApplicants.length === 0 && (
-              <div className="no-results">
-                <p>검색 결과가 없습니다.</p>
-              </div>
-            )}
+                {/* 결과 없음 */}
+                {filteredApplicants.length === 0 && (
+                  <div className="no-results">
+                    <p>검색 결과가 없습니다.</p>
+                  </div>
+                )}
 
-            {/* 페이지네이션 */}
-            {filteredApplicants.length > 0 && totalPages > 1 && (
+                {/* 페이지네이션 */}
+                {filteredApplicants.length > 0 && totalPages > 1 && (
               <div className="pagination">
                 <div className="pagination-info">
                   <span>
@@ -591,6 +782,8 @@ const RecruitingDetailPage = () => {
               </div>
             )}
           </div>
+        </>
+      )}
         </div>
       </main>
 

@@ -93,6 +93,86 @@ export const googleFormsAPI = {
       console.error('구글 폼 생성 실패:', error);
       throw error;
     }
+  },
+
+  // 특정 구글 폼 조회 (ID 기준)
+  getFormById: async (id) => {
+    try {
+      const response = await apiClient.get(`/api/google-forms/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼 조회 실패:', error);
+      throw error;
+    }
+  }
+};
+
+// Webhook Applications API 함수들
+export const applicationsAPI = {
+  // 전체 지원서 조회
+  getAllApplications: async () => {
+    try {
+      const response = await apiClient.get('/api/webhook/applications');
+      return response.data;
+    } catch (error) {
+      console.error('전체 지원서 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼별 지원서 조회
+  getApplicationsByGoogleFormId: async (googleFormId) => {
+    try {
+      const response = await apiClient.get(`/api/webhook/applications/google-form/${googleFormId}`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼별 지원서 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 폼 ID별 지원서 조회
+  getApplicationsByFormId: async (formId) => {
+    try {
+      const response = await apiClient.get(`/api/webhook/applications/form-id/${formId}`);
+      return response.data;
+    } catch (error) {
+      console.error('폼 ID별 지원서 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 특정 지원서 조회
+  getApplicationById: async (id) => {
+    try {
+      const response = await apiClient.get(`/api/webhook/applications/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('지원서 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 상태별 통계 조회
+  getStatistics: async () => {
+    try {
+      const response = await apiClient.get('/api/webhook/applications/statistics');
+      return response.data;
+    } catch (error) {
+      console.error('통계 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼별 상태별 통계 조회
+  getStatisticsByGoogleFormId: async (googleFormId) => {
+    try {
+      const response = await apiClient.get(`/api/webhook/applications/google-form/${googleFormId}/statistics`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼별 통계 조회 실패:', error);
+      throw error;
+    }
   }
 };
 
