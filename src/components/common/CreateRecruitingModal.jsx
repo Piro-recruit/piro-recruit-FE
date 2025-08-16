@@ -10,7 +10,8 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
     sheetUrl: '',
     description: '',
     recruitingStartDate: '',
-    recruitingEndDate: ''
+    recruitingEndDate: '',
+    generation: ''
   });
   const [errors, setErrors] = useState({});
 
@@ -38,6 +39,15 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
     
     if (!formData.title.trim()) {
       newErrors.title = '제목은 필수입니다.';
+    }
+    
+    if (!formData.generation) {
+      newErrors.generation = '기수는 필수입니다.';
+    } else {
+      const generation = parseInt(formData.generation, 10);
+      if (isNaN(generation) || generation < 1) {
+        newErrors.generation = '기수는 1 이상의 숫자여야 합니다.';
+      }
     }
     
     if (!formData.formUrl.trim()) {
@@ -83,6 +93,7 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
       formId: formData.formId.trim(),
       title: formData.title.trim(),
       formUrl: formData.formUrl.trim(),
+      generation: parseInt(formData.generation, 10),
       ...(formData.sheetUrl.trim() && { sheetUrl: formData.sheetUrl.trim() }),
       ...(formData.description.trim() && { description: formData.description.trim() }),
       ...(formData.recruitingStartDate && { recruitingStartDate: new Date(formData.recruitingStartDate).toISOString() }),
@@ -100,7 +111,8 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
       sheetUrl: '',
       description: '',
       recruitingStartDate: '',
-      recruitingEndDate: ''
+      recruitingEndDate: '',
+      generation: ''
     });
     setErrors({});
     onClose();
@@ -139,6 +151,26 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
             />
             {errors.title && (
               <span className="create-recruiting-error-message">{errors.title}</span>
+            )}
+          </div>
+
+          <div className="create-recruiting-form-group">
+            <label htmlFor="generation" className="create-recruiting-form-label">
+              기수 <span className="create-recruiting-required">*</span>
+            </label>
+            <input
+              type="number"
+              id="generation"
+              name="generation"
+              value={formData.generation}
+              onChange={handleChange}
+              className={`create-recruiting-form-input ${errors.generation ? 'error' : ''}`}
+              placeholder="기수를 입력하세요 (예: 25)"
+              min="1"
+              disabled={isLoading}
+            />
+            {errors.generation && (
+              <span className="create-recruiting-error-message">{errors.generation}</span>
             )}
           </div>
 
@@ -215,39 +247,37 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
             />
           </div>
 
-          <div className="create-recruiting-form-row">
-            <div className="create-recruiting-form-group">
-              <label htmlFor="recruitingStartDate" className="create-recruiting-form-label">
-                시작일 (선택)
-              </label>
-              <input
-                type="datetime-local"
-                id="recruitingStartDate"
-                name="recruitingStartDate"
-                value={formData.recruitingStartDate}
-                onChange={handleChange}
-                className="create-recruiting-form-input"
-                disabled={isLoading}
-              />
-            </div>
+          <div className="create-recruiting-form-group">
+            <label htmlFor="recruitingStartDate" className="create-recruiting-form-label">
+              시작일 (선택)
+            </label>
+            <input
+              type="datetime-local"
+              id="recruitingStartDate"
+              name="recruitingStartDate"
+              value={formData.recruitingStartDate}
+              onChange={handleChange}
+              className="create-recruiting-form-input"
+              disabled={isLoading}
+            />
+          </div>
 
-            <div className="create-recruiting-form-group">
-              <label htmlFor="recruitingEndDate" className="create-recruiting-form-label">
-                종료일 (선택)
-              </label>
-              <input
-                type="datetime-local"
-                id="recruitingEndDate"
-                name="recruitingEndDate"
-                value={formData.recruitingEndDate}
-                onChange={handleChange}
-                className={`create-recruiting-form-input ${errors.recruitingEndDate ? 'error' : ''}`}
-                disabled={isLoading}
-              />
-              {errors.recruitingEndDate && (
-                <span className="create-recruiting-error-message">{errors.recruitingEndDate}</span>
-              )}
-            </div>
+          <div className="create-recruiting-form-group">
+            <label htmlFor="recruitingEndDate" className="create-recruiting-form-label">
+              종료일 (선택)
+            </label>
+            <input
+              type="datetime-local"
+              id="recruitingEndDate"
+              name="recruitingEndDate"
+              value={formData.recruitingEndDate}
+              onChange={handleChange}
+              className={`create-recruiting-form-input ${errors.recruitingEndDate ? 'error' : ''}`}
+              disabled={isLoading}
+            />
+            {errors.recruitingEndDate && (
+              <span className="create-recruiting-error-message">{errors.recruitingEndDate}</span>
+            )}
           </div>
 
           <div className="create-recruiting-modal-actions">
