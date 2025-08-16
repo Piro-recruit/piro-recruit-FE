@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Users, X, Trash2, Calendar, Clock, AlertTriangle } from 'lucide-react';
+import { Users, X, Trash2, Calendar, Clock, AlertTriangle, Download } from 'lucide-react';
 import { authService } from '../../services/authService';
+import { integrationAPI } from '../../services/api';
+import { createCSVDownloader, generateAdminsCSVFilename } from '../../utils/csvExport';
 import './AdminManageModal.css';
 
 const AdminManageModal = ({ isOpen, onClose }) => {
@@ -9,6 +11,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [deletingAll, setDeletingAll] = useState(false);
+  const [isCSVExporting, setIsCSVExporting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -102,6 +105,40 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     }
   };
 
+  // CSV 내보내기 핸들러
+  const handleExportCSV = async () => {
+    setIsCSVExporting(true);
+    setError('');
+
+    try {
+      console.log('Admin CSV 내보내기 시작');
+      const csvDownloader = createCSVDownloader(
+        integrationAPI.exportAdminsCSV,
+        generateAdminsCSVFilename()
+      );
+      
+      const result = await csvDownloader.download();
+      
+      if (result.success) {
+        console.log(`Admin CSV 파일이 다운로드되었습니다: ${result.filename}`);
+      }
+    } catch (err) {
+      console.error('Admin CSV 내보내기 실패:', err);
+      
+      if (err.response?.status === 401) {
+        setError('권한이 없습니다. Admin CSV 내보내기는 루트 관리자만 가능합니다.');
+      } else if (err.response?.status === 403) {
+        setError('CSV 내보내기 권한이 없습니다.');
+      } else if (err.response?.status === 404) {
+        setError('CSV 내보내기 API를 찾을 수 없습니다. 백엔드 구현을 확인해주세요.');
+      } else {
+        setError(err.message || 'CSV 내보내기 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsCSVExporting(false);
+    }
+  };
+
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('ko-KR', {
@@ -157,6 +194,14 @@ const AdminManageModal = ({ isOpen, onClose }) => {
               <span className="summary-value expired">{getExpiredCount()}명</span>
             </div>
             <div className="delete-buttons">
+              <button 
+                className="csv-export-btn"
+                onClick={handleExportCSV}
+                disabled={isCSVExporting}
+              >
+                <Download size={16} />
+                {isCSVExporting ? 'CSV 내보내는 중...' : 'CSV 내보내기'}
+              </button>
               <button 
                 className="delete-expired-btn"
                 onClick={handleDeleteExpired}
