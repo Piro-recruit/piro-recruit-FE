@@ -309,6 +309,80 @@ export const applicationsAPI = {
   }
 };
 
+// Admin API 함수들 (인증 필요)
+export const adminAPI = {
+  // 전체 합격 상태 통계 조회
+  getPassStatusStatistics: async () => {
+    try {
+      const response = await apiClient.get('/api/admin/applications/pass-status/statistics');
+      return response.data;
+    } catch (error) {
+      console.error('합격 상태 통계 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼별 합격 상태 통계 조회
+  getPassStatusStatisticsByGoogleFormId: async (googleFormId) => {
+    try {
+      const response = await apiClient.get(`/api/admin/applications/google-form/${googleFormId}/pass-status/statistics`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼별 합격 상태 통계 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 개별 합격 상태 변경
+  updatePassStatus: async (applicationId, passStatus) => {
+    try {
+      const response = await apiClient.put(`/api/admin/applications/${applicationId}/pass-status`, {
+        passStatus: passStatus
+      });
+      return response.data;
+    } catch (error) {
+      console.error('합격 상태 변경 실패:', error);
+      throw error;
+    }
+  },
+
+  // 일괄 합격 상태 변경
+  updateBulkPassStatus: async (applicationIds, passStatus) => {
+    try {
+      const response = await apiClient.put('/api/admin/applications/all/pass-status', {
+        applicationIds: applicationIds,
+        passStatus: passStatus
+      });
+      return response.data;
+    } catch (error) {
+      console.error('일괄 합격 상태 변경 실패:', error);
+      throw error;
+    }
+  },
+
+  // 합격 상태별 지원서 조회
+  getApplicationsByPassStatus: async (status) => {
+    try {
+      const response = await apiClient.get(`/api/admin/applications/pass-status/${status}`);
+      return response.data;
+    } catch (error) {
+      console.error('합격 상태별 지원서 조회 실패:', error);
+      throw error;
+    }
+  },
+
+  // 구글 폼별 + 합격 상태별 지원서 조회
+  getApplicationsByGoogleFormAndPassStatus: async (googleFormId, status) => {
+    try {
+      const response = await apiClient.get(`/api/admin/applications/google-form/${googleFormId}/pass-status/${status}`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼별 합격 상태별 지원서 조회 실패:', error);
+      throw error;
+    }
+  }
+};
+
 // Integration API 함수들 (CSV 내보내기)
 export const integrationAPI = {
   // 지원자 CSV 내보내기

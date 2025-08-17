@@ -11,7 +11,7 @@ import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
-import { googleFormsAPI, applicationsAPI, integrationAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI } from '../services/api';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
 import './RecruitingDetailPage.css';
 
@@ -51,6 +51,8 @@ const RecruitingDetailPage = () => {
   const [isLoadingRecruiting, setIsLoadingRecruiting] = useState(true);
   const [isLoadingApplications, setIsLoadingApplications] = useState(true);
   const [error, setError] = useState(null);
+  const [statisticsData, setStatisticsData] = useState(null);
+  const [isLoadingStatistics, setIsLoadingStatistics] = useState(false);
 
   // 구독자 수 조회
   const fetchSubscriberCount = async () => {
@@ -167,14 +169,14 @@ const RecruitingDetailPage = () => {
             major: `${app.department || 'Unknown'} (${app.grade || 'Unknown'})`, // 기존 호환성을 위해 유지
             majorStatus: app.major || 'Unknown', // 전공자 여부
             appliedDate: app.updatedAt ? new Date(app.updatedAt).toLocaleDateString() : '날짜 없음',
-            // API status를 UI status로 매핑
-            status: app.status === 'COMPLETED' ? APPLICANT_STATUS.REVIEWING : 
-                   app.status === 'PENDING' ? APPLICANT_STATUS.REVIEWING :
-                   app.status === 'FAILED' ? APPLICANT_STATUS.FAILED : 
+            // API passStatus를 UI status로 매핑
+            status: app.passStatus === 'PASS' ? APPLICANT_STATUS.PASSED : 
+                   app.passStatus === 'FAIL' ? APPLICANT_STATUS.FAILED :
+                   app.passStatus === 'PENDING' ? APPLICANT_STATUS.REVIEWING : 
                    APPLICANT_STATUS.REVIEWING,
-            statusColor: app.status === 'COMPLETED' ? 'yellow' :
-                        app.status === 'PENDING' ? 'yellow' :
-                        app.status === 'FAILED' ? 'red' : 'yellow',
+            statusColor: app.passStatus === 'PASS' ? 'green' :
+                        app.passStatus === 'FAIL' ? 'red' :
+                        app.passStatus === 'PENDING' ? 'yellow' : 'yellow',
             aiScore: Math.floor(Math.random() * 40) + 60, // 임시 AI 점수
             skills: [app.major, app.department].filter(Boolean), // 전공여부와 학과를 스킬로 표시
             portfolio: formData['포트폴리오'] || formData['포트폴리오 링크'] || '',
@@ -216,11 +218,37 @@ const RecruitingDetailPage = () => {
     }
   };
 
+  // 통계 데이터 조회
+  const fetchStatistics = async () => {
+    if (!id) return;
+    
+    setIsLoadingStatistics(true);
+    
+    try {
+      console.log('통계 조회 시작, Google Form ID:', id);
+      const response = await adminAPI.getPassStatusStatisticsByGoogleFormId(id);
+      
+      if (response.success && response.data) {
+        console.log('통계 조회 성공:', response.data);
+        setStatisticsData(response.data);
+      } else {
+        console.log('통계 응답 데이터가 없음:', response);
+        setStatisticsData(null);
+      }
+    } catch (error) {
+      console.error('통계 조회 실패:', error);
+      setStatisticsData(null);
+    } finally {
+      setIsLoadingStatistics(false);
+    }
+  };
+
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     console.log('컴포넌트 마운트, id:', id);
     fetchRecruitingInfo();
     fetchApplications();
+    fetchStatistics();
   }, [id]);
 
   // 상태 변화 디버깅
@@ -277,10 +305,22 @@ const RecruitingDetailPage = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, sortBy]);
 
-  // 통계 계산
+  // 통계 계산 - API 데이터 우선, 없으면 클라이언트 계산
   const stats = useMemo(() => {
-    return calculateApplicantStats(allApplicants, evaluations);
-  }, [evaluations]);
+    if (statisticsData) {
+      // API 통계 데이터 사용 (PASS/FAIL/PENDING을 UI 상태로 매핑)
+      return {
+        total: (statisticsData.PASS || 0) + (statisticsData.FAIL || 0) + (statisticsData.PENDING || 0),
+        reviewing: statisticsData.PENDING || 0,
+        passed: statisticsData.PASS || 0,
+        failed: statisticsData.FAIL || 0,
+        cutlineScore: 0 // 커트라인은 별도 계산이 필요하면 추가
+      };
+    } else {
+      // 기존 클라이언트 계산 방식 (fallback)
+      return calculateApplicantStats(allApplicants, evaluations);
+    }
+  }, [statisticsData, allApplicants, evaluations]);
 
   const handleHeaderClick = () => {
     navigate(ROUTES.ADMIN_RECRUITING);
@@ -901,6 +941,7 @@ const RecruitingDetailPage = () => {
                 stats={stats}
                 statusFilter={statusFilter}
                 onStatCardClick={handleStatCardClick}
+                isLoading={isLoadingStatistics}
               />
 
               {/* 지원자 목록 */}

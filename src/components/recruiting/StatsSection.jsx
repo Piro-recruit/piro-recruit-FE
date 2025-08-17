@@ -3,7 +3,15 @@ import { Users, Clock, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { APPLICANT_STATUS } from '../../constants/recruitment';
 import './StatsSection.css';
 
-const StatsSection = ({ stats, statusFilter, onStatCardClick }) => {
+const StatsSection = ({ stats, statusFilter, onStatCardClick, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="applicant-stats-section">
+        <div className="stats-loading">통계 데이터를 불러오는 중...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="applicant-stats-section">
       <div className="stats-grid">
