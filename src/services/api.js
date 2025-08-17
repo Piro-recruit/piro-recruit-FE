@@ -86,12 +86,18 @@ apiClient.interceptors.response.use(
       // CSV 내보내기는 별도 처리하고 자동 로그아웃하지 않음
       const isCSVExport = error.config?.url?.includes('/api/integration/export');
       
-      if (!isCSVExport) {
+      // admin 관련 API 요청이거나 현재 admin 페이지인 경우에만 리다이렉트
+      const isAdminAPI = error.config?.url?.includes('/api/admin/') || 
+                         error.config?.url?.includes('/api/integration/') ||
+                         error.config?.url?.includes('/api/ai-summary/');
+      const isAdminPage = window.location.pathname.startsWith('/admin');
+      
+      if (!isCSVExport && (isAdminAPI || isAdminPage)) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('expiresIn');
-        // 로그인 페이지로 리다이렉트 (필요시)
-        if (window.location.pathname !== '/admin') {
+        // admin 페이지가 아닌 경우에만 리다이렉트
+        if (!isAdminPage) {
           window.location.href = '/admin';
         }
       }

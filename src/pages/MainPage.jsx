@@ -88,9 +88,6 @@ const PiroMainPage = () => {
     if (activeFormUrl) {
       // 활성화된 구글 폼 URL로 리다이렉트
       window.open(activeFormUrl, '_blank');
-    } else {
-      // 폴백: 기존 지원 페이지로 이동
-      navigate(ROUTES.APPLICATION);
     }
   };
 
