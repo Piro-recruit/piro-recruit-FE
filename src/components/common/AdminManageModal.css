@@ -1,0 +1,353 @@
+.admin-manage-container {
+  background: var(--color-gray-8);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.2s ease-out;
+}
+
+.admin-manage-content {
+  padding: 24px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.admin-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: var(--color-gray-2);
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.summary-value.expired {
+  color: #ff6b6b;
+}
+
+.delete-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.csv-export-btn,
+.delete-expired-btn,
+.delete-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.csv-export-btn {
+  background-color: var(--color-gray-6);
+  border: 1px solid var(--color-gray-5);
+  color: var(--color-white);
+}
+
+.csv-export-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-5);
+  transform: translateY(-1px);
+}
+
+.csv-export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.delete-expired-btn {
+  background-color: rgba(220, 38, 38, 0.5);
+  border: 1px solid rgba(220, 38, 38, 0.7);
+  color: var(--color-gray-0);
+  font-weight: 600;
+}
+
+.delete-expired-btn:hover:not(:disabled) {
+  background-color: rgba(220, 38, 38, 0.35);
+  border-color: rgba(220, 38, 38, 0.8);
+  color: var(--color-white);
+}
+
+.delete-expired-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--color-gray-3);
+}
+
+.delete-all-btn {
+  background-color: rgba(220, 38, 38, 0.5);
+  border: 1px solid rgba(220, 38, 38, 0.7);
+  color: var(--color-gray-0);
+  font-weight: 600;
+}
+
+.delete-all-btn:hover:not(:disabled) {
+  background-color: rgba(220, 38, 38, 0.35);
+  border-color: rgba(220, 38, 38, 0.8);
+  color: var(--color-white);
+}
+
+.delete-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--color-gray-3);
+}
+
+.admin-list-container {
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 20px;
+  color: var(--color-gray-2);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-6);
+  border-top: 3px solid var(--color-green-0);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 20px;
+  color: var(--color-gray-3);
+}
+
+.empty-state svg {
+  color: var(--color-gray-4);
+}
+
+.admin-table {
+  width: 100%;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 16px;
+  padding: 12px 16px;
+  background-color: var(--color-gray-6);
+  border-bottom: 1px solid var(--color-gray-5);
+}
+
+.header-cell {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-white);
+  text-align: left;
+}
+
+.table-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-gray-6);
+  transition: background-color 0.15s ease;
+}
+
+.admin-row:hover {
+  background-color: var(--color-gray-6);
+}
+
+.admin-row.expired {
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+.admin-row.expired:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--color-white);
+}
+
+.admin-code-cell {
+  font-family: 'Courier New', monospace;
+}
+
+.admin-code-display {
+  background-color: var(--color-black);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--color-green-0);
+  border: 1px solid var(--color-gray-6);
+  font-size: 12px;
+}
+
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-gray-2);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status-badge.active {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.status-badge.expired {
+  background-color: rgba(220, 38, 38, 0.2);
+  color: #ff6b6b;
+}
+
+
+.close-admin-btn {
+  padding: 10px 24px;
+  background-color: var(--color-green-0);
+  color: var(--color-black);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 80px;
+}
+
+.close-admin-btn:hover {
+  background-color: var(--color-green-1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .admin-manage-container {
+    width: 95%;
+    margin: 20px;
+    max-height: 90vh;
+  }
+  
+  .admin-manage-content {
+    padding: 20px;
+  }
+  
+  .admin-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .delete-buttons {
+    margin-left: 0;
+    align-self: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .table-header,
+  .admin-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  
+  .header-cell {
+    display: none;
+  }
+  
+  .cell {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-gray-6);
+  }
+  
+  .cell:before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-gray-3);
+    margin-bottom: 4px;
+  }
+  
+  .admin-code-cell:before {
+    content: "관리자 코드";
+  }
+  
+  .admin-row .cell:nth-child(2):before {
+    content: "생성일";
+  }
+  
+  .admin-row .cell:nth-child(3):before {
+    content: "만료일";
+  }
+  
+  .admin-row .cell:nth-child(4):before {
+    content: "상태";
+  }
+  
+  .admin-row {
+    flex-direction: column;
+    padding: 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gray-6);
+  }
+}

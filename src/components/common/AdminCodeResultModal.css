@@ -1,0 +1,252 @@
+.result-modal-container {
+  background: var(--color-gray-8);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.2s ease-out;
+}
+
+.result-modal-content {
+  padding: 24px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.success-section,
+.failure-section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.success-icon {
+  color: var(--color-green-0);
+}
+
+.error-icon {
+  color: #ff6b6b;
+}
+
+.copy-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.copy-all-btn:hover {
+  background-color: var(--color-gray-6);
+}
+
+.admin-codes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-code-item {
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-info-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-title {
+  font-weight: 600;
+  color: var(--color-white);
+  font-size: 14px;
+}
+
+.admin-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.code-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--color-gray-6);
+  border: 1px solid var(--color-gray-5);
+  border-radius: 6px;
+}
+
+.code-label {
+  font-size: 13px;
+  color: var(--color-gray-2);
+  font-weight: 500;
+}
+
+.admin-code {
+  flex: 1;
+  background-color: var(--color-black);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-green-0);
+  border: 1px solid var(--color-gray-6);
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-gray-2);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn:hover {
+  background-color: var(--color-gray-7);
+  color: var(--color-white);
+}
+
+.expiry-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-gray-2);
+}
+
+.failure-section {
+  border-top: 1px solid var(--color-gray-6);
+  padding-top: 20px;
+}
+
+.failed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.failed-item {
+  background-color: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #ff6b6b;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.result-summary {
+  background-color: rgba(11, 236, 18, 0.1);
+  border: 1px solid rgba(11, 236, 18, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.summary-text {
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  color: var(--color-green-0);
+  font-size: 14px;
+}
+
+.usage-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-green--1);
+}
+
+.close-result-btn {
+  padding: 10px 24px;
+  background-color: var(--color-green-0);
+  color: var(--color-black);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 80px;
+}
+
+.close-result-btn:hover {
+  background-color: var(--color-green-1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 640px) {
+  .result-modal-container {
+    width: 95%;
+    margin: 20px;
+    max-height: 90vh;
+  }
+  
+  .result-modal-content {
+    padding: 20px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .copy-all-btn {
+    align-self: flex-start;
+  }
+  
+  .code-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .admin-code {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .copy-btn {
+    align-self: flex-end;
+  }
+}

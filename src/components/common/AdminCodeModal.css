@@ -1,0 +1,332 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-container {
+  background: var(--color-gray-8);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-gray-6);
+}
+
+.modal-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--color-gray-2);
+  transition: all 0.15s ease;
+}
+
+.close-btn:hover {
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
+}
+
+.modal-content {
+  padding: 24px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-white);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-white);
+  transition: all 0.15s ease;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--color-green-0);
+  box-shadow: 0 0 0 3px rgba(11, 236, 18, 0.2);
+}
+
+.modal-input:disabled {
+  background-color: var(--color-gray-6);
+  color: var(--color-gray-3);
+  cursor: not-allowed;
+}
+
+.modal-input::placeholder {
+  color: var(--color-gray-3);
+}
+
+/* 숫자 input의 spinner 버튼 숨기기 (Chrome, Safari, Edge) */
+.modal-input[type="number"]::-webkit-outer-spin-button,
+.modal-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 숫자 input의 spinner 버튼 숨기기 (Firefox) */
+.modal-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.input-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-gray-2);
+}
+
+/* 날짜 설정 모드 탭 */
+.date-mode-tabs {
+  display: flex;
+  margin-bottom: 12px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-tab.active {
+  background-color: white;
+  color: #374151;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.mode-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 빠른 선택 버튼들 */
+.quick-select-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--color-gray-6);
+  background: var(--color-gray-7);
+  color: var(--color-white);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 45px;
+}
+
+.quick-btn:hover:not(:disabled) {
+  border-color: var(--color-green-0);
+  background-color: var(--color-gray-6);
+  color: var(--color-green-0);
+}
+
+.quick-btn.active {
+  background-color: var(--color-green-0);
+  border-color: var(--color-green-0);
+  color: var(--color-black);
+}
+
+.quick-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 날짜 입력 필드 */
+.date-input {
+  color-scheme: light;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: opacity(0.6);
+  transition: filter 0.15s ease;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover {
+  filter: opacity(1);
+}
+
+.error-message {
+  background-color: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #ff6b6b;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-gray-6);
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--color-gray-6);
+  background: var(--color-gray-7);
+  color: var(--color-white);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-6);
+  border-color: var(--color-gray-5);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.generate-btn {
+  padding: 8px 16px;
+  background-color: var(--color-green-0);
+  color: var(--color-black);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 100px;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background-color: var(--color-green-1);
+}
+
+.generate-btn:disabled {
+  background-color: var(--color-gray-5);
+  color: var(--color-gray-2);
+  cursor: not-allowed;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 640px) {
+  .modal-container {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .modal-header {
+    padding: 16px 20px;
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .generate-btn {
+    width: 100%;
+    padding: 10px 16px;
+  }
+
+  .quick-select-buttons {
+    justify-content: center;
+  }
+
+  .quick-btn {
+    flex: 1;
+    min-width: 50px;
+  }
+  
+  .date-mode-tabs {
+    margin-bottom: 16px;
+  }
+  
+  .mode-tab {
+    padding: 10px 12px;
+  }
+}
