@@ -1,4 +1,5 @@
 import React from 'react';
+import { sortApplicationQuestions } from '../../utils/sort';
 import './ApplicantModal.css';
 
 const ApplicantModal = ({ selectedApplicant, onClose }) => {
@@ -38,7 +39,7 @@ const ApplicantModal = ({ selectedApplicant, onClose }) => {
             </div>
 
             <div className="application-questions">
-              {Object.entries(selectedApplicant.application).map(([question, answer]) => (
+              {sortApplicationQuestions(selectedApplicant.application).map(([question, answer]) => (
                 <div key={question} className="question-section">
                   <h3 className="question-title">{question}</h3>
                   <div className="answer-content">
