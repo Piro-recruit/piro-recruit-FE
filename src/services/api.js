@@ -134,6 +134,17 @@ export const googleFormsAPI = {
     }
   },
 
+  // 활성화된 구글 폼 존재 여부 및 URL 확인 (Public API)
+  checkActiveFormsExists: async () => {
+    try {
+      const response = await apiClient.get('/api/google-forms/active/exists');
+      return response.data;
+    } catch (error) {
+      console.error('활성화된 구글 폼 존재 여부 확인 실패:', error);
+      throw error;
+    }
+  },
+
   // 새 구글 폼 생성
   createForm: async (formData) => {
     try {

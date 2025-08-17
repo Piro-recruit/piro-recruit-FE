@@ -22,32 +22,26 @@ const PiroMainPage = () => {
     try {
       setIsLoadingRecruitmentStatus(true);
       
-      // 활성화된 구글 폼 조회
-      const activeFormResult = await googleFormsAPI.getActiveForms();
+      // 활성화된 구글 폼 존재 여부 및 URL 확인 (Public API)
+      const existsResult = await googleFormsAPI.checkActiveFormsExists();
       
-      if (activeFormResult.success && activeFormResult.data) {
+      if (existsResult.success && existsResult.data.exists) {
         setIsRecruitmentPeriod(true);
-        setActiveFormUrl(activeFormResult.data.formUrl);
-        console.log('현재 활성화된 폼:', activeFormResult.data.title);
-        console.log('폼 URL:', activeFormResult.data.formUrl);
+        setActiveFormUrl(existsResult.data.formUrl || '');
+        console.log('현재 활성화된 폼이 있습니다.');
+        console.log('폼 URL:', existsResult.data.formUrl);
       } else {
         setIsRecruitmentPeriod(false);
         setActiveFormUrl('');
+        console.log('현재 활성화된 리쿠르팅이 없습니다.');
       }
     } catch (error) {
       console.error('리쿠르팅 상태 확인 실패:', error);
       
-      // 404 에러는 활성화된 폼이 없음을 의미
-      if (error.response?.status === 404) {
-        setIsRecruitmentPeriod(false);
-        setActiveFormUrl('');
-        console.log('현재 활성화된 리쿠르팅이 없습니다.');
-      } else {
-        // 다른 에러의 경우 기본값(false) 유지
-        setIsRecruitmentPeriod(false);
-        setActiveFormUrl('');
-        console.error('리쿠르팅 상태 확인 중 오류:', error.message);
-      }
+      // 에러 발생 시 기본값(false) 유지
+      setIsRecruitmentPeriod(false);
+      setActiveFormUrl('');
+      console.error('리쿠르팅 상태 확인 중 오류:', error.message);
     } finally {
       setIsLoadingRecruitmentStatus(false);
     }
