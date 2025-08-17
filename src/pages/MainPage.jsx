@@ -1,38 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoImage from '../assets/pirologo.png';
 import { ROUTES } from '../constants/routes';
+import { mailService } from '../services/mailService';
+import { googleFormsAPI } from '../services/api';
 import './MainPage.css';
 
 const PiroMainPage = () => {
   const [email, setEmail] = useState('');
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [isEmailSubmitting, setIsEmailSubmitting] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
+  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(false);
+  const [isLoadingRecruitmentStatus, setIsLoadingRecruitmentStatus] = useState(true);
+  const [activeFormUrl, setActiveFormUrl] = useState('');
   const navigate = useNavigate();
-  
-  // 모집 기간 상태 (실제로는 API나 설정에서 가져와야 함)
-  const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(true); // 임시로 true로 설정
 
-  const handleEmailSubmit = () => {
-    if (email && email.includes('@')) {
-      // 이메일 알림 신청 로직
-      console.log('Email submitted:', email);
-      alert('알림 신청이 완료되었습니다!');
-      setEmail('');
-    } else {
+  // 리쿠르팅 활성화 상태 확인
+  const fetchRecruitmentStatus = async () => {
+    try {
+      setIsLoadingRecruitmentStatus(true);
+      
+      // 활성화된 구글 폼 조회
+      const activeFormResult = await googleFormsAPI.getActiveForms();
+      
+      if (activeFormResult.success && activeFormResult.data) {
+        setIsRecruitmentPeriod(true);
+        setActiveFormUrl(activeFormResult.data.formUrl);
+        console.log('현재 활성화된 폼:', activeFormResult.data.title);
+        console.log('폼 URL:', activeFormResult.data.formUrl);
+      } else {
+        setIsRecruitmentPeriod(false);
+        setActiveFormUrl('');
+      }
+    } catch (error) {
+      console.error('리쿠르팅 상태 확인 실패:', error);
+      
+      // 404 에러는 활성화된 폼이 없음을 의미
+      if (error.response?.status === 404) {
+        setIsRecruitmentPeriod(false);
+        setActiveFormUrl('');
+        console.log('현재 활성화된 리쿠르팅이 없습니다.');
+      } else {
+        // 다른 에러의 경우 기본값(false) 유지
+        setIsRecruitmentPeriod(false);
+        setActiveFormUrl('');
+        console.error('리쿠르팅 상태 확인 중 오류:', error.message);
+      }
+    } finally {
+      setIsLoadingRecruitmentStatus(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 리쿠르팅 상태 확인
+  useEffect(() => {
+    fetchRecruitmentStatus();
+  }, []);
+
+  const handleEmailSubmit = async () => {
+    if (!email || !email.includes('@')) {
       alert('올바른 이메일 주소를 입력해주세요.');
+      return;
+    }
+
+    setIsEmailSubmitting(true);
+    setEmailMessage('');
+    
+    try {
+      const result = await mailService.registerSubscriber(email);
+      
+      if (result.success) {
+        setEmailMessage(result.message || '알림 신청이 완료되었습니다!');
+        setEmail('');
+      } else {
+        alert(result.message || '알림 신청 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('구독자 등록 중 예상치 못한 오류:', error);
+      alert('알림 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsEmailSubmitting(false);
     }
   };
 
   const handleApply = () => {
-    navigate(ROUTES.APPLICATION);
+    if (activeFormUrl) {
+      // 활성화된 구글 폼 URL로 리다이렉트
+      window.open(activeFormUrl, '_blank');
+    }
   };
-
-  const handleCheckApplication = () => {
-    // 지원서 확인 및 수정 페이지로 이동 (추후 구현)
-    alert('지원서 확인 및 수정 기능은 추후 구현됩니다.');
-  };
-
 
   const toggleFaq = (id) => {
     setExpandedFaq(expandedFaq === id ? null : id);
@@ -40,9 +97,9 @@ const PiroMainPage = () => {
 
   return (
       <div className="piro-main">
-        <header className="header">
+        <header className="main-header">
           <nav className="nav">
-            <div className="logo">
+            <div className="main-logo">
               <a href={ROUTES.PIROGRAMMING.HOME}>
                 <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
               </a>
@@ -70,7 +127,14 @@ const PiroMainPage = () => {
 
         <section className="hero">
           <div className="hero-content">
-            {isRecruitmentPeriod ? (
+            {isLoadingRecruitmentStatus ? (
+              <div className="loading-status">
+                <p className="hero-subtitle">
+                  모집 상태를 확인 중입니다...
+                </p>
+                <div className="loading-spinner">⏳</div>
+              </div>
+            ) : isRecruitmentPeriod ? (
               <>
                 <p className="hero-subtitle">
                   현재 <span className="highlight">모집</span> 중입니다.<br/>
@@ -83,12 +147,6 @@ const PiroMainPage = () => {
                     className="apply-btn primary"
                   >
                     지원하기
-                  </button>
-                  <button
-                    onClick={handleCheckApplication}
-                    className="apply-btn secondary"
-                  >
-                    지원기록 조회하기
                   </button>
                 </div>
               </>
@@ -106,14 +164,21 @@ const PiroMainPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="메일을 입력해주세요"
                     className="email-input"
+                    disabled={isEmailSubmitting}
                   />
                   <button
                     onClick={handleEmailSubmit}
                     className="email-btn"
+                    disabled={isEmailSubmitting}
                   >
-                    알림받기
+                    {isEmailSubmitting ? '처리중...' : '알림받기'}
                   </button>
                 </div>
+                {emailMessage && (
+                  <p className="email-success-message">
+                    {emailMessage}
+                  </p>
+                )}
               </>
             )}
           </div>

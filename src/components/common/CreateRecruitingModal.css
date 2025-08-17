@@ -1,0 +1,246 @@
+/* Create Recruiting Modal Styles */
+.create-recruiting-modal {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.create-recruiting-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.create-recruiting-modal-container {
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 500px;
+  animation: createRecruitingModalSlideIn 0.3s ease-out;
+}
+
+@keyframes createRecruitingModalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.create-recruiting-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-gray-6);
+}
+
+.create-recruiting-modal-title {
+  color: var(--color-white);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.create-recruiting-modal-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: var(--color-gray-3);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.create-recruiting-modal-close-btn:hover {
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
+}
+
+.create-recruiting-modal-close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.create-recruiting-modal-form {
+  padding: 1.5rem;
+}
+
+.create-recruiting-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.create-recruiting-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.create-recruiting-form-label {
+  display: block;
+  color: var(--color-gray-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.create-recruiting-required {
+  color: #ef4444;
+}
+
+.create-recruiting-form-input,
+.create-recruiting-form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-gray-8);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.create-recruiting-form-input:focus,
+.create-recruiting-form-textarea:focus {
+  border-color: var(--color-green-0);
+}
+
+.create-recruiting-form-input.error,
+.create-recruiting-form-textarea.error {
+  border-color: #ef4444;
+}
+
+.create-recruiting-form-input::placeholder,
+.create-recruiting-form-textarea::placeholder {
+  color: var(--color-gray-4);
+}
+
+.create-recruiting-form-input:disabled,
+.create-recruiting-form-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-recruiting-form-textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+.create-recruiting-form-help {
+  display: block;
+  color: var(--color-gray-4);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.create-recruiting-error-message {
+  display: block;
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.create-recruiting-modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-gray-6);
+}
+
+.create-recruiting-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  outline: none;
+}
+
+.create-recruiting-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-recruiting-btn-secondary {
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
+  border: 1px solid var(--color-gray-5);
+}
+
+.create-recruiting-btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-gray-5);
+}
+
+.create-recruiting-btn-primary {
+  background-color: var(--color-green-0);
+  color: var(--color-white);
+}
+
+.create-recruiting-btn-primary:hover:not(:disabled) {
+  background-color: var(--color-green-1);
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .create-recruiting-modal-overlay {
+    padding: 0.5rem;
+  }
+  
+  .create-recruiting-modal {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .create-recruiting-modal-header {
+    padding: 1rem;
+  }
+  
+  .create-recruiting-modal-form {
+    padding: 1rem;
+  }
+  
+  .create-recruiting-form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .create-recruiting-modal-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .create-recruiting-btn {
+    width: 100%;
+  }
+}
+
+/* 숫자 입력 필드의 스피너 제거 */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}

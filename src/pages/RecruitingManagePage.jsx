@@ -1,7 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, ArrowUpDown, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, ArrowUpDown, Users, Clock, CheckCircle, XCircle, User, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import AdminHeader from '../components/common/AdminHeader';
+import AdminCodeModal from '../components/common/AdminCodeModal';
+import AdminCodeResultModal from '../components/common/AdminCodeResultModal';
+import AdminManageModal from '../components/common/AdminManageModal';
+import CreateRecruitingModal from '../components/common/CreateRecruitingModal';
+import { authService } from '../services/authService';
+import { googleFormsAPI } from '../services/api';
 import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import './RecruitingManagePage.css';
@@ -14,125 +20,193 @@ const RecruitingManagePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = RECRUITMENT_CONFIG.ITEMS_PER_PAGE;
 
+  // 관리자 코드 모달 상태
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+  const [codeGenerationResult, setCodeGenerationResult] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [googleForms, setGoogleForms] = useState([]);
+  const [isLoadingForms, setIsLoadingForms] = useState(false);
+
   const handleRecruitingClick = (recruitingId) => {
-    // 추후 구현할 상세 페이지로 이동
-    navigate(ROUTES.ADMIN_RECRUITING_DETAIL.replace(':id', recruitingId));
+    // recruitingId가 'form-{id}' 형태인 경우 실제 Google Form ID 추출
+    let actualId = recruitingId;
+    if (recruitingId.startsWith('form-')) {
+      actualId = recruitingId.replace('form-', '');
+    }
+    navigate(ROUTES.ADMIN_RECRUITING_DETAIL.replace(':id', actualId));
   };
 
-  // 확장된 모의 데이터
-  const allRecruitings = [
-    {
-      id: 1,
-      title: '2024년 여름기 신입 개발자 채용',
-      period: '2024.07.01 ~ 2024.07.31',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 127,
-      comments: 3
-    },
-    {
-      id: 2,
-      title: '2024년 여름기 디자이너 채용',
-      period: '2024.06.01 ~ 2024.06.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 0,
-      comments: 2
-    },
-    {
-      id: 3,
-      title: '2024년 상반기 마케터 채용',
-      period: '2024.03.01 ~ 2024.03.31',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 89,
-      comments: 3
-    },
-    {
-      id: 4,
-      title: '2024년 봄학기 백엔드 개발자 채용',
-      period: '2024.04.01 ~ 2024.04.30',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 45,
-      comments: 1
-    },
-    {
-      id: 5,
-      title: '2024년 인턴십 프로그램',
-      period: '2024.02.01 ~ 2024.02.28',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 203,
-      comments: 8
-    },
-    {
-      id: 6,
-      title: '2024년 하반기 프론트엔드 개발자 채용',
-      period: '2024.08.01 ~ 2024.08.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 12,
-      comments: 0
-    },
-    {
-      id: 7,
-      title: '2024년 겨울기 UI/UX 디자이너 채용',
-      period: '2024.12.01 ~ 2024.12.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 0,
-      comments: 0
-    },
-    {
-      id: 8,
-      title: '2024년 데이터 사이언티스트 채용',
-      period: '2024.05.01 ~ 2024.05.31',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 67,
-      comments: 4
-    },
-    {
-      id: 9,
-      title: '2024년 풀스택 개발자 채용',
-      period: '2024.09.01 ~ 2024.09.30',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 89,
-      comments: 6
-    },
-    {
-      id: 10,
-      title: '2024년 모바일 앱 개발자 채용',
-      period: '2024.10.01 ~ 2024.10.31',
-      status: RECRUITMENT_STATUS.PENDING,
-      statusColor: 'yellow',
-      applicants: 34,
-      comments: 2
-    },
-    {
-      id: 11,
-      title: '2024년 DevOps 엔지니어 채용',
-      period: '2024.11.01 ~ 2024.11.30',
-      status: RECRUITMENT_STATUS.ACTIVE,
-      statusColor: 'green',
-      applicants: 23,
-      comments: 1
-    },
-    {
-      id: 12,
-      title: '2024년 QA 엔지니어 채용',
-      period: '2024.01.01 ~ 2024.01.31',
-      status: RECRUITMENT_STATUS.INACTIVE,
-      statusColor: 'red',
-      applicants: 156,
-      comments: 9
+  // 관리자 코드 생성 함수
+  const handleGenerateAdminCodes = async (count, expirationDays) => {
+    setIsGenerating(true);
+    
+    try {
+      const result = await authService.createGeneralAdmins(count, expirationDays);
+      
+      if (!result.success) {
+        // API 호출은 성공했지만 결과가 실패인 경우
+        if (result.error?.status === 401) {
+          alert('권한이 없습니다. 관리자 코드 생성은 루트 관리자만 가능합니다.');
+        } else {
+          alert(result.message || '관리자 코드 생성 중 오류가 발생했습니다.');
+        }
+        setIsCodeModalOpen(false);
+        return;
+      }
+      
+      setCodeGenerationResult(result);
+      setIsCodeModalOpen(false);
+      setIsResultModalOpen(true);
+    } catch (error) {
+      console.error('관리자 코드 생성 실패:', error);
+      
+      // HTTP 상태 코드 확인
+      if (error.response?.status === 401) {
+        alert('권한이 없습니다. 관리자 코드 생성은 루트 관리자만 가능합니다.');
+      } else if (error.response?.status === 403) {
+        alert('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        alert('관리자 코드 생성 중 오류가 발생했습니다.');
+      }
+      
+      setIsCodeModalOpen(false);
+    } finally {
+      setIsGenerating(false);
     }
-  ];
+  };
+
+  // 코드 생성 버튼 클릭 핸들러
+  const handleCodeCreateClick = () => {
+    setIsCodeModalOpen(true);
+  };
+
+  // 관리자 관리 버튼 클릭 핸들러
+  const handleManageAdminClick = async () => {
+    // 권한 체크를 위해 미리 API 호출 시도
+    try {
+      await authService.getAllGeneralAdmins();
+      setIsManageModalOpen(true);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        alert('권한이 없습니다. 관리자 계정 관리는 루트 관리자만 가능합니다.');
+      } else if (error.response?.status === 403) {
+        alert('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        alert('관리자 계정 정보를 불러올 수 없습니다.');
+      }
+    }
+  };
+
+  // 모달 닫기 핸들러들
+  const handleCloseCodeModal = () => {
+    setIsCodeModalOpen(false);
+  };
+
+  const handleCloseResultModal = () => {
+    setIsResultModalOpen(false);
+    setCodeGenerationResult(null);
+  };
+
+  const handleCloseManageModal = () => {
+    setIsManageModalOpen(false);
+  };
+
+  // 새 리쿠르팅 생성 함수
+  const handleCreateRecruiting = async (formData) => {
+    setIsCreating(true);
+    
+    try {
+      const response = await googleFormsAPI.createForm(formData);
+      
+      if (response.success) {
+        alert('리쿠르팅이 성공적으로 생성되었습니다.');
+        setIsCreateModalOpen(false);
+        // 구글 폼 리스트 업데이트
+        await fetchGoogleForms();
+      } else {
+        alert(response.message || '리쿠르팅 생성 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('리쿠르팅 생성 실패:', error);
+      
+      if (error.response?.status === 401) {
+        alert('권한이 없습니다. 로그인을 확인해주세요.');
+      } else if (error.response?.status === 403) {
+        alert('접근이 거부되었습니다. 관리자 권한을 확인해주세요.');
+      } else {
+        alert('리쿠르팅 생성 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // 새 리쿠르팅 생성 버튼 클릭 핸들러
+  const handleCreateClick = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  // 새 리쿠르팅 생성 모달 닫기 핸들러
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  // 구글 폼 데이터 로드
+  const fetchGoogleForms = async () => {
+    setIsLoadingForms(true);
+    try {
+      const response = await googleFormsAPI.getForms();
+      if (response.success && response.data) {
+        setGoogleForms(response.data);
+      } else {
+        console.error('구글 폼 조회 실패:', response.message);
+        setGoogleForms([]);
+      }
+    } catch (error) {
+      console.error('구글 폼 조회 중 오류:', error);
+      setGoogleForms([]);
+    } finally {
+      setIsLoadingForms(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 구글 폼 데이터 로드
+  useEffect(() => {
+    fetchGoogleForms();
+  }, []);
+
+  // 구글 폼 데이터를 recruitings 형태로 변환
+  const googleFormsRecruitings = googleForms.map((form) => ({
+    id: `form-${form.id}`,
+    title: form.title || '제목 없는 폼',
+    period: form.recruitingStartDate && form.recruitingEndDate 
+      ? `${new Date(form.recruitingStartDate).toLocaleDateString()} ~ ${new Date(form.recruitingEndDate).toLocaleDateString()}`
+      : form.createdAt 
+      ? `${new Date(form.createdAt).toLocaleDateString()} ~ 진행중`
+      : '기간 미정',
+    status: form.isActive ? RECRUITMENT_STATUS.ACTIVE : RECRUITMENT_STATUS.INACTIVE,
+    statusColor: form.isActive ? 'green' : 'red',
+    applicants: form.applicationCount || 0,
+    comments: 0,
+    formId: form.formId,
+    isGoogleForm: true,
+    originalData: form
+  }));
+
+  // 모든 리쿠르팅 데이터 (구글폼만 사용)
+  const allRecruitings = googleFormsRecruitings;
 
   // 필터링 및 정렬된 데이터
   const filteredRecruitings = useMemo(() => {
+    // 데이터가 로딩 중이거나 없으면 빈 배열 반환
+    if (isLoadingForms || !googleForms.length) {
+      return [];
+    }
+
     let filtered = allRecruitings;
 
     // 검색 필터
@@ -167,7 +241,7 @@ const RecruitingManagePage = () => {
     }
 
     return filtered;
-  }, [searchTerm, statusFilter, sortBy]);
+  }, [searchTerm, statusFilter, sortBy, googleForms, isLoadingForms]);
 
   // 페이지네이션
   const totalPages = Math.ceil(filteredRecruitings.length / itemsPerPage);
@@ -178,11 +252,10 @@ const RecruitingManagePage = () => {
   // 통계 계산
   const stats = useMemo(() => ({
     totalRecruitings: allRecruitings.length,
-    active: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.PENDING).length,
-    recruiting: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.ACTIVE).length,
-    closed: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.INACTIVE).length,
+    active: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.ACTIVE).length,
+    inactive: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.INACTIVE).length,
     totalApplicants: allRecruitings.reduce((sum, r) => sum + r.applicants, 0)
-  }), []);
+  }), [googleForms]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -204,9 +277,6 @@ const RecruitingManagePage = () => {
     switch (filterType) {
       case 'all':
         setStatusFilter('전체 상태');
-        break;
-      case 'pending':
-        setStatusFilter(RECRUITMENT_STATUS.PENDING);
         break;
       case 'active':
         setStatusFilter(RECRUITMENT_STATUS.ACTIVE);
@@ -251,7 +321,6 @@ const RecruitingManagePage = () => {
                 >
                   <option>전체 상태</option>
                   <option>{RECRUITMENT_STATUS.ACTIVE}</option>
-                  <option>{RECRUITMENT_STATUS.PENDING}</option>
                   <option>{RECRUITMENT_STATUS.INACTIVE}</option>
                 </select>
                 <select 
@@ -266,10 +335,14 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             <div className="top-actions">
-              <button className="code-create-btn">
+              <button className="code-create-btn" onClick={handleCodeCreateClick}>
                 코드 생성
               </button>
-              <button className="create-btn">
+              <button className="admin-manage-btn" onClick={handleManageAdminClick}>
+                <Settings size={16} />
+                관리자 관리
+              </button>
+              <button className="create-btn" onClick={handleCreateClick}>
                 <Plus size={16} />
                 새 리쿠르팅 생성
               </button>
@@ -288,23 +361,13 @@ const RecruitingManagePage = () => {
               </div>
             </div>
             
-            <div className="stat-card clickable" onClick={() => handleStatCardClick('pending')}>
-              <div className="stat-icon yellow">
-                <Clock size={24} />
-              </div>
-              <div className="stat-info">
-                <div className="stat-label">작성중</div>
-                <div className="stat-value">{stats.active}</div>
-              </div>
-            </div>
-            
             <div className="stat-card clickable" onClick={() => handleStatCardClick('active')}>
               <div className="stat-icon green">
                 <CheckCircle size={24} />
               </div>
               <div className="stat-info">
-                <div className="stat-label">모집중</div>
-                <div className="stat-value">{stats.recruiting}</div>
+                <div className="stat-label">활성</div>
+                <div className="stat-value">{stats.active}</div>
               </div>
             </div>
             
@@ -313,8 +376,8 @@ const RecruitingManagePage = () => {
                 <XCircle size={24} />
               </div>
               <div className="stat-info">
-                <div className="stat-label">마감</div>
-                <div className="stat-value">{stats.closed}</div>
+                <div className="stat-label">비활성</div>
+                <div className="stat-value">{stats.inactive}</div>
               </div>
             </div>
             
@@ -329,9 +392,17 @@ const RecruitingManagePage = () => {
             </div>
           </div>
 
+          {/* 로딩 상태 표시 */}
+          {isLoadingForms && (
+            <div className="loading-indicator">
+              <p>구글 폼 데이터를 불러오는 중...</p>
+            </div>
+          )}
+
           {/* 리쿠르팅 목록 */}
-          <div className="recruiting-list">
-            {currentRecruitings.map((recruiting) => (
+          {!isLoadingForms && (
+            <div className="recruiting-list">
+              {currentRecruitings.map((recruiting) => (
               <div 
                 key={recruiting.id} 
                 className="recruiting-item clickable"
@@ -360,11 +431,12 @@ const RecruitingManagePage = () => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* 페이지네이션 */}
-          {totalPages > 1 && (
+          {!isLoadingForms && totalPages > 1 && (
             <div className="pagination">
               <button 
                 className="pagination-btn prev"
@@ -397,13 +469,48 @@ const RecruitingManagePage = () => {
           )}
 
           {/* 결과 없음 표시 */}
-          {filteredRecruitings.length === 0 && (
+          {!isLoadingForms && filteredRecruitings.length === 0 && googleForms.length === 0 && (
+            <div className="no-results">
+              <p>등록된 리쿠르팅이 없습니다.</p>
+            </div>
+          )}
+          
+          {!isLoadingForms && filteredRecruitings.length === 0 && googleForms.length > 0 && (
             <div className="no-results">
               <p>검색 결과가 없습니다.</p>
             </div>
           )}
         </div>
       </main>
+
+      {/* 관리자 코드 생성 모달 */}
+      <AdminCodeModal
+        isOpen={isCodeModalOpen}
+        onClose={handleCloseCodeModal}
+        onGenerate={handleGenerateAdminCodes}
+        isLoading={isGenerating}
+      />
+
+      {/* 관리자 코드 생성 결과 모달 */}
+      <AdminCodeResultModal
+        isOpen={isResultModalOpen}
+        onClose={handleCloseResultModal}
+        result={codeGenerationResult}
+      />
+
+      {/* 관리자 관리 모달 */}
+      <AdminManageModal
+        isOpen={isManageModalOpen}
+        onClose={handleCloseManageModal}
+      />
+
+      {/* 새 리쿠르팅 생성 모달 */}
+      <CreateRecruitingModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onSubmit={handleCreateRecruiting}
+        isLoading={isCreating}
+      />
     </div>
   );
 };

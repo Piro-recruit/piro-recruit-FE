@@ -6,9 +6,8 @@ export const RECRUITMENT_CONFIG = {
 };
 
 export const RECRUITMENT_STATUS = {
-  ACTIVE: '모집중',
-  INACTIVE: '모집완료',
-  PENDING: '모집예정',
+  ACTIVE: '활성',
+  INACTIVE: '비활성',
 };
 
 export const APPLICANT_STATUS = {
