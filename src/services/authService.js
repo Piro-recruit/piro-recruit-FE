@@ -80,13 +80,39 @@ export const authService = {
   },
 
   /**
-   * 로그아웃
+   * 로그아웃 (API 호출 포함)
    */
-  logout() {
+  async logout() {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      
+      if (refreshToken) {
+        console.log('로그아웃 API 요청');
+        await apiClient.post('/api/admin/logout', {
+          refreshToken: refreshToken
+        });
+        console.log('로그아웃 API 호출 성공');
+      }
+    } catch (error) {
+      console.error('로그아웃 API 호출 실패:', error);
+      // API 호출 실패해도 로컬 토큰은 제거
+    }
+    
+    // 로컬 스토리지 토큰 제거
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('expiresIn');
     console.log('로그아웃 완료');
+  },
+
+  /**
+   * 로컬 로그아웃 (API 호출 없이 토큰만 제거)
+   */
+  logoutLocal() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('expiresIn');
+    console.log('로컬 로그아웃 완료');
   },
 
   /**

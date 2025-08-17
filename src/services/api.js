@@ -93,6 +93,7 @@ apiClient.interceptors.response.use(
       const isAdminPage = window.location.pathname.startsWith('/admin');
       
       if (!isCSVExport && (isAdminAPI || isAdminPage)) {
+        // authService의 logoutLocal 사용하지 않고 직접 처리 (순환 참조 방지)
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('expiresIn');
