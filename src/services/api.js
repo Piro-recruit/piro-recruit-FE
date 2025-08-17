@@ -289,7 +289,7 @@ export const applicationsAPI = {
   // 특정 지원서 조회
   getApplicationById: async (id) => {
     try {
-      const response = await apiClient.get(`/api/webhook/applications/${id}`);
+      const response = await apiClient.get(`/api/webhook/applications/id/${id}`);
       return response.data;
     } catch (error) {
       console.error('지원서 조회 실패:', error);
