@@ -2,7 +2,6 @@
 export const ROUTES = {
   // Public routes
   HOME: '/',
-  APPLICATION: '/apply',
   
   // Admin routes
   ADMIN_LOGIN: '/admin',
