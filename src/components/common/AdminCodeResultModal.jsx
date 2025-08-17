@@ -20,7 +20,12 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
     
     try {
       const allCodes = result.data.createdAdmins
-        .map((admin, index) => `${index + 1}. ${admin.loginCode} (만료일: ${new Date(admin.expiresAt).toLocaleDateString()})`)
+        .map((admin, index) => {
+          const expiryDate = admin.expiredAt 
+            ? new Date(admin.expiredAt).toLocaleDateString()
+            : '만료일 정보 없음';
+          return `${index + 1}. ${admin.loginCode} (만료일: ${expiryDate})`;
+        })
         .join('\n');
       
       await navigator.clipboard.writeText(allCodes);
@@ -108,7 +113,11 @@ const AdminCodeResultModal = ({ isOpen, onClose, result }) => {
                         </div>
                         <div className="expiry-info">
                           <Calendar size={14} />
-                          <span>만료일: {new Date(admin.expiresAt).toLocaleDateString()}</span>
+                          <span>만료일: {
+                            admin.expiredAt 
+                              ? new Date(admin.expiredAt).toLocaleDateString()
+                              : '정보 없음'
+                          }</span>
                         </div>
                       </div>
                     </div>
