@@ -11,9 +11,48 @@ import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
-import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI, evaluationAPI, applicationStatusAPI } from '../services/api';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
 import './RecruitingDetailPage.css';
+
+// JWT 토큰에서 사용자 정보 추출하는 유틸리티 함수
+const getCurrentUserFromToken = () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.log('토큰이 없습니다');
+      return null;
+    }
+    
+    // JWT는 header.payload.signature 형태
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('유효하지 않은 JWT 형식:', parts.length, '개 부분');
+      return null;
+    }
+    
+    const payload = parts[1];
+    
+    // Base64 디코딩 (URL-safe base64)
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const userInfo = JSON.parse(decoded);
+    
+    console.log('JWT에서 추출한 사용자 정보:', userInfo);
+    console.log('사용자 ID 후보들:', {
+      id: userInfo.id,
+      sub: userInfo.sub,
+      userId: userInfo.userId,
+      username: userInfo.username,
+      email: userInfo.email,
+      adminId: userInfo.adminId
+    });
+    
+    return userInfo;
+  } catch (error) {
+    console.error('JWT 토큰 파싱 실패:', error);
+    return null;
+  }
+};
 
 
 const RecruitingDetailPage = () => {
@@ -53,6 +92,18 @@ const RecruitingDetailPage = () => {
   const [error, setError] = useState(null);
   const [statisticsData, setStatisticsData] = useState(null);
   const [isLoadingStatistics, setIsLoadingStatistics] = useState(false);
+  
+  // AI Summary 상태
+  const [aiSummaries, setAiSummaries] = useState({});
+  const [isLoadingAiSummaries, setIsLoadingAiSummaries] = useState(false);
+  
+  // Evaluation 상태
+  const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
+  
+  // 일괄 상태 변경 상태
+  const [bulkChangeCount, setBulkChangeCount] = useState(10);
+  const [isBulkChanging, setIsBulkChanging] = useState(false);
+  const [showBulkChangeModal, setShowBulkChangeModal] = useState(false);
 
   // 구독자 수 조회
   const fetchSubscriberCount = async () => {
@@ -169,20 +220,24 @@ const RecruitingDetailPage = () => {
             major: `${app.department || 'Unknown'} (${app.grade || 'Unknown'})`, // 기존 호환성을 위해 유지
             majorStatus: app.major || 'Unknown', // 전공자 여부
             appliedDate: app.updatedAt ? new Date(app.updatedAt).toLocaleDateString() : '날짜 없음',
+            // API passStatus 필드 그대로 유지 (상태 변경에 사용)
+            passStatus: app.passStatus || 'PENDING',
             // API passStatus를 UI status로 매핑
-            status: app.passStatus === 'PASS' ? APPLICANT_STATUS.PASSED : 
-                   app.passStatus === 'FAIL' ? APPLICANT_STATUS.FAILED :
+            status: app.passStatus === 'FINAL_PASS' ? APPLICANT_STATUS.PASSED : 
+                   app.passStatus === 'FIRST_PASS' ? '1차 합격' :
+                   app.passStatus === 'FAILED' ? APPLICANT_STATUS.FAILED :
                    app.passStatus === 'PENDING' ? APPLICANT_STATUS.REVIEWING : 
                    APPLICANT_STATUS.REVIEWING,
-            statusColor: app.passStatus === 'PASS' ? 'green' :
-                        app.passStatus === 'FAIL' ? 'red' :
+            statusColor: app.passStatus === 'FINAL_PASS' ? 'green' :
+                        app.passStatus === 'FIRST_PASS' ? 'blue' :
+                        app.passStatus === 'FAILED' ? 'red' :
                         app.passStatus === 'PENDING' ? 'yellow' : 'yellow',
-            aiScore: Math.floor(Math.random() * 40) + 60, // 임시 AI 점수
+            aiScore: 0, // AI Summary API에서 가져올 예정
             skills: [app.major, app.department].filter(Boolean), // 전공여부와 학과를 스킬로 표시
             portfolio: formData['포트폴리오'] || formData['포트폴리오 링크'] || '',
             application: fullApplication, // 전체 지원서 데이터
-            // AI 분석 데이터가 있으면 사용, 없으면 기본 데이터 기반으로 생성
-            aiSummary: app.aiAnalysis || {
+            // AI 분석 데이터는 별도로 관리 (aiSummaries state)
+            aiSummary: {
               '학력 정보': `${app.school} ${app.department} ${app.grade} (${app.major})`,
               '각오': formData['각오'] ? formData['각오'].substring(0, 50) + '...' : '데이터 미제공',
               '경력': formData['경력'] || '데이터 미제공'
@@ -243,6 +298,192 @@ const RecruitingDetailPage = () => {
     }
   };
 
+  // AI Summary 데이터 조회
+  const fetchAiSummaries = async () => {
+    if (!allApplicants.length) return;
+    
+    setIsLoadingAiSummaries(true);
+    
+    try {
+      console.log('AI Summary 조회 시작, 지원자 수:', allApplicants.length);
+      console.log('첫 번째 지원자 ID:', allApplicants[0]?.id);
+      
+      const summaryPromises = allApplicants.map(async (applicant, index) => {
+        try {
+          console.log(`지원자 ${index + 1}/${allApplicants.length}: ID=${applicant.id}, 이름=${applicant.name}`);
+          const response = await aiSummaryAPI.getApplicationSummary(applicant.id);
+          
+          console.log(`지원자 ${applicant.id} 응답:`, response);
+          
+          // 응답 구조를 더 유연하게 처리
+          if (response && response.success && response.data) {
+            console.log(`지원자 ${applicant.id} AI Summary 발견:`, response.data);
+            return {
+              applicantId: applicant.id,
+              summary: response.data
+            };
+          } else {
+            console.log(`지원자 ${applicant.id}: AI Summary 없음 또는 응답 구조 다름`, response);
+            return null;
+          }
+        } catch (error) {
+          console.log(`지원자 ${applicant.id} AI Summary 조회 오류:`, error);
+          return null;
+        }
+      });
+      
+      const summaryResults = await Promise.allSettled(summaryPromises);
+      const newAiSummaries = {};
+      
+      summaryResults.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const { applicantId, summary } = result.value;
+          newAiSummaries[applicantId] = summary;
+          console.log(`지원자 ${applicantId} AI Summary 저장 완료`);
+        } else if (result.status === 'rejected') {
+          console.log(`지원자 ${allApplicants[index]?.id} Promise rejected:`, result.reason);
+        }
+      });
+      
+      console.log('AI Summary 조회 완료:', Object.keys(newAiSummaries).length, '개');
+      console.log('저장된 AI Summary 데이터:', newAiSummaries);
+      setAiSummaries(newAiSummaries);
+    } catch (error) {
+      console.error('AI Summary 조회 실패:', error);
+    } finally {
+      setIsLoadingAiSummaries(false);
+    }
+  };
+
+  // 평가 데이터 조회 - 모든 평가자의 평가를 가져오고, 현재 사용자의 평가만 편집 가능하게 함
+  const fetchEvaluations = async () => {
+    if (!allApplicants.length) return;
+    
+    setIsLoadingEvaluations(true);
+    
+    try {
+      const currentUser = getCurrentUserFromToken();
+      console.log('평가 데이터 조회 시작');
+      console.log('지원자 수:', allApplicants.length);
+      console.log('현재 로그인 사용자:', currentUser);
+      
+      const evaluationPromises = allApplicants.map(async (applicant) => {
+        try {
+          console.log(`지원자 ${applicant.id} 평가 조회 중`);
+          const response = await evaluationAPI.getApplicationEvaluations(applicant.id);
+          
+          if (response.success && response.data && response.data.length > 0) {
+            console.log(`지원자 ${applicant.id} 평가 발견:`, response.data);
+            
+            // 모든 평가를 저장하되, 현재 사용자의 평가를 구분
+            const allEvaluations = response.data.map(evaluation => ({
+              id: evaluation.id,
+              score: evaluation.score,
+              comment: evaluation.comment,
+              evaluator: evaluation.evaluatorName,
+              evaluatedAt: evaluation.createdAt,
+              evaluatorId: evaluation.evaluatorId,
+              applicantName: evaluation.applicantName,
+              updatedAt: evaluation.updatedAt
+            }));
+            
+            // 현재 사용자의 평가 찾기
+            const currentUser = getCurrentUserFromToken();
+            let myEvaluation = null;
+            
+            if (currentUser) {
+              // JWT에서 사용자 ID를 추출해서 해당 사용자의 평가 찾기
+              // JWT 토큰의 구조에 따라 사용자 ID 필드명이 다를 수 있음
+              const possibleUserIds = [
+                currentUser.id,
+                currentUser.sub, 
+                currentUser.userId,
+                currentUser.adminId,
+                currentUser.username,
+                currentUser.email
+              ].filter(Boolean); // null, undefined 제거
+              
+              console.log('현재 사용자 ID 후보들:', possibleUserIds);
+              console.log('평가 목록의 evaluatorId들:', allEvaluations.map(e => e.evaluatorId));
+              
+              // 각 후보 ID로 평가 찾기 시도
+              for (const candidateId of possibleUserIds) {
+                myEvaluation = allEvaluations.find(evaluation => {
+                  // 정확한 매치, 문자열 매치, 숫자 매치 모두 시도
+                  return evaluation.evaluatorId === candidateId || 
+                         evaluation.evaluatorId === candidateId.toString() ||
+                         evaluation.evaluatorId === parseInt(candidateId) ||
+                         evaluation.evaluator === candidateId; // evaluatorName으로도 비교
+                });
+                
+                if (myEvaluation) {
+                  console.log(`사용자 ID ${candidateId}로 평가를 찾았습니다:`, myEvaluation);
+                  break;
+                }
+              }
+              
+              if (!myEvaluation) {
+                console.log('현재 사용자의 평가를 찾지 못했습니다. 새로운 평가를 작성할 수 있습니다.');
+              }
+            }
+            
+            // myEvaluation이 null이면 현재 사용자는 아직 이 지원자를 평가하지 않았음
+            
+            return {
+              applicantId: applicant.id,
+              allEvaluations: allEvaluations, // 모든 평가 목록
+              myEvaluation: myEvaluation // 내 평가만 편집 가능
+            };
+          } else {
+            console.log(`지원자 ${applicant.id}: 평가 없음`);
+            // 평가가 없어도 현재 사용자는 새로운 평가를 작성할 수 있음
+            return {
+              applicantId: applicant.id,
+              allEvaluations: [],
+              myEvaluation: null // null이므로 새로운 평가를 작성할 수 있음
+            };
+          }
+        } catch (error) {
+          console.log(`지원자 ${applicant.id} 평가 조회 오류:`, error);
+          return {
+            applicantId: applicant.id,
+            allEvaluations: [],
+            myEvaluation: null
+          };
+        }
+      });
+      
+      const evaluationResults = await Promise.allSettled(evaluationPromises);
+      const newEvaluations = {};
+      
+      evaluationResults.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const { applicantId, allEvaluations, myEvaluation } = result.value;
+          newEvaluations[applicantId] = {
+            allEvaluations: allEvaluations,
+            myEvaluation: myEvaluation
+          };
+          console.log(`지원자 ${applicantId} 평가 저장 완료:`, allEvaluations.length, '개 평가');
+        } else if (result.status === 'rejected') {
+          const applicantId = allApplicants[index]?.id;
+          console.log(`지원자 ${applicantId} Promise rejected:`, result.reason);
+          newEvaluations[applicantId] = {
+            allEvaluations: [],
+            myEvaluation: null
+          };
+        }
+      });
+      
+      console.log('평가 조회 완료:', Object.keys(newEvaluations).length, '개 지원자');
+      console.log('저장된 평가 데이터:', newEvaluations);
+      setEvaluations(newEvaluations);
+    } catch (error) {
+      console.error('평가 조회 실패:', error);
+    } finally {
+      setIsLoadingEvaluations(false);
+    }
+  };
+
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     console.log('컴포넌트 마운트, id:', id);
@@ -250,6 +491,14 @@ const RecruitingDetailPage = () => {
     fetchApplications();
     fetchStatistics();
   }, [id]);
+
+  // 지원자 데이터가 로드된 후 AI Summary와 평가 데이터 조회
+  useEffect(() => {
+    if (allApplicants.length > 0 && !isLoadingApplications) {
+      fetchAiSummaries();
+      fetchEvaluations();
+    }
+  }, [allApplicants.length, isLoadingApplications]);
 
   // 상태 변화 디버깅
   useEffect(() => {
@@ -344,17 +593,64 @@ const RecruitingDetailPage = () => {
     setSelectedApplicant(null);
   };
 
-  const handleEvaluationSubmit = (applicantId, evaluationData) => {
-    setEvaluations(prev => ({
-      ...prev,
-      [applicantId]: {
+  const handleEvaluationSubmit = async (applicantId, evaluationData) => {
+    try {
+      console.log('평가 제출 시작:', applicantId, evaluationData);
+      
+      // API를 통해 평가 생성
+      const response = await evaluationAPI.createEvaluation({
+        applicationId: applicantId,
         score: evaluationData.score,
-        comment: evaluationData.comment,
-        evaluator: '운영진A', // 실제로는 로그인한 사용자 정보
-        evaluatedAt: new Date().toISOString()
+        comment: evaluationData.comment
+      });
+
+      if (response.success && response.data) {
+        console.log('평가 생성 성공:', response.data);
+        
+        // 새로운 평가 객체 생성
+        const newEvaluation = {
+          id: response.data.id,
+          score: response.data.score,
+          comment: response.data.comment,
+          evaluator: response.data.evaluatorName || '운영진A',
+          evaluatedAt: response.data.createdAt || new Date().toISOString(),
+          evaluatorId: response.data.evaluatorId,
+          applicantName: response.data.applicantName,
+          updatedAt: response.data.updatedAt
+        };
+        
+        // 로컬 상태 업데이트 - 새로운 데이터 구조에 맞게
+        setEvaluations(prev => {
+          const currentEvaluations = prev[applicantId] || { allEvaluations: [], myEvaluation: null };
+          return {
+            ...prev,
+            [applicantId]: {
+              allEvaluations: [...currentEvaluations.allEvaluations, newEvaluation], // 모든 평가 목록에 추가
+              myEvaluation: newEvaluation // 내 평가로 설정
+            }
+          };
+        });
+        
+        setEditingEvaluation(null); // 편집 모드 종료
+        console.log('평가가 성공적으로 등록되었습니다.');
+      } else {
+        console.error('평가 생성 응답 오류:', response);
+        alert(response.message || '평가 등록에 실패했습니다.');
       }
-    }));
-    setEditingEvaluation(null); // 편집 모드 종료
+    } catch (error) {
+      console.error('평가 등록 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 409) {
+        alert('이미 이 지원서에 대한 평가를 등록하셨습니다.');
+      } else if (error.response?.status === 404) {
+        alert('지원서를 찾을 수 없습니다.');
+      } else if (error.response?.status === 400) {
+        alert('평가 데이터가 올바르지 않습니다. (점수: 0-100점)');
+      } else {
+        alert('평가 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
   };
 
   const handleEditEvaluation = (applicantId) => {
@@ -365,6 +661,224 @@ const RecruitingDetailPage = () => {
     setEditingEvaluation(null);
   };
 
+  // 평가 수정 핸들러
+  const handleEvaluationUpdate = async (applicantId, evaluationData) => {
+    try {
+      // 현재 저장된 내 평가의 ID를 가져옴
+      const currentEvaluations = evaluations[applicantId];
+      if (!currentEvaluations || !currentEvaluations.myEvaluation || !currentEvaluations.myEvaluation.id) {
+        alert('수정할 평가를 찾을 수 없습니다.');
+        return;
+      }
+
+      const myEvaluation = currentEvaluations.myEvaluation;
+      console.log('평가 수정 시작:', myEvaluation.id, evaluationData);
+      
+      // API를 통해 평가 수정
+      const response = await evaluationAPI.updateEvaluation(myEvaluation.id, {
+        score: evaluationData.score,
+        comment: evaluationData.comment
+      });
+
+      if (response.success && response.data) {
+        console.log('평가 수정 성공:', response.data);
+        
+        // 업데이트된 평가 객체 생성
+        const updatedEvaluation = {
+          ...myEvaluation,
+          score: response.data.score,
+          comment: response.data.comment,
+          updatedAt: response.data.updatedAt,
+          evaluator: response.data.evaluatorName || myEvaluation.evaluator,
+          applicantName: response.data.applicantName
+        };
+        
+        // 로컬 상태 업데이트 - 새로운 데이터 구조에 맞게
+        setEvaluations(prev => {
+          const currentEvaluations = prev[applicantId] || { allEvaluations: [], myEvaluation: null };
+          
+          // 전체 평가 목록에서 내 평가 업데이트
+          const updatedAllEvaluations = currentEvaluations.allEvaluations.map(evaluation => 
+            evaluation.id === myEvaluation.id ? updatedEvaluation : evaluation
+          );
+          
+          return {
+            ...prev,
+            [applicantId]: {
+              allEvaluations: updatedAllEvaluations,
+              myEvaluation: updatedEvaluation
+            }
+          };
+        });
+        
+        setEditingEvaluation(null); // 편집 모드 종료
+        console.log('평가가 성공적으로 수정되었습니다.');
+      } else {
+        console.error('평가 수정 응답 오류:', response);
+        alert(response.message || '평가 수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('평가 수정 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 403) {
+        alert('이 평가를 수정할 권한이 없습니다. (본인이 작성한 평가만 수정 가능)');
+      } else if (error.response?.status === 404) {
+        alert('수정할 평가를 찾을 수 없습니다.');
+      } else if (error.response?.status === 400) {
+        alert('평가 데이터가 올바르지 않습니다. (점수: 0-100점)');
+      } else {
+        alert('평가 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  // 평가 삭제 핸들러
+  const handleEvaluationDelete = async (applicantId) => {
+    try {
+      // 현재 저장된 내 평가의 ID를 가져옴
+      const currentEvaluations = evaluations[applicantId];
+      if (!currentEvaluations || !currentEvaluations.myEvaluation || !currentEvaluations.myEvaluation.id) {
+        alert('삭제할 평가를 찾을 수 없습니다.');
+        return;
+      }
+
+      const myEvaluation = currentEvaluations.myEvaluation;
+      
+      // 삭제 확인
+      const confirmDelete = window.confirm(
+        `${myEvaluation.applicantName || '지원자'}에 대한 내 평가를 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
+      );
+      
+      if (!confirmDelete) {
+        return;
+      }
+
+      console.log('평가 삭제 시작:', myEvaluation.id);
+      
+      // API를 통해 평가 삭제
+      const response = await evaluationAPI.deleteEvaluation(myEvaluation.id);
+
+      if (response.success) {
+        console.log('평가 삭제 성공');
+        
+        // 로컬 상태에서 내 평가만 제거 (다른 평가자의 평가는 유지)
+        setEvaluations(prev => {
+          const currentEvaluations = prev[applicantId] || { allEvaluations: [], myEvaluation: null };
+          
+          // 전체 평가 목록에서 내 평가 제거
+          const updatedAllEvaluations = currentEvaluations.allEvaluations.filter(
+            evaluation => evaluation.id !== myEvaluation.id
+          );
+          
+          return {
+            ...prev,
+            [applicantId]: {
+              allEvaluations: updatedAllEvaluations,
+              myEvaluation: null // 내 평가 제거
+            }
+          };
+        });
+        
+        setEditingEvaluation(null); // 편집 모드 종료
+        console.log('평가가 성공적으로 삭제되었습니다.');
+      } else {
+        console.error('평가 삭제 응답 오류:', response);
+        alert(response.message || '평가 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('평가 삭제 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 403) {
+        alert('이 평가를 삭제할 권한이 없습니다. (본인이 작성한 평가만 삭제 가능)');
+      } else if (error.response?.status === 404) {
+        alert('삭제할 평가를 찾을 수 없습니다.');
+      } else {
+        alert('평가 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  // 지원서 상태 변경 핸들러
+  const handleStatusChange = async (applicantId, newPassStatus) => {
+    try {
+      console.log('지원서 상태 변경 시도:', { applicantId, newPassStatus });
+      
+      const response = await applicationStatusAPI.changeApplicationStatus(applicantId, newPassStatus);
+      
+      if (response.success) {
+        alert(`지원서 상태가 ${getStatusDisplayName(newPassStatus)}(으)로 변경되었습니다.`);
+        
+        // 지원자 목록 새로고침
+        await fetchApplications();
+        
+        console.log('지원서 상태 변경 완료:', response.data);
+      }
+    } catch (error) {
+      console.error('지원서 상태 변경 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 403) {
+        alert('지원서 상태를 변경할 권한이 없습니다. (Root 권한 필요)');
+      } else if (error.response?.status === 404) {
+        alert('변경할 지원서를 찾을 수 없습니다.');
+      } else {
+        alert('지원서 상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  // 점수 기준 상위 N명 상태 변경
+  const handleTopNStatusChange = async (passStatus) => {
+    const confirmMessage = `점수 상위 ${bulkChangeCount}명의 상태를 ${getStatusDisplayName(passStatus)}(으)로 변경하시겠습니까?`;
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      setIsBulkChanging(true);
+      const response = await applicationStatusAPI.bulkChangeApplicationStatus(parseInt(bulkChangeCount), passStatus);
+      
+      if (response.success) {
+        alert(`상위 ${bulkChangeCount}명의 상태가 ${getStatusDisplayName(passStatus)}(으)로 변경되었습니다.`);
+        
+        // 지원자 목록 새로고침
+        await fetchApplications();
+        
+        // 모달 닫기
+        setShowBulkChangeModal(false);
+      }
+    } catch (error) {
+      console.error('상위 N명 상태 변경 실패:', error);
+      
+      if (error.response?.status === 403) {
+        alert('일괄 상태 변경 권한이 없습니다. (Root 권한 필요)');
+      } else {
+        alert('상위 N명 상태 변경 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsBulkChanging(false);
+    }
+  };
+
+  // 일괄 상태 변경 모달 열기/닫기
+  const handleShowBulkChangeModal = () => {
+    setShowBulkChangeModal(true);
+  };
+
+  const handleCloseBulkChangeModal = () => {
+    setShowBulkChangeModal(false);
+  };
+
+  // 상태 표시명 변환 함수
+  const getStatusDisplayName = (passStatus) => {
+    switch (passStatus) {
+      case 'PENDING': return '평가 대기';
+      case 'FIRST_PASS': return '1차 합격';
+      case 'FINAL_PASS': return '최종 합격';
+      case 'FAILED': return '불합격';
+      default: return '알 수 없음';
+    }
+  };
 
   const handleCloseEmailModal = () => {
     setShowEmailModal(false);
@@ -711,6 +1225,9 @@ const RecruitingDetailPage = () => {
                     <Mail size={20} />
                     일괄 이메일 전송
                   </button>
+                  <button className="bulk-change-btn" onClick={handleShowBulkChangeModal}>
+                    일괄 상태 변경
+                  </button>
                 </div>
               </div>
 
@@ -987,20 +1504,28 @@ const RecruitingDetailPage = () => {
                 <div className="applicants-list">
                   {currentApplicants.map((applicant) => {
                     const isExpanded = expandedApplicants.has(applicant.id);
-                    const evaluation = evaluations[applicant.id];
+                    const evaluationData = evaluations[applicant.id] || { allEvaluations: [], myEvaluation: null };
+                    const aiSummary = aiSummaries[applicant.id];
                     
                     return (
                       <ApplicantCard
                         key={applicant.id}
                         applicant={applicant}
                         isExpanded={isExpanded}
-                        evaluation={evaluation}
+                        evaluation={evaluationData.myEvaluation} // 내 평가만 편집 가능
+                        allEvaluations={evaluationData.allEvaluations} // 모든 평가 목록 표시
                         editingEvaluation={editingEvaluation}
+                        aiSummary={aiSummary}
+                        isLoadingAi={isLoadingAiSummaries}
+                        isLoadingEvaluation={isLoadingEvaluations}
                         onToggle={handleToggleApplicant}
                         onShowOriginal={handleShowOriginal}
                         onEvaluationSubmit={handleEvaluationSubmit}
+                        onEvaluationUpdate={handleEvaluationUpdate}
+                        onEvaluationDelete={handleEvaluationDelete}
                         onEditEvaluation={handleEditEvaluation}
                         onCancelEdit={handleCancelEdit}
+                        onStatusChange={handleStatusChange}
                       />
                     );
                   })}
@@ -1107,6 +1632,91 @@ const RecruitingDetailPage = () => {
               >
                 {isDeleting ? '삭제 중...' : '삭제'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 일괄 상태 변경 모달 */}
+      {showBulkChangeModal && (
+        <div className="bulk-change-modal-overlay">
+          <div className="bulk-change-modal-container">
+            <div className="bulk-change-modal-header">
+              <h3 className="bulk-change-modal-title">일괄 상태 변경</h3>
+              <button 
+                className="bulk-change-modal-close-btn"
+                onClick={handleCloseBulkChangeModal}
+                disabled={isBulkChanging}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="bulk-change-modal-content">
+              <div className="bulk-change-description">
+                평가 점수를 기준으로 상위 지원자들의 상태를 일괄 변경합니다.
+              </div>
+              
+              <div className="bulk-change-controls">
+                <div className="bulk-count-section">
+                  <label htmlFor="bulk-count" className="bulk-count-label">
+                    변경할 인원수
+                  </label>
+                  <div className="bulk-count-input-wrapper">
+                    <input 
+                      id="bulk-count"
+                      type="number" 
+                      value={bulkChangeCount}
+                      onChange={(e) => setBulkChangeCount(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="bulk-count-input"
+                      min="1"
+                      max="100"
+                      disabled={isBulkChanging}
+                    />
+                    <span className="bulk-count-suffix">명</span>
+                  </div>
+                </div>
+
+                <div className="bulk-status-section">
+                  <label className="bulk-status-label">변경할 상태 선택</label>
+                  <div className="bulk-status-buttons">
+                    <button 
+                      className="bulk-status-btn first-pass"
+                      onClick={() => handleTopNStatusChange('FIRST_PASS')}
+                      disabled={isBulkChanging}
+                    >
+                      1차 합격
+                    </button>
+                    <button 
+                      className="bulk-status-btn final-pass"
+                      onClick={() => handleTopNStatusChange('FINAL_PASS')}
+                      disabled={isBulkChanging}
+                    >
+                      최종 합격
+                    </button>
+                    <button 
+                      className="bulk-status-btn failed"
+                      onClick={() => handleTopNStatusChange('FAILED')}
+                      disabled={isBulkChanging}
+                    >
+                      불합격
+                    </button>
+                    <button 
+                      className="bulk-status-btn pending"
+                      onClick={() => handleTopNStatusChange('PENDING')}
+                      disabled={isBulkChanging}
+                    >
+                      평가 대기
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {isBulkChanging && (
+                <div className="bulk-change-loading">
+                  <div className="loading-spinner"></div>
+                  <span>상태 변경 중...</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

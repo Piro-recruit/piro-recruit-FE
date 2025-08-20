@@ -27,40 +27,52 @@ This is a React-based recruitment management system for Pirogramming, built with
 
 The application follows a standard React project structure:
 
-- `src/pages/`: Main application pages (Main, Application, Admin pages)
-- `src/components/`: Reusable components organized by domain (common, layout)
+- `src/pages/`: Main application pages (MainPage, AdminLoginPage, RecruitingManagePage, RecruitingDetailPage)
+- `src/components/`: Reusable components organized by domain
+  - `common/`: Shared UI components (Button, Modal, forms)
+  - `layout/`: Layout components (Header, Layout)
+  - `auth/`: Authentication components (ProtectedRoute)
+  - `recruiting/`: Recruiting-specific components (ApplicantCard, evaluation forms)
 - `src/services/`: API services and HTTP client configuration
 - `src/constants/`: Application constants (routes, recruitment configs)
 - `src/data/`: Mock data for development (transitioning to API integration)
-- `src/context/`: React context providers for state management
-- `src/hooks/`: Custom React hooks
-- `src/styles/`: Global styles (reset, fonts, colors)
-- `src/utils/`: Utility functions (evaluation, sorting)
+- `src/styles/`: Global styles (reset, fonts, colors, utilities)
+- `src/utils/`: Utility functions (evaluation, sorting, CSV export)
 
 ## Key Application Areas
 
 ### Public Routes
-- **MainPage** (`/`): Landing page
-- **ApplicationPage** (`/apply`): Job application form with Layout wrapper
+- **MainPage** (`/`): Landing page with recruitment information and application links
 
-### Admin Routes
-- **AdminLoginPage** (`/admin`): Admin authentication
-- **RecruitingManagePage** (`/admin/recruiting`): Dashboard for managing applications
+### Admin Routes (Protected)
+All admin routes require authentication via the ProtectedRoute component:
+- **AdminLoginPage** (`/admin`): Admin authentication with login code
+- **RecruitingManagePage** (`/admin/recruiting`): Main dashboard for managing applications
+  - View applicant statistics and filtering options
+  - Bulk actions for pass/fail status updates
+  - CSV export functionality
+  - Admin account management
 - **RecruitingDetailPage** (`/admin/recruiting/:id`): Detailed view of individual applications
+  - Full application data display
+  - Individual pass status updates
+  - AI evaluation integration
 
 ## Data Management
 
-Currently uses mock data (`src/data/mockData.js`) for applicant information including:
-- Basic applicant details (name, email, university, skills)
-- AI evaluation scores and summaries
-- Application status tracking
-- Detailed application responses
+The application integrates with backend APIs for real-time data management:
+- **Live Application Data**: Retrieved from Google Forms via webhook integration
+- **Pass Status Tracking**: Admin-controlled application evaluation states (PENDING, PASS, FAIL)
+- **Google Forms Integration**: Dynamic form creation, activation, and management
+- **Statistics and Analytics**: Real-time applicant statistics and form-specific metrics
+- **CSV Export**: Comprehensive export functionality for applicants and admin data
+
+Mock data (`src/data/mockData.js`) available for development and testing purposes.
 
 ## Key Constants
 
 - **RECRUITMENT_CONFIG**: Application limits, pagination, cutlines
 - **RECRUITMENT_STATUS**: Active, inactive, pending states
-- **APPLICANT_STATUS**: Reviewing, passed, failed states
+- **APPLICANT_STATUS**: PENDING, PASS, FAIL states for application evaluation
 - **SORT_OPTIONS**: Various sorting methods for applicant lists
 
 ## Styling Approach
@@ -81,23 +93,25 @@ Netlify deployment with:
 
 ## API Specifications
 
-The application connects to backend APIs for recruitment management. Full API specification is available in `api-spec.json`.
+The application connects to backend APIs for recruitment management. Full API specifications are available in `api-spec.md` and individual API files in the `/api` directory.
 
 ### Core API Categories
-- **Admin APIs**: Authentication, user management, JWT token handling
-- **AI Summary APIs**: Application analysis and scoring
-- **Google Form APIs**: Form management and statistics
+- **Admin APIs**: Authentication, user management, JWT token handling, pass status management
+- **Google Form APIs**: Form creation, activation, URL management, generation tracking
+- **Webhook Application APIs**: Application data retrieval, statistics, form-specific queries
+- **Integration APIs**: CSV export for applicants and admin data
 - **Mail APIs**: Single and bulk email sending
 - **Mail Subscriber APIs**: Subscriber management with pagination
-- **Webhook Application APIs**: Application data handling and status tracking
+- **AI Summary APIs**: Application analysis and scoring
 
 ### Key API Endpoints (Most Used)
-- **POST** `/api/ai-summary/analyze` - Analyze application data
-- **POST** `/mail/bulk` - Send bulk emails to all subscribers
-- **POST** `/mail/subscribers` - Register new email subscriber
-- **GET** `/mail/subscribers/count` - Get total subscriber count
+- **POST** `/api/admin/login` - Admin authentication with login code
+- **GET** `/api/google-forms/active` - Get currently active Google Forms
 - **GET** `/api/webhook/applications` - Get all applications
-- **GET** `/api/webhook/applications/form-id/{formId}` - Get applications by form
+- **GET** `/api/webhook/applications/google-form/{id}` - Get applications by Google Form
+- **PUT** `/api/admin/applications/{id}/pass-status` - Update application pass status
+- **GET** `/api/integration/export/applicants/csv` - Export applicants as CSV
+- **POST** `/api/admin/general/batch` - Create multiple admin accounts
 
 ### API Response Format
 ```javascript
@@ -107,35 +121,67 @@ The application connects to backend APIs for recruitment management. Full API sp
   "data": {...},
   "message": "Success message",
   "status": 200,
-  "code": "SUCCESS",
-  "time": "2024-01-01T10:00:00"
+  "code": 0,
+  "time": "2025-01-15T10:30:00"
 }
 
-// Error Response
+// Error Response  
 {
   "success": false,
   "data": null,
-  "message": "Error message", 
+  "message": "Error message",
   "status": 400,
-  "code": "BAD_REQUEST",
-  "time": "2024-01-01T10:00:00"
+  "code": 2201,
+  "time": "2025-01-15T10:30:00"
+}
+
+// Authentication Response
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
 
 ## HTTP Client Configuration
 
 The application uses Axios with a centralized configuration in `src/services/api.js`:
-- Base URL: `http://localhost:8080` for backend API
+- Base URL: `https://localhost:8080` for backend API (configurable via API_BASE_URL constant)
 - 30-second timeout for all requests
-- Request/response interceptors for logging and error handling
-- Prepared for future authentication token integration
-- Common error handling for 401 (authentication) and 500 (server) errors
+- Request/response interceptors for comprehensive logging and error handling
+- JWT token automatically added to authenticated requests
+- Advanced error handling including Blob response parsing and CSV export considerations
+- Automatic token cleanup and logout on authentication failures
+
+## Authentication System
+
+The application uses a dual authentication approach:
+
+### Admin Authentication
+- **Login-code based authentication**: Admins use login codes to authenticate
+- **JWT token management**: Access and refresh tokens stored in localStorage
+- **Multi-admin system**: Support for creating and managing multiple admin accounts
+- **Token expiration handling**: Automatic logout on token expiration
+- **Protected routes**: Admin pages require authentication via ProtectedRoute component
+
+### Authentication Flow
+1. Admin enters login code on `/admin`
+2. System exchanges login code for JWT tokens via `/api/admin/login`
+3. Tokens stored in localStorage (accessToken, refreshToken, expiresIn)
+4. API client automatically adds Bearer token to authenticated requests
+5. Automatic logout and redirect on 401 responses
+
+### Admin Management Features
+- Create multiple general admin accounts with expiration dates
+- View all admin accounts via CSV export
+- Delete expired or all admin accounts
+- API key exchange for alternative authentication
 
 ## Development Notes
 
-- Backend integration in progress (transitioning from mock data)
+- Backend fully integrated with comprehensive API coverage
 - ESLint configured with React hooks and refresh plugins
-- Vite configured with asset chunking and file naming strategies
+- Vite configured with asset chunking and file naming strategies for optimal builds
 - Branch-based development workflow
-- Current services: `api.js` (HTTP client), `mailService.js` (email functionality)
-- Mock data still used in some components during API transition
+- Services: `api.js` (HTTP client), `authService.js` (authentication), `mailService.js` (email)
+- Google Forms integration for recruitment management
+- CSV export functionality for applicant and admin data
