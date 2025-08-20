@@ -11,7 +11,7 @@ import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
-import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI } from '../services/api';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
 import './RecruitingDetailPage.css';
 
@@ -53,6 +53,10 @@ const RecruitingDetailPage = () => {
   const [error, setError] = useState(null);
   const [statisticsData, setStatisticsData] = useState(null);
   const [isLoadingStatistics, setIsLoadingStatistics] = useState(false);
+  
+  // AI Summary 상태
+  const [aiSummaries, setAiSummaries] = useState({});
+  const [isLoadingAiSummaries, setIsLoadingAiSummaries] = useState(false);
 
   // 구독자 수 조회
   const fetchSubscriberCount = async () => {
@@ -177,12 +181,12 @@ const RecruitingDetailPage = () => {
             statusColor: app.passStatus === 'PASS' ? 'green' :
                         app.passStatus === 'FAIL' ? 'red' :
                         app.passStatus === 'PENDING' ? 'yellow' : 'yellow',
-            aiScore: Math.floor(Math.random() * 40) + 60, // 임시 AI 점수
+            aiScore: 0, // AI Summary API에서 가져올 예정
             skills: [app.major, app.department].filter(Boolean), // 전공여부와 학과를 스킬로 표시
             portfolio: formData['포트폴리오'] || formData['포트폴리오 링크'] || '',
             application: fullApplication, // 전체 지원서 데이터
-            // AI 분석 데이터가 있으면 사용, 없으면 기본 데이터 기반으로 생성
-            aiSummary: app.aiAnalysis || {
+            // AI 분석 데이터는 별도로 관리 (aiSummaries state)
+            aiSummary: {
               '학력 정보': `${app.school} ${app.department} ${app.grade} (${app.major})`,
               '각오': formData['각오'] ? formData['각오'].substring(0, 50) + '...' : '데이터 미제공',
               '경력': formData['경력'] || '데이터 미제공'
@@ -243,6 +247,63 @@ const RecruitingDetailPage = () => {
     }
   };
 
+  // AI Summary 데이터 조회
+  const fetchAiSummaries = async () => {
+    if (!allApplicants.length) return;
+    
+    setIsLoadingAiSummaries(true);
+    
+    try {
+      console.log('AI Summary 조회 시작, 지원자 수:', allApplicants.length);
+      console.log('첫 번째 지원자 ID:', allApplicants[0]?.id);
+      
+      const summaryPromises = allApplicants.map(async (applicant, index) => {
+        try {
+          console.log(`지원자 ${index + 1}/${allApplicants.length}: ID=${applicant.id}, 이름=${applicant.name}`);
+          const response = await aiSummaryAPI.getApplicationSummary(applicant.id);
+          
+          console.log(`지원자 ${applicant.id} 응답:`, response);
+          
+          // 응답 구조를 더 유연하게 처리
+          if (response && response.success && response.data) {
+            console.log(`지원자 ${applicant.id} AI Summary 발견:`, response.data);
+            return {
+              applicantId: applicant.id,
+              summary: response.data
+            };
+          } else {
+            console.log(`지원자 ${applicant.id}: AI Summary 없음 또는 응답 구조 다름`, response);
+            return null;
+          }
+        } catch (error) {
+          console.log(`지원자 ${applicant.id} AI Summary 조회 오류:`, error);
+          return null;
+        }
+      });
+      
+      const summaryResults = await Promise.allSettled(summaryPromises);
+      const newAiSummaries = {};
+      
+      summaryResults.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const { applicantId, summary } = result.value;
+          newAiSummaries[applicantId] = summary;
+          console.log(`지원자 ${applicantId} AI Summary 저장 완료`);
+        } else if (result.status === 'rejected') {
+          console.log(`지원자 ${allApplicants[index]?.id} Promise rejected:`, result.reason);
+        }
+      });
+      
+      console.log('AI Summary 조회 완료:', Object.keys(newAiSummaries).length, '개');
+      console.log('저장된 AI Summary 데이터:', newAiSummaries);
+      setAiSummaries(newAiSummaries);
+    } catch (error) {
+      console.error('AI Summary 조회 실패:', error);
+    } finally {
+      setIsLoadingAiSummaries(false);
+    }
+  };
+
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     console.log('컴포넌트 마운트, id:', id);
@@ -250,6 +311,13 @@ const RecruitingDetailPage = () => {
     fetchApplications();
     fetchStatistics();
   }, [id]);
+
+  // 지원자 데이터가 로드된 후 AI Summary 조회
+  useEffect(() => {
+    if (allApplicants.length > 0 && !isLoadingApplications) {
+      fetchAiSummaries();
+    }
+  }, [allApplicants.length, isLoadingApplications]);
 
   // 상태 변화 디버깅
   useEffect(() => {
@@ -988,6 +1056,7 @@ const RecruitingDetailPage = () => {
                   {currentApplicants.map((applicant) => {
                     const isExpanded = expandedApplicants.has(applicant.id);
                     const evaluation = evaluations[applicant.id];
+                    const aiSummary = aiSummaries[applicant.id];
                     
                     return (
                       <ApplicantCard
@@ -996,6 +1065,8 @@ const RecruitingDetailPage = () => {
                         isExpanded={isExpanded}
                         evaluation={evaluation}
                         editingEvaluation={editingEvaluation}
+                        aiSummary={aiSummary}
+                        isLoadingAi={isLoadingAiSummaries}
                         onToggle={handleToggleApplicant}
                         onShowOriginal={handleShowOriginal}
                         onEvaluationSubmit={handleEvaluationSubmit}

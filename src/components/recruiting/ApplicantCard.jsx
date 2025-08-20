@@ -21,6 +21,8 @@ const ApplicantCard = ({
   isExpanded, 
   evaluation, 
   editingEvaluation, 
+  aiSummary,
+  isLoadingAi,
   onToggle, 
   onShowOriginal, 
   onEvaluationSubmit,
@@ -67,7 +69,9 @@ const ApplicantCard = ({
           </div>
           <div className="applicant-right-info">
             <span className="applied-date">{applicant.appliedDate}</span>
-            <span className="applicant-score">AI 점수: {applicant.aiScore}점</span>
+            <span className="applicant-score">
+              AI 점수: {isLoadingAi ? '로딩중...' : aiSummary?.scoreOutOf100 ? `${aiSummary.scoreOutOf100}점` : '분석 대기'}
+            </span>
             {evaluation && (
               <span className="evaluation-score">평가: {evaluation.score}점</span>
             )}
@@ -84,15 +88,58 @@ const ApplicantCard = ({
         <div className="applicant-details-toggle">
           {/* AI 요약 섹션 */}
           <div className="ai-summary-section">
-            <h4 className="section-subtitle">AI 요약</h4>
-            <div className="summary-items">
-              {Object.entries(applicant.aiSummary).map(([question, summary]) => (
-                <div key={question} className="summary-item">
-                  <div className="summary-question">{question}</div>
-                  <div className="summary-answer">{summary}</div>
+            <div className="ai-summary-header">
+              <h4 className="section-subtitle">🤖 AI 분석 요약</h4>
+              {aiSummary && (
+                <div className="ai-score-badge-header">
+                  <span className="score-value">{aiSummary.scoreOutOf100}</span>
+                  <span className="score-label">/ 100점</span>
                 </div>
-              ))}
+              )}
             </div>
+            
+            {isLoadingAi ? (
+              <div className="ai-loading">
+                <div className="loading-spinner"></div>
+                <span>AI 분석을 불러오는 중...</span>
+              </div>
+            ) : aiSummary ? (
+              <div className="ai-summary-content">
+                <div className="ai-score-reason-box">
+                  <div className="score-reason-label">📊 점수 근거</div>
+                  <div className="score-reason-text">{aiSummary.scoreReason}</div>
+                </div>
+                
+                <div className="ai-question-summaries">
+                  <div className="summaries-label">📋 질문별 AI 요약</div>
+                  {aiSummary.questionSummaries?.map((item, index) => (
+                    <div key={index} className="ai-question-card">
+                      <div className="question-header">
+                        <span className="question-number">Q{index + 1}</span>
+                        <div className="question-title">{item.question}</div>
+                      </div>
+                      <div className="ai-answer">{item.aiSummary}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="no-ai-summary">
+                <div className="no-ai-message">
+                  <span className="no-ai-icon">⚠️</span>
+                  <span>AI 분석 데이터가 없습니다</span>
+                </div>
+                <div className="fallback-summary">
+                  <div className="fallback-label">📄 기본 정보</div>
+                  {Object.entries(applicant.aiSummary).map(([question, summary]) => (
+                    <div key={question} className="fallback-item">
+                      <div className="fallback-question">{question}</div>
+                      <div className="fallback-answer">{summary}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 평가 섹션 */}

@@ -1,97 +1,89 @@
-# Webhook Application API 문서
+# Webhook Application API 명세서
+
+구글 폼 웹훅 지원서 관리 API
+
+## 목차
+
+- [개요](#개요)
+- [인증](#인증)
+- [API 엔드포인트](#api-엔드포인트)
+  - [지원서 데이터 수신](#지원서-데이터-수신)
+  - [지원서 조회](#지원서-조회)
+  - [지원서 상태 관리](#지원서-상태-관리)
+  - [통계 및 모니터링](#통계-및-모니터링)
+- [데이터 모델](#데이터-모델)
+- [오류 코드](#오류-코드)
 
 ## 개요
-Google Forms에서 전송된 지원서 데이터를 처리하는 Webhook API입니다. Spring Boot 애플리케이션에서 구글 폼의 제출 데이터를 받아 저장하고, 다양한 조회 및 상태 관리 기능을 제공합니다.
 
-## 기본 정보
-- **Base URL**: `/api/webhook/applications`
-- **인증**: JWT 인증 필요 (일부 엔드포인트 제외)
-- **응답 형식**: `ApiRes<T>` 표준 응답 형태
+Webhook Application API는 구글 폼에서 전송된 지원서 데이터를 받아 저장하고 관리하는 시스템입니다. 실시간 지원서 수집, 상태 추적, 평가 관리 등의 기능을 제공합니다.
 
-## 데이터 모델
+**Base URL:** `/api/webhook/applications`
 
-### WebhookApplicationRequest
-```java
-{
-  "formId": "string (required)",          // 구글 폼 ID
-  "applicantName": "string (required)",   // 지원자 이름
-  "applicantEmail": "string (required)",  // 지원자 이메일 (유효한 이메일 형식)
-  "formResponseId": "string (required)",  // 구글 폼 응답 ID
-  "submissionTimestamp": "datetime",      // 제출 시간
-  "formData": {}                          // 폼 데이터 (JSON 객체)
-}
-```
+## 인증
 
-### WebhookApplicationResponse
-```java
-{
-  "id": "number",                    // 지원서 ID
-  "googleFormId": "number",          // 구글 폼 엔티티 ID
-  "formId": "string",                // 구글 폼 ID
-  "formTitle": "string",             // 폼 제목
-  "applicantName": "string",         // 지원자 이름
-  "applicantEmail": "string",        // 지원자 이메일
-  "formResponseId": "string",        // 폼 응답 ID
-  "submissionTimestamp": "datetime", // 제출 시간
-  "formData": {},                    // 폼 데이터
-  "status": "string",                // 처리 상태 (PENDING, COMPLETED, FAILED)
-  "errorMessage": "string",          // 오류 메시지
-  "aiAnalysis": {},                  // AI 분석 결과
-  "createdAt": "datetime",           // 생성 시간
-  "updatedAt": "datetime"            // 수정 시간
-}
-```
-
-### ProcessingStatus
-- `PENDING`: 처리 대기 상태
-- `COMPLETED`: 처리 완료 상태
-- `FAILED`: 처리 실패 상태
+- **지원서 수신**: 웹훅 토큰 인증 필요
+- **관리 기능**: Admin 권한 필요 (`@RequireAdmin`)
+- **상태 변경**: Root 권한 필요 (`@RequireRoot`)
 
 ## API 엔드포인트
 
-### 1. 웹훅 지원서 수신
-```http
-POST /api/webhook/applications/receive
-```
+### 지원서 데이터 수신
+
+#### POST /receive
 구글 폼에서 전송된 지원서 데이터를 받아 저장합니다.
 
-**Request Body:**
+**요청 헤더**
+```
+Content-Type: application/json
+X-Webhook-Token: {WEBHOOK_API_KEY}
+```
+
+**요청 본문**
 ```json
 {
   "formId": "1FAIpQLSe...",
   "applicantName": "홍길동",
   "applicantEmail": "hong@example.com",
-  "formResponseId": "2_ABaOnue...",
-  "submissionTimestamp": "2024-01-15T10:30:00",
+  "formResponseId": "2_ABaOnud...",
+  "submissionTimestamp": "2024-01-01T10:00:00",
+  "school": "서울대학교",
+  "department": "컴퓨터공학과", 
+  "grade": "3학년",
+  "major": "컴퓨터공학",
+  "phoneNumber": "010-1234-5678",
   "formData": {
-    "질문1": "답변1",
-    "질문2": "답변2"
+    "question1": "답변 내용...",
+    "question2": "답변 내용..."
   }
 }
 ```
 
-**Response:**
+**응답 예시**
 ```json
 {
   "success": true,
   "data": {
     "id": 1,
+    "googleFormId": 1,
+    "formId": "1FAIpQLSe...",
+    "formTitle": "25기 리크루팅",
     "applicantName": "홍길동",
+    "applicantEmail": "hong@example.com",
     "status": "PENDING",
-    // ... 기타 필드
+    "passStatus": "PENDING",
+    "createdAt": "2024-01-01T10:00:00"
   },
-  "message": "지원서가 성공적으로 저장되었습니다.",
-  "status": 201
+  "message": "지원서가 성공적으로 저장되었습니다."
 }
 ```
 
-### 2. 전체 지원서 조회
-```http
-GET /api/webhook/applications
-```
-저장된 모든 지원서를 최신순으로 조회합니다.
+### 지원서 조회
 
-**Response:**
+#### GET /
+전체 지원서 목록을 최신순으로 조회합니다. (Admin 권한 필요)
+
+**응답 예시**
 ```json
 {
   "success": true,
@@ -99,85 +91,135 @@ GET /api/webhook/applications
     {
       "id": 1,
       "applicantName": "홍길동",
-      // ... 지원서 정보
+      "applicantEmail": "hong@example.com",
+      "averageScore": 82.5,
+      "evaluationCount": 3,
+      "passStatus": "PENDING",
+      "createdAt": "2024-01-01T10:00:00"
     }
   ],
-  "message": "2개의 지원서를 조회했습니다."
+  "message": "15개의 지원서를 조회했습니다."
 }
 ```
 
-### 3. 구글 폼별 지원서 조회
-```http
-GET /api/webhook/applications/google-form/{googleFormId}
-```
+#### GET /google-form/{googleFormId}
 특정 구글 폼의 모든 지원서를 조회합니다.
 
-**Parameters:**
-- `googleFormId` (path): 구글 폼 엔티티 ID
+**경로 매개변수**
+- `googleFormId`: 구글 폼 ID (Long)
 
-### 4. 폼 ID별 지원서 조회
-```http
-GET /api/webhook/applications/form-id/{formId}
-```
+#### GET /form-id/{formId}
 특정 폼 ID의 모든 지원서를 조회합니다.
 
-**Parameters:**
-- `formId` (path): 구글 폼 식별자
+**경로 매개변수**
+- `formId`: 구글 폼 식별자 (String)
 
-### 5. 특정 지원서 조회
-```http
-GET /api/webhook/applications/{id}
-```
+#### GET /id/{id}
 ID를 기준으로 특정 지원서를 조회합니다.
 
-**Parameters:**
-- `id` (path): 지원서 ID
+**경로 매개변수**
+- `id`: 지원서 ID (Long)
 
-### 6. 이메일로 지원서 조회
-```http
-GET /api/webhook/applications/by-email?email={email}
-```
+#### GET /by-email
 이메일을 기준으로 지원서를 조회합니다.
 
-**Parameters:**
-- `email` (query): 지원자 이메일
+**쿼리 매개변수**
+- `email`: 지원자 이메일 (String)
 
-### 7. 구글 폼별 + 이메일로 지원서 조회
-```http
-GET /api/webhook/applications/google-form/{googleFormId}/by-email?email={email}
-```
+#### GET /google-form/{googleFormId}/by-email
 특정 구글 폼에서 이메일을 기준으로 지원서를 조회합니다.
 
-### 8. 폼 ID별 + 이메일로 지원서 조회
-```http
-GET /api/webhook/applications/form-id/{formId}/by-email?email={email}
-```
+**경로 매개변수**
+- `googleFormId`: 구글 폼 ID (Long)
+
+**쿼리 매개변수**
+- `email`: 지원자 이메일 (String)
+
+#### GET /form-id/{formId}/by-email
 특정 폼 ID에서 이메일을 기준으로 지원서를 조회합니다.
 
-### 9. 처리 상태별 지원서 조회
-```http
-GET /api/webhook/applications/by-status?status={status}
-```
+**경로 매개변수**
+- `formId`: 구글 폼 식별자 (String)
+
+**쿼리 매개변수**
+- `email`: 지원자 이메일 (String)
+
+#### GET /by-status
 처리 상태를 기준으로 지원서를 조회합니다.
 
-**Parameters:**
-- `status` (query): 처리 상태 (PENDING, COMPLETED, FAILED)
+**쿼리 매개변수**
+- `status`: 처리 상태 (`PENDING`, `COMPLETED`, `FAILED`)
 
-### 10. 구글 폼별 + 상태별 지원서 조회
-```http
-GET /api/webhook/applications/google-form/{googleFormId}/by-status?status={status}
-```
+#### GET /google-form/{googleFormId}/by-status
 특정 구글 폼에서 처리 상태를 기준으로 지원서를 조회합니다.
 
-## 지원서 제출 확인 API
+**경로 매개변수**
+- `googleFormId`: 구글 폼 ID (Long)
 
-### 11. 지원서 제출 여부 확인
-```http
-GET /api/webhook/applications/check?email={email}
+**쿼리 매개변수**
+- `status`: 처리 상태 (`PENDING`, `COMPLETED`, `FAILED`)
+
+### 지원서 상태 관리
+
+#### POST /{id}/status
+특정 지원서의 합격 상태를 변경합니다. (Root 권한 필요)
+
+**경로 매개변수**
+- `id`: 지원서 ID (Long)
+
+**쿼리 매개변수**
+- `passStatus`: 변경할 합격 상태 (`PENDING`, `FIRST_PASS`, `FINAL_PASS`, `FAILED`)
+
+**응답 예시**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "applicantName": "홍길동",
+    "passStatus": "FIRST_PASS",
+    "updatedAt": "2024-01-01T15:00:00"
+  },
+  "message": "지원서 상태가 FIRST_PASS로 변경되었습니다."
+}
 ```
+
+#### POST /bulk-status
+점수 상위 N명의 지원서 상태를 일괄 변경합니다. (Root 권한 필요)
+
+**쿼리 매개변수**
+- `topN`: 변경할 상위 인원 수 (Integer)
+- `passStatus`: 변경할 합격 상태 (`PENDING`, `FIRST_PASS`, `FINAL_PASS`, `FAILED`)
+
+**응답 예시**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "applicantName": "홍길동",
+      "passStatus": "FIRST_PASS"
+    },
+    {
+      "id": 2,
+      "applicantName": "김철수",
+      "passStatus": "FIRST_PASS"
+    }
+  ],
+  "message": "상위 2명의 지원서 상태가 FIRST_PASS로 변경되었습니다."
+}
+```
+
+### 통계 및 모니터링
+
+#### GET /check
 이메일을 기준으로 지원서 제출 여부를 확인합니다.
 
-**Response:**
+**쿼리 매개변수**
+- `email`: 확인할 이메일 (String)
+
+**응답 예시**
 ```json
 {
   "success": true,
@@ -189,136 +231,154 @@ GET /api/webhook/applications/check?email={email}
 }
 ```
 
-### 12. 구글 폼별 지원서 제출 여부 확인
-```http
-GET /api/webhook/applications/google-form/{googleFormId}/check?email={email}
-```
+#### GET /google-form/{googleFormId}/check
+특정 구글 폼에서 이메일을 기준으로 지원서 제출 여부를 확인합니다.
 
-### 13. 폼 ID별 지원서 제출 여부 확인
-```http
-GET /api/webhook/applications/form-id/{formId}/check?email={email}
-```
+#### GET /form-id/{formId}/check
+특정 폼 ID에서 이메일을 기준으로 지원서 제출 여부를 확인합니다.
 
-## 통계 및 개수 조회 API
-
-### 14. 대기 중인 지원서 개수 조회
-```http
-GET /api/webhook/applications/pending-count
-```
+#### GET /pending-count
 처리 대기 중인 지원서의 개수를 조회합니다.
 
-**Response:**
+**응답 예시**
 ```json
 {
   "success": true,
   "data": {
-    "pendingCount": 5,
-    "message": "처리 대기 중인 지원서 5개"
+    "pendingCount": 23,
+    "message": "처리 대기 중인 지원서 23개"
   }
 }
 ```
 
-### 15. 구글 폼별 지원서 개수 조회
-```http
-GET /api/webhook/applications/google-form/{googleFormId}/count
-```
+#### GET /google-form/{googleFormId}/count
+특정 구글 폼의 총 지원서 개수를 조회합니다.
 
-### 16. 폼 ID별 지원서 개수 조회
-```http
-GET /api/webhook/applications/form-id/{formId}/count
-```
+#### GET /form-id/{formId}/count
+특정 폼 ID의 총 지원서 개수를 조회합니다.
 
-### 17. 상태별 통계 조회
-```http
-GET /api/webhook/applications/statistics
-```
+#### GET /statistics
 전체 지원서의 상태별 통계를 조회합니다.
 
-**Response:**
+**응답 예시**
 ```json
 {
   "success": true,
   "data": {
-    "PENDING": 3,
-    "COMPLETED": 10,
-    "FAILED": 1
+    "PENDING": 15,
+    "COMPLETED": 8,
+    "FAILED": 2
   },
   "message": "상태별 통계를 조회했습니다."
 }
 ```
 
-### 18. 구글 폼별 상태별 통계 조회
-```http
-GET /api/webhook/applications/google-form/{googleFormId}/statistics
-```
+#### GET /google-form/{googleFormId}/statistics
+특정 구글 폼의 상태별 통계를 조회합니다.
 
-## 테스트 API
-
-### 19. 웹훅 연결 테스트
-```http
-POST /api/webhook/applications/test
-```
+#### POST /test
 Apps Script와의 연결을 테스트하기 위한 엔드포인트입니다.
 
-**Request Body (선택사항):**
+**요청 본문**
 ```json
 {
   "test": "data"
 }
 ```
 
-**Response:**
+**응답 예시**
 ```json
 {
   "success": true,
   "data": {
     "status": "success",
     "message": "웹훅 연결이 정상적으로 작동합니다.",
-    "timestamp": 1642234567890,
-    "receivedData": {}
+    "timestamp": 1704067200000,
+    "receivedData": {
+      "test": "data"
+    }
   },
   "message": "웹훅 테스트 성공"
 }
 ```
 
-## 에러 코드
-- `WEBHOOK_APPLICATION_NOT_FOUND`: 지원서를 찾을 수 없음
+## 데이터 모델
 
-## 주요 특징
-1. **유연한 폼 데이터**: JSON 형태로 다양한 폼 필드를 저장
-2. **중복 방지**: 구글 폼 ID + 이메일 조합으로 중복 지원 방지
-3. **상태 관리**: 지원서 처리 상태 추적
-4. **AI 분석 지원**: 향후 AI 기반 지원서 분석 결과 저장
-5. **다양한 조회 옵션**: 폼별, 이메일별, 상태별 등 다양한 조건으로 조회 가능
+### WebhookApplicationRequest
+```json
+{
+  "formId": "String (required)",
+  "applicantName": "String (required)",
+  "applicantEmail": "String (required, email format)",
+  "formResponseId": "String (required)",
+  "submissionTimestamp": "LocalDateTime (required)",
+  "school": "String (optional)",
+  "department": "String (optional)",
+  "grade": "String (optional)",
+  "major": "String (optional)",
+  "phoneNumber": "String (optional)",
+  "formData": "Map<String, Object> (required)"
+}
+```
 
-## 사용 예시
+### WebhookApplicationResponse
+```json
+{
+  "id": "Long",
+  "googleFormId": "Long",
+  "formId": "String",
+  "formTitle": "String",
+  "applicantName": "String",
+  "applicantEmail": "String",
+  "formResponseId": "String",
+  "submissionTimestamp": "LocalDateTime",
+  "school": "String",
+  "department": "String",
+  "grade": "String",
+  "major": "String",
+  "phoneNumber": "String",
+  "formData": "Map<String, Object>",
+  "status": "String (PENDING, COMPLETED, FAILED)",
+  "errorMessage": "String",
+  "aiAnalysis": "Map<String, Object>",
+  "averageScore": "Double",
+  "evaluationCount": "Integer",
+  "passStatus": "String (PENDING, FAILED, FIRST_PASS, FINAL_PASS)",
+  "createdAt": "LocalDateTime",
+  "updatedAt": "LocalDateTime"
+}
+```
 
-### Google Apps Script에서 웹훅 전송
-```javascript
-function onFormSubmit(e) {
-  const formResponse = e.response;
-  const itemResponses = formResponse.getItemResponses();
-  
-  const formData = {};
-  itemResponses.forEach(item => {
-    formData[item.getItem().getTitle()] = item.getResponse();
-  });
-  
-  const payload = {
-    formId: e.source.getId(),
-    applicantName: formData['이름'],
-    applicantEmail: formData['이메일'],
-    formResponseId: formResponse.getId(),
-    submissionTimestamp: new Date().toISOString(),
-    formData: formData
-  };
-  
-  UrlFetchApp.fetch('https://your-api.com/api/webhook/applications/receive', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    payload: JSON.stringify(payload)
-  });
+### ProcessingStatus
+- `PENDING`: 처리 대기
+- `COMPLETED`: 처리 완료
+- `FAILED`: 처리 실패
+
+### PassStatus
+- `PENDING`: 평가 대기
+- `FAILED`: 불합격
+- `FIRST_PASS`: 1차 합격
+- `FINAL_PASS`: 최종 합격
+
+## 오류 코드
+
+| 상태 코드 | 오류 유형 | 설명 |
+|---------|---------|------|
+| 400 | Bad Request | 잘못된 요청 형식 또는 유효성 검증 실패 |
+| 401 | Unauthorized | 인증되지 않은 요청 |
+| 403 | Forbidden | 권한이 없는 접근 |
+| 404 | Not Found | 지원서를 찾을 수 없음 |
+| 409 | Conflict | 중복된 지원서 |
+| 500 | Internal Server Error | 서버 내부 오류 |
+
+**오류 응답 예시**
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "지원서 ID 999를 찾을 수 없습니다.",
+  "status": 404,
+  "code": 4005,
+  "time": "2024-01-01T10:00:00"
 }
 ```

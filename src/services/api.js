@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API 기본 설정
-const API_BASE_URL = 'https://api.piro-recruiting.kro.kr';
+const API_BASE_URL = 'http://localhost:8080';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -473,6 +473,72 @@ export const integrationAPI = {
       };
     } catch (error) {
       console.error('관리자 CSV 내보내기 실패:', error);
+      throw error;
+    }
+  }
+};
+
+// AI Summary API 함수들
+export const aiSummaryAPI = {
+  // WebhookApplication ID로 기존 AI 요약 조회
+  getApplicationSummary: async (webhookApplicationId) => {
+    try {
+      console.log('AI 요약 조회 요청:', webhookApplicationId);
+      const response = await apiClient.get(`/api/ai-summary/webhook-application/${webhookApplicationId}`);
+      console.log('AI 요약 API 응답:', response);
+      console.log('AI 요약 응답 데이터:', response.data);
+      
+      // 실제 API 응답 구조에 맞춰서 데이터 변환
+      if (response.data && response.data.success && response.data.data && response.data.data.items) {
+        const items = response.data.data.items;
+        
+        // questionSummaries가 JSON 문자열로 되어 있으므로 파싱
+        let questionSummaries = [];
+        try {
+          if (items.questionSummaries) {
+            questionSummaries = JSON.parse(items.questionSummaries);
+          }
+        } catch (parseError) {
+          console.error('questionSummaries JSON 파싱 실패:', parseError);
+          questionSummaries = [];
+        }
+        
+        // UI에서 사용할 수 있는 형태로 변환
+        const transformedData = {
+          scoreOutOf100: parseInt(items.scoreOutOf100) || 0,
+          scoreReason: items.scoreReason || '',
+          questionSummaries: questionSummaries,
+          // 추가 메타데이터
+          processingStatus: response.data.data.processingStatus,
+          createdAt: response.data.data.createdAt,
+          updatedAt: response.data.data.updatedAt
+        };
+        
+        console.log('변환된 AI Summary 데이터:', transformedData);
+        
+        return {
+          success: true,
+          data: transformedData,
+          message: response.data.message
+        };
+      } else {
+        return {
+          success: false,
+          message: "AI 요약 데이터 형식이 올바르지 않습니다."
+        };
+      }
+    } catch (error) {
+      console.error('AI 요약 조회 실패:', error);
+      console.error('에러 상태:', error.response?.status);
+      console.error('에러 데이터:', error.response?.data);
+      
+      if (error.response?.status === 404) {
+        // 요약이 없는 경우
+        return {
+          success: false,
+          message: "AI 요약을 찾을 수 없습니다."
+        };
+      }
       throw error;
     }
   }
