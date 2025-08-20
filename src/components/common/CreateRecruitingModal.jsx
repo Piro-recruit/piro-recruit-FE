@@ -77,7 +77,7 @@ const CreateRecruitingModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
     try {
       new URL(string);
       return true;
-    } catch (_) {
+    } catch {
       return false;
     }
   };

@@ -14,7 +14,6 @@ import {
   X 
 } from 'lucide-react';
 import EvaluationForm from './EvaluationForm';
-import './ApplicantCard.css';
 import './EvaluationStyles.css';
 
 const ApplicantCard = ({ 

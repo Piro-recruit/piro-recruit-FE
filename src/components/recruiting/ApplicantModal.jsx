@@ -1,6 +1,5 @@
 import React from 'react';
 import { sortApplicationQuestions } from '../../utils/sort';
-import './ApplicantModal.css';
 
 const ApplicantModal = ({ selectedApplicant, onClose }) => {
   if (!selectedApplicant) return null;

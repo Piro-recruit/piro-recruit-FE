@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import logoImage from '../assets/pirologo.png';
 import { ROUTES } from '../constants/routes';
 import { mailService } from '../services/mailService';
@@ -9,13 +8,11 @@ import './MainPage.css';
 
 const PiroMainPage = () => {
   const [email, setEmail] = useState('');
-  const [expandedFaq, setExpandedFaq] = useState(null);
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
   const [isRecruitmentPeriod, setIsRecruitmentPeriod] = useState(false);
   const [isLoadingRecruitmentStatus, setIsLoadingRecruitmentStatus] = useState(true);
   const [activeFormUrl, setActiveFormUrl] = useState('');
-  const navigate = useNavigate();
 
   // 리쿠르팅 활성화 상태 확인
   const fetchRecruitmentStatus = async () => {
@@ -85,9 +82,6 @@ const PiroMainPage = () => {
     }
   };
 
-  const toggleFaq = (id) => {
-    setExpandedFaq(expandedFaq === id ? null : id);
-  };
 
   return (
       <div className="piro-main">

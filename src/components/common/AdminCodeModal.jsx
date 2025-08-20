@@ -30,7 +30,7 @@ const AdminCodeModal = ({ isOpen, onClose, onGenerate, isLoading }) => {
       // 성공 시 폼 초기화
       setAdminCount('');
       setExpirationDays('30');
-    } catch (error) {
+    } catch {
       setError('관리자 코드 생성 중 오류가 발생했습니다.');
     }
   };

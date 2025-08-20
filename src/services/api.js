@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // API 기본 설정
-// const API_BASE_URL = 'http://localhost:8080';
-const API_BASE_URL = 'https://api.piro-recruiting.kro.kr';
+const API_BASE_URL = 'http://localhost:8080';
+// const API_BASE_URL = 'https://api.piro-recruiting.kro.kr';
 // axios 인스턴스 생성
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -66,7 +66,7 @@ apiClient.interceptors.response.use(
           const errorJson = JSON.parse(errorText);
           console.error('파싱된 에러 JSON:', errorJson);
           error.response.data = errorJson;
-        } catch (jsonError) {
+        } catch {
           console.error('JSON 파싱 실패, 텍스트로 유지:', errorText);
           error.response.data = { message: errorText };
         }
