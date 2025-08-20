@@ -532,119 +532,7 @@
   color: var(--color-yellow);
 }
 
-/* 평가 폼 */
-.evaluation-form {
-  margin-top: 1rem;
-}
-
-.evaluation-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.score-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.score-input-group label {
-  color: var(--color-gray-3);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.score-input {
-  max-width: 120px;
-  padding: 0.5rem 0.75rem;
-  background-color: var(--color-gray-8);
-  border: 1px solid var(--color-gray-6);
-  border-radius: 6px;
-  color: var(--color-white);
-  font-size: 0.875rem;
-  outline: none;
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-.score-input::-webkit-outer-spin-button,
-.score-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.score-input:focus {
-  border-color: var(--color-green-0);
-}
-
-.comment-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.comment-input-group label {
-  color: var(--color-gray-3);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.comment-textarea {
-  padding: 0.75rem;
-  background-color: var(--color-gray-8);
-  border: 1px solid var(--color-gray-6);
-  border-radius: 6px;
-  color: var(--color-white);
-  font-size: 0.875rem;
-  font-family: var(--font-family);
-  outline: none;
-  resize: vertical;
-  min-height: 80px;
-}
-
-.comment-textarea:focus {
-  border-color: var(--color-green-0);
-}
-
-.comment-textarea::placeholder {
-  color: var(--color-gray-4);
-}
-
-.submit-evaluation-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background-color: var(--color-green-0);
-  border: none;
-  border-radius: 6px;
-  color: var(--color-white);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-  align-self: flex-start;
-}
-
-.submit-evaluation-btn:hover:not(:disabled) {
-  background-color: var(--color-green-1);
-}
-
-.submit-evaluation-btn:disabled {
-  background-color: var(--color-gray-6);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* 평가 완료 표시 */
-.evaluation-comment {
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background-color: var(--color-gray-8);
-  border: 1px solid var(--color-gray-6);
-  border-radius: 6px;
-}
+/* 평가 폼 스타일은 EvaluationStyles.css로 이동됨 */
 
 .comment-label {
   color: var(--color-gray-3);
@@ -660,87 +548,9 @@
   white-space: pre-wrap;
 }
 
-.evaluation-actions {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.5rem;
-}
+/* 기존 evaluation 스타일들도 EvaluationStyles.css로 통합됨 */
 
-.edit-evaluation-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background-color: var(--color-gray-7);
-  border: 1px solid var(--color-gray-6);
-  border-radius: 6px;
-  color: var(--color-white);
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.edit-evaluation-btn:hover {
-  background-color: var(--color-gray-6);
-}
-
-.evaluation-form-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.cancel-edit-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background-color: var(--color-gray-7);
-  border: 1px solid var(--color-gray-6);
-  border-radius: 6px;
-  color: var(--color-white);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  align-self: flex-start;
-}
-
-.cancel-edit-btn:hover {
-  background-color: var(--color-gray-6);
-}
-
-/* 평가 완료 */
-.evaluation-completed {
-  margin-top: 1rem;
-}
-
-.evaluation-score-display {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background-color: var(--color-gray-8);
-  border: 1px solid var(--color-green-0);
-  border-radius: 8px;
-}
-
-.score-label {
-  color: var(--color-gray-3);
-  font-size: 0.875rem;
-}
-
-.recruit-score-value {
-  color: var(--color-green-0);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.evaluator {
-  color: var(--color-gray-4);
-  font-size: 0.75rem;
-  margin-left: auto;
-}
+/* 기존 평가 스타일들 모두 EvaluationStyles.css로 이동됨 */
 
 /* 액션 버튼 */
 .detail-actions {
@@ -2321,3 +2131,5 @@
   font-size: 0.875rem;
   line-height: 1.5;
 }
+
+/* 평가 스타일은 EvaluationStyles.css로 분리됨 */

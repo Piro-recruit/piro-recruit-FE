@@ -544,4 +544,94 @@ export const aiSummaryAPI = {
   }
 };
 
+// Evaluation API 함수들 
+export const evaluationAPI = {
+  // 새로운 평가 생성
+  createEvaluation: async (evaluationData) => {
+    try {
+      console.log('평가 생성 요청:', evaluationData);
+      const response = await apiClient.post('/api/evaluations', evaluationData);
+      console.log('평가 생성 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('평가 생성 실패:', error);
+      console.error('에러 상태:', error.response?.status);
+      console.error('에러 데이터:', error.response?.data);
+      throw error;
+    }
+  },
+
+  // 평가 수정
+  updateEvaluation: async (evaluationId, evaluationData) => {
+    try {
+      console.log('평가 수정 요청:', evaluationId, evaluationData);
+      const response = await apiClient.put(`/api/evaluations/${evaluationId}`, evaluationData);
+      console.log('평가 수정 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('평가 수정 실패:', error);
+      throw error;
+    }
+  },
+
+  // 평가 삭제
+  deleteEvaluation: async (evaluationId) => {
+    try {
+      console.log('평가 삭제 요청:', evaluationId);
+      const response = await apiClient.delete(`/api/evaluations/${evaluationId}`);
+      console.log('평가 삭제 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('평가 삭제 실패:', error);
+      throw error;
+    }
+  },
+
+  // 특정 지원서의 모든 평가 조회
+  getApplicationEvaluations: async (applicationId) => {
+    try {
+      console.log('지원서별 평가 조회 요청:', applicationId);
+      const response = await apiClient.get(`/api/evaluations/application/${applicationId}`);
+      console.log('지원서별 평가 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('지원서별 평가 조회 실패:', error);
+      if (error.response?.status === 404) {
+        // 평가가 없는 경우
+        return {
+          success: true,
+          data: []
+        };
+      }
+      throw error;
+    }
+  },
+
+  // 지원서별 평가 요약 조회 (평균 점수 포함)
+  getApplicationEvaluationSummary: async (applicationId) => {
+    try {
+      console.log('평가 요약 조회 요청:', applicationId);
+      const response = await apiClient.get(`/api/evaluations/application/${applicationId}/summary`);
+      console.log('평가 요약 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('평가 요약 조회 실패:', error);
+      if (error.response?.status === 404) {
+        // 평가가 없는 경우
+        return {
+          success: true,
+          data: {
+            applicationId: applicationId,
+            applicantName: '알 수 없음',
+            averageScore: null,
+            evaluationCount: 0,
+            evaluations: []
+          }
+        };
+      }
+      throw error;
+    }
+  }
+};
+
 export default apiClient;

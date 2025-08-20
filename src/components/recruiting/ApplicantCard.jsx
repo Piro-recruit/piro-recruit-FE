@@ -15,20 +15,41 @@ import {
 } from 'lucide-react';
 import EvaluationForm from './EvaluationForm';
 import './ApplicantCard.css';
+import './EvaluationStyles.css';
 
 const ApplicantCard = ({ 
   applicant, 
   isExpanded, 
   evaluation, 
+  allEvaluations = [],
   editingEvaluation, 
   aiSummary,
   isLoadingAi,
+  isLoadingEvaluation,
   onToggle, 
   onShowOriginal, 
   onEvaluationSubmit,
+  onEvaluationUpdate,
+  onEvaluationDelete,
   onEditEvaluation,
   onCancelEdit
 }) => {
+  // 디버깅: 현재 사용자의 평가와 모든 평가 목록 로그
+  React.useEffect(() => {
+    if (allEvaluations.length > 0) {
+      console.log(`지원자 ${applicant.name} 평가 디버깅:`, {
+        myEvaluation: evaluation,
+        allEvaluations: allEvaluations,
+        matchingCheck: allEvaluations.map(evalItem => ({
+          evalId: evalItem.id,
+          myEvalId: evaluation?.id,
+          isMatch: evaluation && evalItem.id === evaluation.id,
+          evaluator: evalItem.evaluator
+        }))
+      });
+    }
+  }, [evaluation, allEvaluations, applicant.name]);
+
   return (
     <div className="applicant-card">
       {/* 기본 지원자 정보 박스 */}
@@ -142,56 +163,108 @@ const ApplicantCard = ({
             )}
           </div>
 
-          {/* 평가 섹션 */}
+          {/* 평가 섹션 - 댓글 형식 */}
           <div className="evaluation-section">
             <div className="evaluation-header">
-              <h4 className="section-subtitle">평가</h4>
+              <h4 className="section-subtitle">💬 평가 ({allEvaluations.length})</h4>
               <div className="ai-score">
                 <Star size={16} className="star-icon" />
-                <span>AI 점수: {applicant.aiScore}점</span>
+                <span>AI 점수: {isLoadingAi ? '로딩중...' : aiSummary?.scoreOutOf100 ? `${aiSummary.scoreOutOf100}점` : '분석 대기'}</span>
               </div>
             </div>
             
-            {evaluation && editingEvaluation !== applicant.id ? (
-              <div className="evaluation-completed">
-                <div className="evaluation-score-display">
-                  <span className="score-label">내 평가:</span>
-                  <span className="recruit-score-value">{evaluation.score}점</span>
-                  <span className="evaluator">by {evaluation.evaluator}</span>
-                </div>
-                
-                {evaluation.comment && (
-                  <div className="evaluation-comment">
-                    <div className="comment-label">코멘트:</div>
-                    <div className="comment-content">{evaluation.comment}</div>
+            {isLoadingEvaluation ? (
+              <div className="evaluation-loading">
+                <div className="loading-spinner"></div>
+                <span>평가를 불러오는 중...</span>
+              </div>
+            ) : (
+              <div className="evaluations-container">
+                {/* 기존 평가들 - 댓글 형식으로 표시 */}
+                {allEvaluations.length > 0 && (
+                  <div className="evaluations-list">
+                    {allEvaluations.map((evalItem, index) => (
+                      <div key={evalItem.id || index} className="evaluation-comment-item">
+                        <div className="evaluation-comment-header">
+                          <div className="evaluator-info">
+                            <span className="evaluator-name">{evalItem.evaluator}</span>
+                            <span className="evaluation-score-badge">{evalItem.score}점</span>
+                          </div>
+                          <div className="evaluation-meta-container">
+                            <span className="evaluation-date">
+                              {new Date(evalItem.evaluatedAt).toLocaleDateString('ko-KR', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                            {/* 내가 작성한 평가인 경우에만 수정/삭제 버튼 표시 */}
+                            {evaluation && evalItem.id === evaluation.id && (
+                              <div className="evaluation-actions">
+                                <button 
+                                  className="edit-evaluation-btn"
+                                  onClick={() => onEditEvaluation(applicant.id)}
+                                  title="평가 수정"
+                                >
+                                  <Edit size={14} />
+                                  <span className="action-text">수정</span>
+                                </button>
+                                <button 
+                                  className="delete-evaluation-btn"
+                                  onClick={() => onEvaluationDelete(applicant.id)}
+                                  title="평가 삭제"
+                                >
+                                  <X size={14} />
+                                  <span className="action-text">삭제</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {evalItem.comment && (
+                          <div className="evaluation-comment-content">
+                            {evalItem.comment}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
                 
-                <div className="evaluation-actions">
-                  <button 
-                    className="edit-evaluation-btn"
-                    onClick={() => onEditEvaluation(applicant.id)}
-                  >
-                    <Edit size={14} />
-                    수정
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="evaluation-form-container">
-                <EvaluationForm 
-                  applicantId={applicant.id}
-                  onSubmit={onEvaluationSubmit}
-                  initialData={evaluation}
-                />
-                {editingEvaluation === applicant.id && (
-                  <button 
-                    className="cancel-edit-btn"
-                    onClick={onCancelEdit}
-                  >
-                    <X size={14} />
-                    취소
-                  </button>
+                {/* 평가 작성/수정 폼 */}
+                {editingEvaluation === applicant.id ? (
+                  <div className="evaluation-form-container editing">
+                    <div className="evaluation-form-header">
+                      <h5>{evaluation ? '평가 수정' : '평가 작성'}</h5>
+                      <button 
+                        className="cancel-edit-btn"
+                        onClick={onCancelEdit}
+                        title="취소"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <EvaluationForm 
+                      applicantId={applicant.id}
+                      onSubmit={evaluation ? onEvaluationUpdate : onEvaluationSubmit}
+                      initialData={evaluation}
+                    />
+                  </div>
+                ) : (
+                  /* 새 평가 작성 버튼 또는 내 평가가 없는 경우 폼 표시 */
+                  !evaluation ? (
+                    <div className="evaluation-form-container new">
+                      <div className="new-evaluation-prompt">
+                        <span className="prompt-text">이 지원자를 평가해보세요</span>
+                      </div>
+                      <EvaluationForm 
+                        applicantId={applicant.id}
+                        onSubmit={onEvaluationSubmit}
+                        initialData={null}
+                      />
+                    </div>
+                  ) : null
                 )}
               </div>
             )}

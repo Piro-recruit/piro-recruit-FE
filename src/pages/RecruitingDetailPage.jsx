@@ -11,9 +11,48 @@ import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
-import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI, evaluationAPI } from '../services/api';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
 import './RecruitingDetailPage.css';
+
+// JWT 토큰에서 사용자 정보 추출하는 유틸리티 함수
+const getCurrentUserFromToken = () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.log('토큰이 없습니다');
+      return null;
+    }
+    
+    // JWT는 header.payload.signature 형태
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('유효하지 않은 JWT 형식:', parts.length, '개 부분');
+      return null;
+    }
+    
+    const payload = parts[1];
+    
+    // Base64 디코딩 (URL-safe base64)
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const userInfo = JSON.parse(decoded);
+    
+    console.log('JWT에서 추출한 사용자 정보:', userInfo);
+    console.log('사용자 ID 후보들:', {
+      id: userInfo.id,
+      sub: userInfo.sub,
+      userId: userInfo.userId,
+      username: userInfo.username,
+      email: userInfo.email,
+      adminId: userInfo.adminId
+    });
+    
+    return userInfo;
+  } catch (error) {
+    console.error('JWT 토큰 파싱 실패:', error);
+    return null;
+  }
+};
 
 
 const RecruitingDetailPage = () => {
@@ -57,6 +96,9 @@ const RecruitingDetailPage = () => {
   // AI Summary 상태
   const [aiSummaries, setAiSummaries] = useState({});
   const [isLoadingAiSummaries, setIsLoadingAiSummaries] = useState(false);
+  
+  // Evaluation 상태
+  const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
 
   // 구독자 수 조회
   const fetchSubscriberCount = async () => {
@@ -304,6 +346,135 @@ const RecruitingDetailPage = () => {
     }
   };
 
+  // 평가 데이터 조회 - 모든 평가자의 평가를 가져오고, 현재 사용자의 평가만 편집 가능하게 함
+  const fetchEvaluations = async () => {
+    if (!allApplicants.length) return;
+    
+    setIsLoadingEvaluations(true);
+    
+    try {
+      const currentUser = getCurrentUserFromToken();
+      console.log('평가 데이터 조회 시작');
+      console.log('지원자 수:', allApplicants.length);
+      console.log('현재 로그인 사용자:', currentUser);
+      
+      const evaluationPromises = allApplicants.map(async (applicant) => {
+        try {
+          console.log(`지원자 ${applicant.id} 평가 조회 중`);
+          const response = await evaluationAPI.getApplicationEvaluations(applicant.id);
+          
+          if (response.success && response.data && response.data.length > 0) {
+            console.log(`지원자 ${applicant.id} 평가 발견:`, response.data);
+            
+            // 모든 평가를 저장하되, 현재 사용자의 평가를 구분
+            const allEvaluations = response.data.map(evaluation => ({
+              id: evaluation.id,
+              score: evaluation.score,
+              comment: evaluation.comment,
+              evaluator: evaluation.evaluatorName,
+              evaluatedAt: evaluation.createdAt,
+              evaluatorId: evaluation.evaluatorId,
+              applicantName: evaluation.applicantName,
+              updatedAt: evaluation.updatedAt
+            }));
+            
+            // 현재 사용자의 평가 찾기
+            const currentUser = getCurrentUserFromToken();
+            let myEvaluation = null;
+            
+            if (currentUser) {
+              // JWT에서 사용자 ID를 추출해서 해당 사용자의 평가 찾기
+              // JWT 토큰의 구조에 따라 사용자 ID 필드명이 다를 수 있음
+              const possibleUserIds = [
+                currentUser.id,
+                currentUser.sub, 
+                currentUser.userId,
+                currentUser.adminId,
+                currentUser.username,
+                currentUser.email
+              ].filter(Boolean); // null, undefined 제거
+              
+              console.log('현재 사용자 ID 후보들:', possibleUserIds);
+              console.log('평가 목록의 evaluatorId들:', allEvaluations.map(e => e.evaluatorId));
+              
+              // 각 후보 ID로 평가 찾기 시도
+              for (const candidateId of possibleUserIds) {
+                myEvaluation = allEvaluations.find(evaluation => {
+                  // 정확한 매치, 문자열 매치, 숫자 매치 모두 시도
+                  return evaluation.evaluatorId === candidateId || 
+                         evaluation.evaluatorId === candidateId.toString() ||
+                         evaluation.evaluatorId === parseInt(candidateId) ||
+                         evaluation.evaluator === candidateId; // evaluatorName으로도 비교
+                });
+                
+                if (myEvaluation) {
+                  console.log(`사용자 ID ${candidateId}로 평가를 찾았습니다:`, myEvaluation);
+                  break;
+                }
+              }
+              
+              if (!myEvaluation) {
+                console.log('현재 사용자의 평가를 찾지 못했습니다. 새로운 평가를 작성할 수 있습니다.');
+              }
+            }
+            
+            // myEvaluation이 null이면 현재 사용자는 아직 이 지원자를 평가하지 않았음
+            
+            return {
+              applicantId: applicant.id,
+              allEvaluations: allEvaluations, // 모든 평가 목록
+              myEvaluation: myEvaluation // 내 평가만 편집 가능
+            };
+          } else {
+            console.log(`지원자 ${applicant.id}: 평가 없음`);
+            // 평가가 없어도 현재 사용자는 새로운 평가를 작성할 수 있음
+            return {
+              applicantId: applicant.id,
+              allEvaluations: [],
+              myEvaluation: null // null이므로 새로운 평가를 작성할 수 있음
+            };
+          }
+        } catch (error) {
+          console.log(`지원자 ${applicant.id} 평가 조회 오류:`, error);
+          return {
+            applicantId: applicant.id,
+            allEvaluations: [],
+            myEvaluation: null
+          };
+        }
+      });
+      
+      const evaluationResults = await Promise.allSettled(evaluationPromises);
+      const newEvaluations = {};
+      
+      evaluationResults.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const { applicantId, allEvaluations, myEvaluation } = result.value;
+          newEvaluations[applicantId] = {
+            allEvaluations: allEvaluations,
+            myEvaluation: myEvaluation
+          };
+          console.log(`지원자 ${applicantId} 평가 저장 완료:`, allEvaluations.length, '개 평가');
+        } else if (result.status === 'rejected') {
+          const applicantId = allApplicants[index]?.id;
+          console.log(`지원자 ${applicantId} Promise rejected:`, result.reason);
+          newEvaluations[applicantId] = {
+            allEvaluations: [],
+            myEvaluation: null
+          };
+        }
+      });
+      
+      console.log('평가 조회 완료:', Object.keys(newEvaluations).length, '개 지원자');
+      console.log('저장된 평가 데이터:', newEvaluations);
+      setEvaluations(newEvaluations);
+    } catch (error) {
+      console.error('평가 조회 실패:', error);
+    } finally {
+      setIsLoadingEvaluations(false);
+    }
+  };
+
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     console.log('컴포넌트 마운트, id:', id);
@@ -312,10 +483,11 @@ const RecruitingDetailPage = () => {
     fetchStatistics();
   }, [id]);
 
-  // 지원자 데이터가 로드된 후 AI Summary 조회
+  // 지원자 데이터가 로드된 후 AI Summary와 평가 데이터 조회
   useEffect(() => {
     if (allApplicants.length > 0 && !isLoadingApplications) {
       fetchAiSummaries();
+      fetchEvaluations();
     }
   }, [allApplicants.length, isLoadingApplications]);
 
@@ -412,17 +584,64 @@ const RecruitingDetailPage = () => {
     setSelectedApplicant(null);
   };
 
-  const handleEvaluationSubmit = (applicantId, evaluationData) => {
-    setEvaluations(prev => ({
-      ...prev,
-      [applicantId]: {
+  const handleEvaluationSubmit = async (applicantId, evaluationData) => {
+    try {
+      console.log('평가 제출 시작:', applicantId, evaluationData);
+      
+      // API를 통해 평가 생성
+      const response = await evaluationAPI.createEvaluation({
+        applicationId: applicantId,
         score: evaluationData.score,
-        comment: evaluationData.comment,
-        evaluator: '운영진A', // 실제로는 로그인한 사용자 정보
-        evaluatedAt: new Date().toISOString()
+        comment: evaluationData.comment
+      });
+
+      if (response.success && response.data) {
+        console.log('평가 생성 성공:', response.data);
+        
+        // 새로운 평가 객체 생성
+        const newEvaluation = {
+          id: response.data.id,
+          score: response.data.score,
+          comment: response.data.comment,
+          evaluator: response.data.evaluatorName || '운영진A',
+          evaluatedAt: response.data.createdAt || new Date().toISOString(),
+          evaluatorId: response.data.evaluatorId,
+          applicantName: response.data.applicantName,
+          updatedAt: response.data.updatedAt
+        };
+        
+        // 로컬 상태 업데이트 - 새로운 데이터 구조에 맞게
+        setEvaluations(prev => {
+          const currentEvaluations = prev[applicantId] || { allEvaluations: [], myEvaluation: null };
+          return {
+            ...prev,
+            [applicantId]: {
+              allEvaluations: [...currentEvaluations.allEvaluations, newEvaluation], // 모든 평가 목록에 추가
+              myEvaluation: newEvaluation // 내 평가로 설정
+            }
+          };
+        });
+        
+        setEditingEvaluation(null); // 편집 모드 종료
+        console.log('평가가 성공적으로 등록되었습니다.');
+      } else {
+        console.error('평가 생성 응답 오류:', response);
+        alert(response.message || '평가 등록에 실패했습니다.');
       }
-    }));
-    setEditingEvaluation(null); // 편집 모드 종료
+    } catch (error) {
+      console.error('평가 등록 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 409) {
+        alert('이미 이 지원서에 대한 평가를 등록하셨습니다.');
+      } else if (error.response?.status === 404) {
+        alert('지원서를 찾을 수 없습니다.');
+      } else if (error.response?.status === 400) {
+        alert('평가 데이터가 올바르지 않습니다. (점수: 0-100점)');
+      } else {
+        alert('평가 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
   };
 
   const handleEditEvaluation = (applicantId) => {
@@ -431,6 +650,145 @@ const RecruitingDetailPage = () => {
 
   const handleCancelEdit = () => {
     setEditingEvaluation(null);
+  };
+
+  // 평가 수정 핸들러
+  const handleEvaluationUpdate = async (applicantId, evaluationData) => {
+    try {
+      // 현재 저장된 내 평가의 ID를 가져옴
+      const currentEvaluations = evaluations[applicantId];
+      if (!currentEvaluations || !currentEvaluations.myEvaluation || !currentEvaluations.myEvaluation.id) {
+        alert('수정할 평가를 찾을 수 없습니다.');
+        return;
+      }
+
+      const myEvaluation = currentEvaluations.myEvaluation;
+      console.log('평가 수정 시작:', myEvaluation.id, evaluationData);
+      
+      // API를 통해 평가 수정
+      const response = await evaluationAPI.updateEvaluation(myEvaluation.id, {
+        score: evaluationData.score,
+        comment: evaluationData.comment
+      });
+
+      if (response.success && response.data) {
+        console.log('평가 수정 성공:', response.data);
+        
+        // 업데이트된 평가 객체 생성
+        const updatedEvaluation = {
+          ...myEvaluation,
+          score: response.data.score,
+          comment: response.data.comment,
+          updatedAt: response.data.updatedAt,
+          evaluator: response.data.evaluatorName || myEvaluation.evaluator,
+          applicantName: response.data.applicantName
+        };
+        
+        // 로컬 상태 업데이트 - 새로운 데이터 구조에 맞게
+        setEvaluations(prev => {
+          const currentEvaluations = prev[applicantId] || { allEvaluations: [], myEvaluation: null };
+          
+          // 전체 평가 목록에서 내 평가 업데이트
+          const updatedAllEvaluations = currentEvaluations.allEvaluations.map(evaluation => 
+            evaluation.id === myEvaluation.id ? updatedEvaluation : evaluation
+          );
+          
+          return {
+            ...prev,
+            [applicantId]: {
+              allEvaluations: updatedAllEvaluations,
+              myEvaluation: updatedEvaluation
+            }
+          };
+        });
+        
+        setEditingEvaluation(null); // 편집 모드 종료
+        console.log('평가가 성공적으로 수정되었습니다.');
+      } else {
+        console.error('평가 수정 응답 오류:', response);
+        alert(response.message || '평가 수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('평가 수정 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 403) {
+        alert('이 평가를 수정할 권한이 없습니다. (본인이 작성한 평가만 수정 가능)');
+      } else if (error.response?.status === 404) {
+        alert('수정할 평가를 찾을 수 없습니다.');
+      } else if (error.response?.status === 400) {
+        alert('평가 데이터가 올바르지 않습니다. (점수: 0-100점)');
+      } else {
+        alert('평가 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  // 평가 삭제 핸들러
+  const handleEvaluationDelete = async (applicantId) => {
+    try {
+      // 현재 저장된 내 평가의 ID를 가져옴
+      const currentEvaluations = evaluations[applicantId];
+      if (!currentEvaluations || !currentEvaluations.myEvaluation || !currentEvaluations.myEvaluation.id) {
+        alert('삭제할 평가를 찾을 수 없습니다.');
+        return;
+      }
+
+      const myEvaluation = currentEvaluations.myEvaluation;
+      
+      // 삭제 확인
+      const confirmDelete = window.confirm(
+        `${myEvaluation.applicantName || '지원자'}에 대한 내 평가를 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
+      );
+      
+      if (!confirmDelete) {
+        return;
+      }
+
+      console.log('평가 삭제 시작:', myEvaluation.id);
+      
+      // API를 통해 평가 삭제
+      const response = await evaluationAPI.deleteEvaluation(myEvaluation.id);
+
+      if (response.success) {
+        console.log('평가 삭제 성공');
+        
+        // 로컬 상태에서 내 평가만 제거 (다른 평가자의 평가는 유지)
+        setEvaluations(prev => {
+          const currentEvaluations = prev[applicantId] || { allEvaluations: [], myEvaluation: null };
+          
+          // 전체 평가 목록에서 내 평가 제거
+          const updatedAllEvaluations = currentEvaluations.allEvaluations.filter(
+            evaluation => evaluation.id !== myEvaluation.id
+          );
+          
+          return {
+            ...prev,
+            [applicantId]: {
+              allEvaluations: updatedAllEvaluations,
+              myEvaluation: null // 내 평가 제거
+            }
+          };
+        });
+        
+        setEditingEvaluation(null); // 편집 모드 종료
+        console.log('평가가 성공적으로 삭제되었습니다.');
+      } else {
+        console.error('평가 삭제 응답 오류:', response);
+        alert(response.message || '평가 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('평가 삭제 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 403) {
+        alert('이 평가를 삭제할 권한이 없습니다. (본인이 작성한 평가만 삭제 가능)');
+      } else if (error.response?.status === 404) {
+        alert('삭제할 평가를 찾을 수 없습니다.');
+      } else {
+        alert('평가 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
   };
 
 
@@ -1055,7 +1413,7 @@ const RecruitingDetailPage = () => {
                 <div className="applicants-list">
                   {currentApplicants.map((applicant) => {
                     const isExpanded = expandedApplicants.has(applicant.id);
-                    const evaluation = evaluations[applicant.id];
+                    const evaluationData = evaluations[applicant.id] || { allEvaluations: [], myEvaluation: null };
                     const aiSummary = aiSummaries[applicant.id];
                     
                     return (
@@ -1063,13 +1421,17 @@ const RecruitingDetailPage = () => {
                         key={applicant.id}
                         applicant={applicant}
                         isExpanded={isExpanded}
-                        evaluation={evaluation}
+                        evaluation={evaluationData.myEvaluation} // 내 평가만 편집 가능
+                        allEvaluations={evaluationData.allEvaluations} // 모든 평가 목록 표시
                         editingEvaluation={editingEvaluation}
                         aiSummary={aiSummary}
                         isLoadingAi={isLoadingAiSummaries}
+                        isLoadingEvaluation={isLoadingEvaluations}
                         onToggle={handleToggleApplicant}
                         onShowOriginal={handleShowOriginal}
                         onEvaluationSubmit={handleEvaluationSubmit}
+                        onEvaluationUpdate={handleEvaluationUpdate}
+                        onEvaluationDelete={handleEvaluationDelete}
                         onEditEvaluation={handleEditEvaluation}
                         onCancelEdit={handleCancelEdit}
                       />
