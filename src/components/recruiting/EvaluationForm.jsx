@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Save } from 'lucide-react';
-import './EvaluationForm.css';
+import './EvaluationStyles.css';
 
 const EvaluationForm = ({ applicantId, onSubmit, initialData = null }) => {
   const [score, setScore] = useState(initialData?.score?.toString() || '');
