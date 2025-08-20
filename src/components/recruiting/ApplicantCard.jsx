@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   User, 
   ChevronDown, 
@@ -32,8 +32,26 @@ const ApplicantCard = ({
   onEvaluationUpdate,
   onEvaluationDelete,
   onEditEvaluation,
-  onCancelEdit
+  onCancelEdit,
+  onStatusChange
 }) => {
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const statusDropdownRef = useRef(null);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // 디버깅: 현재 사용자의 평가와 모든 평가 목록 로그
   React.useEffect(() => {
     if (allEvaluations.length > 0) {
@@ -67,9 +85,64 @@ const ApplicantCard = ({
           <div className="applicant-left-info">
             <div className="applicant-main-row">
               <h3 className="applicant-name">{applicant.name}</h3>
-              <span className={`status-badge ${applicant.statusColor}`}>
-                {applicant.status}
-              </span>
+              <div className="status-change-container" ref={statusDropdownRef}>
+                <div 
+                  className={`status-badge ${applicant.statusColor} clickable`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowStatusDropdown(!showStatusDropdown);
+                  }}
+                  title="상태 변경하기"
+                >
+                  {applicant.status}
+                  <ChevronDown size={12} className="status-arrow" />
+                </div>
+                
+                {showStatusDropdown && (
+                  <div className="status-dropdown-menu">
+                    <button 
+                      className={`status-option ${applicant.passStatus === 'PENDING' ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onStatusChange && onStatusChange(applicant.id, 'PENDING');
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      평가 대기
+                    </button>
+                    <button 
+                      className={`status-option ${applicant.passStatus === 'FIRST_PASS' ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onStatusChange && onStatusChange(applicant.id, 'FIRST_PASS');
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      1차 합격
+                    </button>
+                    <button 
+                      className={`status-option ${applicant.passStatus === 'FINAL_PASS' ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onStatusChange && onStatusChange(applicant.id, 'FINAL_PASS');
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      최종 합격
+                    </button>
+                    <button 
+                      className={`status-option ${applicant.passStatus === 'FAILED' ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onStatusChange && onStatusChange(applicant.id, 'FAILED');
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      불합격
+                    </button>
+                  </div>
+                )}
+              </div>
               <span className="applicant-university">
                 <MapPin size={14} />
                 {applicant.university}

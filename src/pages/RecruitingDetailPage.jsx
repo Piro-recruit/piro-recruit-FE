@@ -11,7 +11,7 @@ import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
-import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI, evaluationAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI, evaluationAPI, applicationStatusAPI } from '../services/api';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
 import './RecruitingDetailPage.css';
 
@@ -99,6 +99,11 @@ const RecruitingDetailPage = () => {
   
   // Evaluation 상태
   const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
+  
+  // 일괄 상태 변경 상태
+  const [bulkChangeCount, setBulkChangeCount] = useState(10);
+  const [isBulkChanging, setIsBulkChanging] = useState(false);
+  const [showBulkChangeModal, setShowBulkChangeModal] = useState(false);
 
   // 구독자 수 조회
   const fetchSubscriberCount = async () => {
@@ -215,13 +220,17 @@ const RecruitingDetailPage = () => {
             major: `${app.department || 'Unknown'} (${app.grade || 'Unknown'})`, // 기존 호환성을 위해 유지
             majorStatus: app.major || 'Unknown', // 전공자 여부
             appliedDate: app.updatedAt ? new Date(app.updatedAt).toLocaleDateString() : '날짜 없음',
+            // API passStatus 필드 그대로 유지 (상태 변경에 사용)
+            passStatus: app.passStatus || 'PENDING',
             // API passStatus를 UI status로 매핑
-            status: app.passStatus === 'PASS' ? APPLICANT_STATUS.PASSED : 
-                   app.passStatus === 'FAIL' ? APPLICANT_STATUS.FAILED :
+            status: app.passStatus === 'FINAL_PASS' ? APPLICANT_STATUS.PASSED : 
+                   app.passStatus === 'FIRST_PASS' ? '1차 합격' :
+                   app.passStatus === 'FAILED' ? APPLICANT_STATUS.FAILED :
                    app.passStatus === 'PENDING' ? APPLICANT_STATUS.REVIEWING : 
                    APPLICANT_STATUS.REVIEWING,
-            statusColor: app.passStatus === 'PASS' ? 'green' :
-                        app.passStatus === 'FAIL' ? 'red' :
+            statusColor: app.passStatus === 'FINAL_PASS' ? 'green' :
+                        app.passStatus === 'FIRST_PASS' ? 'blue' :
+                        app.passStatus === 'FAILED' ? 'red' :
                         app.passStatus === 'PENDING' ? 'yellow' : 'yellow',
             aiScore: 0, // AI Summary API에서 가져올 예정
             skills: [app.major, app.department].filter(Boolean), // 전공여부와 학과를 스킬로 표시
@@ -791,6 +800,85 @@ const RecruitingDetailPage = () => {
     }
   };
 
+  // 지원서 상태 변경 핸들러
+  const handleStatusChange = async (applicantId, newPassStatus) => {
+    try {
+      console.log('지원서 상태 변경 시도:', { applicantId, newPassStatus });
+      
+      const response = await applicationStatusAPI.changeApplicationStatus(applicantId, newPassStatus);
+      
+      if (response.success) {
+        alert(`지원서 상태가 ${getStatusDisplayName(newPassStatus)}(으)로 변경되었습니다.`);
+        
+        // 지원자 목록 새로고침
+        await fetchApplications();
+        
+        console.log('지원서 상태 변경 완료:', response.data);
+      }
+    } catch (error) {
+      console.error('지원서 상태 변경 실패:', error);
+      
+      // 구체적인 에러 메시지 표시
+      if (error.response?.status === 403) {
+        alert('지원서 상태를 변경할 권한이 없습니다. (Root 권한 필요)');
+      } else if (error.response?.status === 404) {
+        alert('변경할 지원서를 찾을 수 없습니다.');
+      } else {
+        alert('지원서 상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  // 점수 기준 상위 N명 상태 변경
+  const handleTopNStatusChange = async (passStatus) => {
+    const confirmMessage = `점수 상위 ${bulkChangeCount}명의 상태를 ${getStatusDisplayName(passStatus)}(으)로 변경하시겠습니까?`;
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      setIsBulkChanging(true);
+      const response = await applicationStatusAPI.bulkChangeApplicationStatus(parseInt(bulkChangeCount), passStatus);
+      
+      if (response.success) {
+        alert(`상위 ${bulkChangeCount}명의 상태가 ${getStatusDisplayName(passStatus)}(으)로 변경되었습니다.`);
+        
+        // 지원자 목록 새로고침
+        await fetchApplications();
+        
+        // 모달 닫기
+        setShowBulkChangeModal(false);
+      }
+    } catch (error) {
+      console.error('상위 N명 상태 변경 실패:', error);
+      
+      if (error.response?.status === 403) {
+        alert('일괄 상태 변경 권한이 없습니다. (Root 권한 필요)');
+      } else {
+        alert('상위 N명 상태 변경 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsBulkChanging(false);
+    }
+  };
+
+  // 일괄 상태 변경 모달 열기/닫기
+  const handleShowBulkChangeModal = () => {
+    setShowBulkChangeModal(true);
+  };
+
+  const handleCloseBulkChangeModal = () => {
+    setShowBulkChangeModal(false);
+  };
+
+  // 상태 표시명 변환 함수
+  const getStatusDisplayName = (passStatus) => {
+    switch (passStatus) {
+      case 'PENDING': return '평가 대기';
+      case 'FIRST_PASS': return '1차 합격';
+      case 'FINAL_PASS': return '최종 합격';
+      case 'FAILED': return '불합격';
+      default: return '알 수 없음';
+    }
+  };
 
   const handleCloseEmailModal = () => {
     setShowEmailModal(false);
@@ -1137,6 +1225,9 @@ const RecruitingDetailPage = () => {
                     <Mail size={20} />
                     일괄 이메일 전송
                   </button>
+                  <button className="bulk-change-btn" onClick={handleShowBulkChangeModal}>
+                    일괄 상태 변경
+                  </button>
                 </div>
               </div>
 
@@ -1434,6 +1525,7 @@ const RecruitingDetailPage = () => {
                         onEvaluationDelete={handleEvaluationDelete}
                         onEditEvaluation={handleEditEvaluation}
                         onCancelEdit={handleCancelEdit}
+                        onStatusChange={handleStatusChange}
                       />
                     );
                   })}
@@ -1540,6 +1632,91 @@ const RecruitingDetailPage = () => {
               >
                 {isDeleting ? '삭제 중...' : '삭제'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 일괄 상태 변경 모달 */}
+      {showBulkChangeModal && (
+        <div className="bulk-change-modal-overlay">
+          <div className="bulk-change-modal-container">
+            <div className="bulk-change-modal-header">
+              <h3 className="bulk-change-modal-title">일괄 상태 변경</h3>
+              <button 
+                className="bulk-change-modal-close-btn"
+                onClick={handleCloseBulkChangeModal}
+                disabled={isBulkChanging}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="bulk-change-modal-content">
+              <div className="bulk-change-description">
+                평가 점수를 기준으로 상위 지원자들의 상태를 일괄 변경합니다.
+              </div>
+              
+              <div className="bulk-change-controls">
+                <div className="bulk-count-section">
+                  <label htmlFor="bulk-count" className="bulk-count-label">
+                    변경할 인원수
+                  </label>
+                  <div className="bulk-count-input-wrapper">
+                    <input 
+                      id="bulk-count"
+                      type="number" 
+                      value={bulkChangeCount}
+                      onChange={(e) => setBulkChangeCount(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="bulk-count-input"
+                      min="1"
+                      max="100"
+                      disabled={isBulkChanging}
+                    />
+                    <span className="bulk-count-suffix">명</span>
+                  </div>
+                </div>
+
+                <div className="bulk-status-section">
+                  <label className="bulk-status-label">변경할 상태 선택</label>
+                  <div className="bulk-status-buttons">
+                    <button 
+                      className="bulk-status-btn first-pass"
+                      onClick={() => handleTopNStatusChange('FIRST_PASS')}
+                      disabled={isBulkChanging}
+                    >
+                      1차 합격
+                    </button>
+                    <button 
+                      className="bulk-status-btn final-pass"
+                      onClick={() => handleTopNStatusChange('FINAL_PASS')}
+                      disabled={isBulkChanging}
+                    >
+                      최종 합격
+                    </button>
+                    <button 
+                      className="bulk-status-btn failed"
+                      onClick={() => handleTopNStatusChange('FAILED')}
+                      disabled={isBulkChanging}
+                    >
+                      불합격
+                    </button>
+                    <button 
+                      className="bulk-status-btn pending"
+                      onClick={() => handleTopNStatusChange('PENDING')}
+                      disabled={isBulkChanging}
+                    >
+                      평가 대기
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {isBulkChanging && (
+                <div className="bulk-change-loading">
+                  <div className="loading-spinner"></div>
+                  <span>상태 변경 중...</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

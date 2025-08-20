@@ -634,4 +634,33 @@ export const evaluationAPI = {
   }
 };
 
+// 지원서 상태 변경 API 함수들
+export const applicationStatusAPI = {
+  // 단일 지원서 상태 변경 (Root 권한 필요)
+  changeApplicationStatus: async (applicationId, passStatus) => {
+    try {
+      console.log('지원서 상태 변경 요청:', { applicationId, passStatus });
+      const response = await apiClient.post(`/api/webhook/applications/${applicationId}/status?passStatus=${passStatus}`);
+      console.log('지원서 상태 변경 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('지원서 상태 변경 실패:', error);
+      throw error;
+    }
+  },
+
+  // 다중 지원서 상태 일괄 변경 - 점수 상위 N명 (Root 권한 필요)
+  bulkChangeApplicationStatus: async (topN, passStatus) => {
+    try {
+      console.log('지원서 일괄 상태 변경 요청:', { topN, passStatus });
+      const response = await apiClient.post(`/api/webhook/applications/bulk-status?topN=${topN}&passStatus=${passStatus}`);
+      console.log('지원서 일괄 상태 변경 응답:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('지원서 일괄 상태 변경 실패:', error);
+      throw error;
+    }
+  }
+};
+
 export default apiClient;
