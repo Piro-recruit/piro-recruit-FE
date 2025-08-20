@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Instagram, MessageCircle, Mail, Github, Globe } from 'lucide-react';
-import logoImage from '../assets/pirologo.png';
+import { Instagram, MessageCircle, Mail } from 'lucide-react';
+import NavigationHeader from '../components/main/NavigationHeader';
+import HeroSection from '../components/main/HeroSection';
+import Footer from '../components/main/Footer';
 import { ROUTES } from '../constants/routes';
 import { mailService } from '../services/mailService';
 import { googleFormsAPI } from '../services/api';
@@ -85,92 +87,19 @@ const PiroMainPage = () => {
 
   return (
       <div className="piro-main">
-        <header className="main-header">
-          <nav className="nav">
-            <div className="main-logo">
-              <a href={ROUTES.PIROGRAMMING.HOME}>
-                <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
-              </a>
-            </div>
-            <div className="nav-links">
-              <a href={ROUTES.PIROGRAMMING.HOME}>
-                Home
-              </a>
-              <a href={ROUTES.PIROGRAMMING.ABOUT}>
-                About Us
-              </a>
-              <a href={ROUTES.PIROGRAMMING.PORTFOLIO}>
-                Portfolio
-              </a>
-              <a href={ROUTES.PIROGRAMMING.INTERVIEW}>
-                Interview
-              </a>
-              <a href={ROUTES.PIROGRAMMING.GALLERY}>
-                Gallery
-              </a>
-              <a href="#" className="active">Recruit</a>
-            </div>
-          </nav>
-        </header>
+        <NavigationHeader />
 
-        <section className="hero">
-          <div className="hero-content">
-            {isLoadingRecruitmentStatus ? (
-              <div className="loading-status">
-                <p className="hero-subtitle">
-                  모집 상태를 확인 중입니다...
-                </p>
-                <div className="loading-spinner">⏳</div>
-              </div>
-            ) : isRecruitmentPeriod ? (
-              <>
-                <p className="hero-subtitle">
-                  현재 <span className="highlight">모집</span> 중입니다.<br/>
-                  망설이지 말고 지금 바로 지원하세요.
-                </p>
-
-                <div className="recruitment-actions">
-                  <button
-                    onClick={handleApply}
-                    className="apply-btn primary"
-                  >
-                    지원하기
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="hero-subtitle">
-                  지금은 모집 기간이 아니에요<br/>
-                  <span className="highlight">모집 시작 알림</span>을 메일로 받아보세요.
-                </p>
-
-                <div className="email-form">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="메일을 입력해주세요"
-                    className="email-input"
-                    disabled={isEmailSubmitting}
-                  />
-                  <button
-                    onClick={handleEmailSubmit}
-                    className="email-btn"
-                    disabled={isEmailSubmitting}
-                  >
-                    {isEmailSubmitting ? '처리중...' : '알림받기'}
-                  </button>
-                </div>
-                {emailMessage && (
-                  <p className="email-success-message">
-                    {emailMessage}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        </section>
+        <HeroSection
+          isLoadingRecruitmentStatus={isLoadingRecruitmentStatus}
+          isRecruitmentPeriod={isRecruitmentPeriod}
+          activeFormUrl={activeFormUrl}
+          email={email}
+          emailMessage={emailMessage}
+          isEmailSubmitting={isEmailSubmitting}
+          onEmailChange={setEmail}
+          onEmailSubmit={handleEmailSubmit}
+          onApply={handleApply}
+        />
 
         <section className="categories">
           <div className="categories-content">
@@ -244,61 +173,7 @@ const PiroMainPage = () => {
           </div>
         </section>
 
-        <footer className="footer">
-          <div className="footer-content">
-            <div className="footer-info">
-              <span className="footer-brand">PIROGRAMMING</span>
-              <div className="footer-socials">
-                <a 
-                  href={ROUTES.SOCIAL.GITHUB} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <Github className="footer-social-icon" />
-                </a>
-                <a 
-                  href={ROUTES.PIROGRAMMING.HOME} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <Globe className="footer-social-icon" />
-                </a>
-                <a 
-                  href={ROUTES.SOCIAL.INSTAGRAM} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <Instagram className="footer-social-icon" />
-                </a>
-              </div>
-              <a 
-                href={ROUTES.SOCIAL.EMAIL}
-                className="footer-email"
-              >
-                pirogramming.official@gmail.com
-              </a>
-            </div>
-
-            <div className="footer-links">
-              <a href={ROUTES.PIROGRAMMING.HOME}>
-                Home
-              </a>
-              <a href={ROUTES.PIROGRAMMING.ABOUT}>
-                About Us
-              </a>
-              <a href={ROUTES.PIROGRAMMING.PORTFOLIO}>
-                Portfolio
-              </a>
-              <a href={ROUTES.PIROGRAMMING.INTERVIEW}>
-                Interview
-              </a>
-              <a href={ROUTES.PIROGRAMMING.GALLERY}>
-                Gallery
-              </a>
-              <a href="#">Recruit</a>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
   );
 };
