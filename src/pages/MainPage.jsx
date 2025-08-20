@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Instagram, MessageCircle, Mail } from 'lucide-react';
-import NavigationHeader from '../components/main/NavigationHeader';
-import HeroSection from '../components/main/HeroSection';
-import Footer from '../components/main/Footer';
+import NavigationHeader from '../components/layout/NavigationHeader';
+import HeroSection from '../components/layout/HeroSection';
+import Footer from '../components/layout/Footer';
 import { ROUTES } from '../constants/routes';
 import { mailService } from '../services/mailService';
 import { googleFormsAPI } from '../services/api';

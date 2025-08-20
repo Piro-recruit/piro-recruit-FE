@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Search, Calendar, Mail, ChevronLeft, ChevronRight, Download } from 'lucide-react';
-import AdminHeader from '../components/common/AdminHeader';
-import StatsSection from '../components/recruiting/StatsSection';
-import ApplicantCard from '../components/recruiting/ApplicantCard';
-import ApplicantModal from '../components/recruiting/ApplicantModal';
-import EmailModal from '../components/recruiting/EmailModal';
+import AdminHeader from '../features/admin/AdminHeader';
+import StatsSection from '../features/recruiting/StatsSection';
+import ApplicantCard from '../features/recruiting/ApplicantCard';
+import ApplicantModal from '../features/recruiting/ApplicantModal';
+import EmailModal from '../features/recruiting/EmailModal';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';

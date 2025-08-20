@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import ProtectedRoute from './features/auth/ProtectedRoute';
 import MainPage from './pages/MainPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import RecruitingManagePage from './pages/RecruitingManagePage';

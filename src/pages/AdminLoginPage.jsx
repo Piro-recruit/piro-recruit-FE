@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminHeader from '../components/common/AdminHeader';
+import AdminHeader from '../features/admin/AdminHeader';
 import { authService } from '../services/authService';
 import { ROUTES } from '../constants/routes';
 import './AdminLoginPage.css';
