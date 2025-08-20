@@ -27,12 +27,9 @@ const PiroMainPage = () => {
       if (existsResult.success && existsResult.data.exists) {
         setIsRecruitmentPeriod(true);
         setActiveFormUrl(existsResult.data.formUrl || '');
-        console.log('현재 활성화된 폼이 있습니다.');
-        console.log('폼 URL:', existsResult.data.formUrl);
       } else {
         setIsRecruitmentPeriod(false);
         setActiveFormUrl('');
-        console.log('현재 활성화된 리쿠르팅이 없습니다.');
       }
     } catch (error) {
       console.error('리쿠르팅 상태 확인 실패:', error);
@@ -92,7 +89,6 @@ const PiroMainPage = () => {
         <HeroSection
           isLoadingRecruitmentStatus={isLoadingRecruitmentStatus}
           isRecruitmentPeriod={isRecruitmentPeriod}
-          activeFormUrl={activeFormUrl}
           email={email}
           emailMessage={emailMessage}
           isEmailSubmitting={isEmailSubmitting}

@@ -3,7 +3,6 @@ import React from 'react';
 const HeroSection = ({
   isLoadingRecruitmentStatus,
   isRecruitmentPeriod,
-  activeFormUrl,
   email,
   emailMessage,
   isEmailSubmitting,

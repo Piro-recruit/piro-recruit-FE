@@ -23,14 +23,9 @@ const AdminLoginPage = () => {
     }
 
     try {
-      console.log('Admin login attempt with code:', loginCode);
-      
-      // API 호출
       const result = await authService.login(loginCode);
       
       if (result.success) {
-        console.log('로그인 성공:', result.data);
-        // 로그인 성공 시 RecruitingManagePage로 이동
         navigate(ROUTES.ADMIN_RECRUITING);
       } else {
         setError(result.message || '로그인에 실패했습니다.');

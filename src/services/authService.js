@@ -44,42 +44,6 @@ export const authService = {
   },
 
   /**
-   * API 키로 JWT 토큰 교환
-   * @param {string} apiKey - API 키
-   * @returns {Promise} API 응답
-   */
-  async exchangeApiKey(apiKey) {
-    try {
-      console.log('API 키 교환 요청');
-      const response = await apiClient.post('/api/admin/token/exchange', {
-        apiKey
-      });
-      
-      console.log('API 키 교환 성공 응답:', response.data);
-      
-      // JWT 토큰을 localStorage에 저장
-      if (response.data.data?.token) {
-        localStorage.setItem('accessToken', response.data.data.token);
-        localStorage.setItem('expiresIn', response.data.data.expiresIn);
-      }
-      
-      return {
-        success: true,
-        data: response.data.data,
-        message: response.data.message || 'API 키 교환이 완료되었습니다.'
-      };
-    } catch (error) {
-      console.error('API 키 교환 실패:', error);
-      
-      return {
-        success: false,
-        message: error.response?.data?.message || 'API 키 교환 중 오류가 발생했습니다.',
-        error: error.response?.data || error.message
-      };
-    }
-  },
-
-  /**
    * 로그아웃 (API 호출 포함)
    */
   async logout() {
