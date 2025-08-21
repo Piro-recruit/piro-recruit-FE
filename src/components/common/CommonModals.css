@@ -243,6 +243,7 @@
 }
 
 .email-modal {
+  width: 100%;
   max-width: 750px;
   min-height: 650px;
   border-radius: 20px;
@@ -321,27 +322,27 @@
 }
 
 .email-close-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  color: var(--color-white);
-  font-size: 1.5rem;
-  cursor: pointer;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1;
-  position: relative;
+    background: #fff3;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: .5rem;
+    border-radius: 8px;
+    transition: all .3s;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .email-close-btn:hover {
   background-color: rgba(255, 255, 255, 0.3);
-  transform: rotate(90deg) scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .bulk-email-modal-body {
@@ -358,16 +359,12 @@
 }
 
 .bulk-email-recipients-card {
-  position: relative;
-  background: linear-gradient(135deg, var(--color-gray-7) 0%, var(--color-gray-6) 100%);
-  border: 2px solid var(--color-green-0);
-  border-radius: 20px;
-  padding: 2rem;
-  text-align: center;
-  overflow: hidden;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-gray-7) 0%, var(--color-gray-6) 100%);
+    border: 1px solid var(--color-gray-5);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .bulk-email-recipients-card::before {
@@ -381,43 +378,41 @@
 }
 
 .bulk-recipients-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 .bulk-recipients-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--color-green-0);
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  color: var(--color-white);
-  font-size: 0.875rem;
-  font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.bulk-email-recipients-card p {
+    color: var(--color-gray-2);
+    font-size: .875rem;
+    line-height: 1.6;
+    margin: 0;
 }
 
 .bulk-email-recipients-card strong {
-  color: var(--color-white);
-  font-size: 1.25rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+    color: var(--color-green-0);
+    font-weight: 600;
 }
 
 .bulk-count-badge {
-  background: linear-gradient(135deg, var(--color-green-0), var(--color-green-1));
-  color: var(--color-white);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 1rem;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    background: linear-gradient(135deg, var(--color-green-0), var(--color-green-1));
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .bulk-email-field-group {

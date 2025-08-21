@@ -15,7 +15,7 @@ const EmailModal = ({
 
   return (
     <div className="modal-overlay email-modal-overlay" onClick={onClose}>
-      <div className="modal-content email-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="email-modal" onClick={(e) => e.stopPropagation()}>
         <div className="email-modal-header">
           <div className="email-header-content">
             <div className="email-header-icon">

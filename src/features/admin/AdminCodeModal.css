@@ -299,9 +299,6 @@
     padding: 16px 20px;
   }
   
-  .modal-content {
-    padding: 20px;
-  }
   
   .modal-actions {
     flex-direction: column;
