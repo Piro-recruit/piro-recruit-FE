@@ -1,18 +1,8 @@
 /* 페이지네이션 스타일 */
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 2rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e1e5e9;
-}
-
 .pagination-info {
-  color: #666;
-  font-size: 0.9rem;
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+  margin: 0;
 }
 
 .pagination-controls {
@@ -26,22 +16,26 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.9rem;
   transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #f8f9fa;
-  border-color: #007bff;
+  background-color: var(--color-gray-6);
+  border-color: var(--color-green-0);
+  transform: translateY(-1px);
 }
 
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .pagination-numbers {
@@ -51,27 +45,29 @@
 
 .pagination-number {
   padding: 0.5rem 0.75rem;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 6px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.9rem;
   transition: all 0.2s ease;
   min-width: 2.5rem;
   text-align: center;
 }
 
 .pagination-number:hover {
-  background: #f8f9fa;
-  border-color: #007bff;
+  background-color: var(--color-gray-6);
+  border-color: var(--color-green-0);
 }
 
 .pagination-number.active {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
+  background-color: var(--color-green-0);
+  color: var(--color-white);
+  border-color: var(--color-green-0);
 }
 
 .pagination-number.active:hover {
-  background: #0056b3;
+  background-color: var(--color-green-1);
 }

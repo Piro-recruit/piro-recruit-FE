@@ -1,7 +1,5 @@
 /* 지원자 목록 섹션 스타일 */
 .applicants-section {
-  background-color: var(--color-gray-7);
-  border: 1px solid var(--color-gray-6);
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -29,14 +27,550 @@
   margin-bottom: 1.5rem;
 }
 
-.no-results {
+/* Applicant Card */
+.applicant-card {
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 12px;
+  overflow: visible;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1;
+}
+
+.applicant-card:hover .applicant-summary {
+  background-color: var(--color-gray-6);
+}
+
+.applicant-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: visible;
+  border-radius: 12px;
+}
+
+.applicant-summary:hover {
+  background-color: var(--color-gray-6);
+}
+
+.applicant-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-green-0);
+  flex-shrink: 0;
+}
+
+.applicant-content {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.applicant-left-info {
+  display: flex;
+  flex: 1;
+}
+
+.applicant-main-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.applicant-name {
+  color: var(--color-white);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.green {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.status-badge.blue {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.status-badge.red {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.applicant-right-info {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.applicant-university,
+.applicant-department,
+.applicant-grade,
+.applicant-major,
+.applicant-major-status {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+}
+
+.applied-date,
+.applicant-score,
+.evaluation-score {
+  color: var(--color-gray-4);
+  font-size: 0.75rem;
+}
+
+.evaluation-score {
+  color: var(--color-green-0);
+  font-weight: 500;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  color: var(--color-gray-4);
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 50%;
+}
+
+.toggle-btn:hover {
+  color: var(--color-white);
+}
+
+/* 토글 확장 영역 */
+.applicant-details-toggle {
+  border-top: 1px solid var(--color-gray-6);
+  background-color: var(--color-gray-8);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 섹션 제목 */
+.section-subtitle {
+  color: var(--color-white);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+/* AI Summary Section */
+.ai-summary-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid var(--color-blue-1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ai-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.ai-summary-header .section-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-blue-1);
+  margin: 0;
+}
+
+.ai-score-badge-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  background: linear-gradient(135deg, var(--color-green-0), var(--color-green-1));
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.ai-score-badge-header .score-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.ai-score-badge-header .score-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: var(--color-gray-4);
+  font-size: 0.875rem;
+}
+
+.ai-score-reason-box {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.score-reason-label {
+  color: var(--color-blue-1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.score-reason-text {
+  color: var(--color-gray-1);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ai-question-summaries {
+  margin-top: 1.25rem;
+}
+
+.summaries-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-blue-1);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-question-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.ai-question-card:hover {
+  border-color: var(--color-gray-4);
+  transform: translateY(-1px);
+}
+
+.question-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.question-number {
+  background-color: var(--color-blue-1);
+  color: var(--color-white);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.question-title {
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ai-answer {
+  color: var(--color-gray-1);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding-left: 2.75rem;
+}
+
+.no-ai-summary {
   text-align: center;
   padding: 3rem 1rem;
+  color: var(--color-gray-4);
+}
+
+.no-ai-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.no-ai-icon {
+  color: var(--color-gray-5);
+}
+
+.fallback-summary {
+  background-color: var(--color-gray-8);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.fallback-label {
   color: var(--color-gray-3);
-  font-size: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fallback-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-gray-7);
+}
+
+.fallback-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.fallback-question {
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.fallback-answer {
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Evaluation Section */
+.evaluation-section {
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.evaluation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ai-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+}
+
+.star-icon {
+  color: var(--color-yellow-0);
+}
+
+.comment-label {
+  color: var(--color-gray-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.comment-content {
+  color: var(--color-gray-2);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Detail Actions */
+.detail-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-original-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-gray-6);
+  border: 1px solid var(--color-gray-5);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-original-btn:hover {
+  background-color: var(--color-gray-5);
+}
+
+/* 상태 변경 컨테이너 */
+.status-change-container {
+  position: relative;
+  margin-left: 0.75rem;
+  z-index: 100;
+}
+
+.status-badge.clickable {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 101;
+}
+
+.status-badge.clickable:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  filter: brightness(1.1);
+}
+
+.status-badge.clickable:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.status-arrow {
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.status-badge.clickable .status-arrow {
+  opacity: 0.9;
+}
+
+.status-badge.clickable:hover .status-arrow {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.status-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  min-width: 180px;
+  background: linear-gradient(135deg, var(--color-gray-8) 0%, var(--color-gray-7) 100%);
+  border: 1px solid var(--color-gray-5);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 6px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.status-option {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.status-option:hover {
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
+  transform: translateX(4px);
+}
+
+.status-option.active {
+  background-color: var(--color-green-0);
+  color: var(--color-white);
+  position: relative;
+}
+
+.status-option.active:hover {
+  background-color: var(--color-green-1);
+  transform: translateX(4px);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.no-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
 }
 
 .no-results p {
+  color: var(--color-gray-3);
+  font-size: 1.125rem;
   margin: 0;
 }
 
@@ -53,6 +587,39 @@
   }
   
   .applicants-section {
+    padding: 1rem;
+  }
+
+  .applicant-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .applicant-right-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .ai-question-card {
+    padding: 0.75rem;
+  }
+
+  .question-header {
+    gap: 0.5rem;
+  }
+
+  .ai-answer {
+    padding-left: 2rem;
+  }
+
+  .status-dropdown-menu {
+    left: 0;
+    transform: translateX(0);
+  }
+
+  .applicant-summary {
     padding: 1rem;
   }
 }
