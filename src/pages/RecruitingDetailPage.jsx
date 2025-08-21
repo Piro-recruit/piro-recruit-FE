@@ -13,7 +13,6 @@ import RecruitingHeader from '../components/recruiting/RecruitingHeader';
 import ApplicantFilters from '../components/recruiting/ApplicantFilters';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
-import { calculateApplicantStats } from '../utils/evaluation';
 import { sortApplicants } from '../utils/sort';
 import { useRecruitingData } from '../hooks/useRecruitingData';
 import { useEvaluationData } from '../hooks/useEvaluationData';
@@ -161,26 +160,53 @@ const RecruitingDetailPage = () => {
   const currentApplicants = filteredApplicants.slice(startIndex, endIndex);
 
   // 필터나 검색이 변경될 때 첫 페이지로 이동
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, sortBy]);
 
   // 통계 계산 - API 데이터 우선, 없으면 클라이언트 계산
   const stats = useMemo(() => {
+    // API 통계 데이터가 있으면 우선 사용
     if (statisticsData) {
-      // API 통계 데이터 사용 (PASS/FAIL/PENDING을 UI 상태로 매핑)
+      const pending = statisticsData.PENDING || 0;
+      const firstPass = statisticsData.FIRST_PASS || 0;
+      const finalPass = statisticsData.FINAL_PASS || 0;
+      const failed = statisticsData.FAIL || 0;
+      
       return {
-        total: (statisticsData.PASS || 0) + (statisticsData.FAIL || 0) + (statisticsData.PENDING || 0),
-        reviewing: statisticsData.PENDING || 0,
-        passed: statisticsData.PASS || 0,
-        failed: statisticsData.FAIL || 0,
-        cutlineScore: 0 // 커트라인은 별도 계산이 필요하면 추가
+        total: pending + firstPass + finalPass + failed,
+        reviewing: pending,
+        firstPass: firstPass,
+        passed: finalPass, // 최종 합격
+        failed: failed
       };
-    } else {
-      // 기존 클라이언트 계산 방식 (fallback)
-      return calculateApplicantStats(allApplicants, evaluations);
+    } 
+    
+    // API 통계 데이터가 없고, 아직 지원서 로딩 중이면 0으로 표시
+    if (isLoadingApplications) {
+      return {
+        total: 0,
+        reviewing: 0,
+        firstPass: 0,
+        passed: 0,
+        failed: 0
+      };
     }
-  }, [statisticsData, allApplicants, evaluations]);
+    
+    // 클라이언트 계산 방식 (fallback)
+    const pending = allApplicants.filter(app => app.passStatus === 'PENDING').length;
+    const firstPass = allApplicants.filter(app => app.passStatus === 'FIRST_PASS').length;
+    const finalPass = allApplicants.filter(app => app.passStatus === 'FINAL_PASS').length;
+    const failed = allApplicants.filter(app => app.passStatus === 'FAILED').length;
+    
+    return {
+      total: allApplicants.length,
+      reviewing: pending,
+      firstPass: firstPass,
+      passed: finalPass,
+      failed: failed
+    };
+  }, [statisticsData, allApplicants, isLoadingApplications]);
 
   const handleHeaderClick = () => {
     navigate(ROUTES.ADMIN_RECRUITING);

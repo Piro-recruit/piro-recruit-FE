@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import { APPLICANT_STATUS, SORT_OPTIONS } from '../../constants/recruitment';
+import { APPLICANT_STATUS, SORT_OPTIONS, PASS_STATUS_KOREAN } from '../../constants/recruitment';
 import './ApplicantFilters.css';
 
 const ApplicantFilters = ({
@@ -29,9 +29,10 @@ const ApplicantFilters = ({
         className="status-filter"
       >
         <option>전체 상태</option>
-        <option>{APPLICANT_STATUS.REVIEWING}</option>
-        <option>{APPLICANT_STATUS.PASSED}</option>
-        <option>{APPLICANT_STATUS.FAILED}</option>
+        <option>{PASS_STATUS_KOREAN.PENDING}</option>
+        <option>{PASS_STATUS_KOREAN.FIRST_PASS}</option>
+        <option>{PASS_STATUS_KOREAN.FINAL_PASS}</option>
+        <option>{PASS_STATUS_KOREAN.FAILED}</option>
       </select>
       <select 
         value={sortBy}

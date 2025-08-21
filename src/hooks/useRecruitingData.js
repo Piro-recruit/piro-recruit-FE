@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { googleFormsAPI, applicationsAPI, adminAPI } from '../services/api';
+import { googleFormsAPI, applicationsAPI } from '../services/api';
+import { PASS_STATUS_KOREAN } from '../constants/recruitment';
 
 export const useRecruitingData = (id) => {
   // 상태들
@@ -111,12 +112,8 @@ export const useRecruitingData = (id) => {
             appliedDate: app.updatedAt ? new Date(app.updatedAt).toLocaleDateString() : '날짜 없음',
             // API passStatus 필드 그대로 유지 (상태 변경에 사용)
             passStatus: app.passStatus || 'PENDING',
-            // API passStatus를 UI status로 매핑
-            status: app.passStatus === 'FINAL_PASS' ? 'PASSED' : 
-                   app.passStatus === 'FIRST_PASS' ? '1차 합격' :
-                   app.passStatus === 'FAILED' ? 'FAILED' :
-                   app.passStatus === 'PENDING' ? 'REVIEWING' : 
-                   'REVIEWING',
+            // API passStatus를 한글 UI status로 매핑
+            status: PASS_STATUS_KOREAN[app.passStatus] || PASS_STATUS_KOREAN.PENDING,
             statusColor: app.passStatus === 'FINAL_PASS' ? 'green' :
                         app.passStatus === 'FIRST_PASS' ? 'blue' :
                         app.passStatus === 'FAILED' ? 'red' :
@@ -170,7 +167,7 @@ export const useRecruitingData = (id) => {
     
     try {
       console.log('통계 조회 시작, Google Form ID:', id);
-      const response = await adminAPI.getPassStatusStatisticsByGoogleFormId(id);
+      const response = await applicationsAPI.getPassStatusStatisticsByGoogleFormId(id);
       
       if (response.success && response.data) {
         console.log('통계 조회 성공:', response.data);

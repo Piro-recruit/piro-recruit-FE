@@ -275,6 +275,17 @@ export const applicationsAPI = {
     }
   },
 
+  // 구글 폼별 합격 상태별 지원서 조회
+  getApplicationsByGoogleFormIdAndStatus: async (googleFormId, passStatus) => {
+    try {
+      const response = await apiClient.get(`/api/webhook/applications/google-form/${googleFormId}/by-pass-status?passStatus=${passStatus}`);
+      return response.data;
+    } catch (error) {
+      console.error(`구글 폼별 ${passStatus} 상태 지원서 조회 실패:`, error);
+      throw error;
+    }
+  },
+
   // 폼 ID별 지원서 조회
   getApplicationsByFormId: async (formId) => {
     try {
@@ -317,6 +328,17 @@ export const applicationsAPI = {
       console.error('구글 폼별 통계 조회 실패:', error);
       throw error;
     }
+  },
+
+  // 구글 폼별 합격 상태 통계 조회 (새로운 API)
+  getPassStatusStatisticsByGoogleFormId: async (googleFormId) => {
+    try {
+      const response = await apiClient.get(`/api/webhook/applications/google-form/${googleFormId}/pass-statistics`);
+      return response.data;
+    } catch (error) {
+      console.error('구글 폼별 합격 상태 통계 조회 실패:', error);
+      throw error;
+    }
   }
 };
 
@@ -336,7 +358,7 @@ export const adminAPI = {
   // 구글 폼별 합격 상태 통계 조회
   getPassStatusStatisticsByGoogleFormId: async (googleFormId) => {
     try {
-      const response = await apiClient.get(`/api/admin/applications/google-form/${googleFormId}/pass-status/statistics`);
+      const response = await apiClient.get(`/api/webhook/applications/google-form/${googleFormId}/pass-statistics`);
       return response.data;
     } catch (error) {
       console.error('구글 폼별 합격 상태 통계 조회 실패:', error);
