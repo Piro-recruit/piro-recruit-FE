@@ -53,7 +53,7 @@ const EmailModal = ({
                     type="text"
                     value={emailContent.subject}
                     onChange={(e) => onEmailContentChange('subject', e.target.value)}
-                    placeholder="예: [피로그래밍] 2024년 여름기 신입 개발자 채용 공지"
+                    placeholder="예: [피로그래밍] 2025년 전반기 모집 공지"
                     className="bulk-email-input"
                   />
                 </div>
@@ -74,7 +74,7 @@ const EmailModal = ({
                       e.target.style.height = 'auto';
                       e.target.style.height = Math.max(160, e.target.scrollHeight) + 'px';
                     }}
-                    placeholder="안녕하세요, 피로그래밍입니다.&#10;&#10;2024년 여름기 신입 개발자 채용에 대한 안내드립니다.&#10;&#10;자세한 내용은 아래를 확인해주세요."
+                    placeholder="안녕하세요, 피로그래밍입니다.&#10;&#10;2025년 전반기 모집이 시작되어 안내드립니다.&#10;&#10;자세한 내용은 아래를 확인해주세요."
                     className="bulk-email-textarea"
                     rows={6}
                     style={{ minHeight: '160px' }}

@@ -1,11 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Search, Calendar, Mail, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { Search, Calendar, Mail, Download } from 'lucide-react';
 import AdminHeader from '../features/admin/AdminHeader';
 import StatsSection from '../features/recruiting/StatsSection';
 import ApplicantCard from '../features/recruiting/ApplicantCard';
 import ApplicantModal from '../features/recruiting/ApplicantModal';
 import EmailModal from '../features/recruiting/EmailModal';
+import Pagination from '../components/common/Pagination';
+import DeleteConfirmModal from '../components/common/DeleteConfirmModal';
+import BulkStatusChangeModal from '../components/recruiting/BulkStatusChangeModal';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
@@ -13,46 +16,8 @@ import { sortApplicants } from '../utils/sort';
 import { mailService } from '../services/mailService';
 import { googleFormsAPI, applicationsAPI, integrationAPI, adminAPI, aiSummaryAPI, evaluationAPI, applicationStatusAPI } from '../services/api';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../utils/csvExport';
+import { getCurrentUserFromToken } from '../utils/jwtUtils';
 import './RecruitingDetailPage.css';
-
-// JWT 토큰에서 사용자 정보 추출하는 유틸리티 함수
-const getCurrentUserFromToken = () => {
-  try {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      console.log('토큰이 없습니다');
-      return null;
-    }
-    
-    // JWT는 header.payload.signature 형태
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      console.error('유효하지 않은 JWT 형식:', parts.length, '개 부분');
-      return null;
-    }
-    
-    const payload = parts[1];
-    
-    // Base64 디코딩 (URL-safe base64)
-    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-    const userInfo = JSON.parse(decoded);
-    
-    console.log('JWT에서 추출한 사용자 정보:', userInfo);
-    console.log('사용자 ID 후보들:', {
-      id: userInfo.id,
-      sub: userInfo.sub,
-      userId: userInfo.userId,
-      username: userInfo.username,
-      email: userInfo.email,
-      adminId: userInfo.adminId
-    });
-    
-    return userInfo;
-  } catch (error) {
-    console.error('JWT 토큰 파싱 실패:', error);
-    return null;
-  }
-};
 
 
 const RecruitingDetailPage = () => {
@@ -802,6 +767,16 @@ const RecruitingDetailPage = () => {
 
   // 지원서 상태 변경 핸들러
   const handleStatusChange = async (applicantId, newPassStatus) => {
+    const getStatusDisplayName = (status) => {
+      switch (status) {
+        case 'PENDING': return '평가 대기';
+        case 'FIRST_PASS': return '1차 합격';
+        case 'FINAL_PASS': return '최종 합격';
+        case 'FAILED': return '불합격';
+        default: return '알 수 없음';
+      }
+    };
+
     try {
       console.log('지원서 상태 변경 시도:', { applicantId, newPassStatus });
       
@@ -831,6 +806,16 @@ const RecruitingDetailPage = () => {
 
   // 점수 기준 상위 N명 상태 변경
   const handleTopNStatusChange = async (passStatus) => {
+    const getStatusDisplayName = (status) => {
+      switch (status) {
+        case 'PENDING': return '평가 대기';
+        case 'FIRST_PASS': return '1차 합격';
+        case 'FINAL_PASS': return '최종 합격';
+        case 'FAILED': return '불합격';
+        default: return '알 수 없음';
+      }
+    };
+
     const confirmMessage = `점수 상위 ${bulkChangeCount}명의 상태를 ${getStatusDisplayName(passStatus)}(으)로 변경하시겠습니까?`;
     if (!confirm(confirmMessage)) return;
 
@@ -869,16 +854,6 @@ const RecruitingDetailPage = () => {
     setShowBulkChangeModal(false);
   };
 
-  // 상태 표시명 변환 함수
-  const getStatusDisplayName = (passStatus) => {
-    switch (passStatus) {
-      case 'PENDING': return '평가 대기';
-      case 'FIRST_PASS': return '1차 합격';
-      case 'FINAL_PASS': return '최종 합격';
-      case 'FAILED': return '불합격';
-      default: return '알 수 없음';
-    }
-  };
 
   const handleCloseEmailModal = () => {
     setShowEmailModal(false);
@@ -1539,46 +1514,14 @@ const RecruitingDetailPage = () => {
                 )}
 
                 {/* 페이지네이션 */}
-                {filteredApplicants.length > 0 && totalPages > 1 && (
-              <div className="pagination">
-                <div className="pagination-info">
-                  <span>
-                    {startIndex + 1}-{Math.min(endIndex, filteredApplicants.length)} / {filteredApplicants.length}개
-                  </span>
-                </div>
-                <div className="pagination-controls">
-                  <button
-                    className="pagination-btn"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft size={16} />
-                    이전
-                  </button>
-                  
-                  <div className="pagination-numbers">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
-                      <button
-                        key={pageNum}
-                        className={`pagination-number ${pageNum === currentPage ? 'active' : ''}`}
-                        onClick={() => setCurrentPage(pageNum)}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <button
-                    className="pagination-btn"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    다음
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </div>
-            )}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  startIndex={startIndex}
+                  endIndex={endIndex}
+                  totalItems={filteredApplicants.length}
+                  onPageChange={setCurrentPage}
+                />
           </div>
         </>
       )}
@@ -1603,124 +1546,26 @@ const RecruitingDetailPage = () => {
       />
 
       {/* 삭제 확인 모달 */}
-      {showDeleteModal && (
-        <div className="delete-modal-overlay">
-          <div className="delete-modal-container">
-            <div className="delete-modal-header">
-              <h3 className="delete-modal-title">리쿠르팅 삭제 확인</h3>
-            </div>
-            <div className="delete-modal-content">
-              <p className="delete-modal-message">
-                <strong>"{recruitingInfo?.title}"</strong> 리쿠르팅을 정말 삭제하시겠습니까?
-              </p>
-              <p className="delete-modal-warning">
-                이 작업은 되돌릴 수 없으며, 관련된 모든 데이터가 영구적으로 삭제됩니다.
-              </p>
-            </div>
-            <div className="delete-modal-actions">
-              <button
-                className="delete-modal-cancel-btn"
-                onClick={handleCloseDeleteModal}
-                disabled={isDeleting}
-              >
-                취소
-              </button>
-              <button
-                className="delete-modal-confirm-btn"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="리쿠르팅 삭제 확인"
+        itemName={recruitingInfo?.title}
+        message="리쿠르팅을 정말 삭제하시겠습니까?"
+        warning="이 작업은 되돌릴 수 없으며, 관련된 모든 데이터가 영구적으로 삭제됩니다."
+        isDeleting={isDeleting}
+      />
 
       {/* 일괄 상태 변경 모달 */}
-      {showBulkChangeModal && (
-        <div className="bulk-change-modal-overlay">
-          <div className="bulk-change-modal-container">
-            <div className="bulk-change-modal-header">
-              <h3 className="bulk-change-modal-title">일괄 상태 변경</h3>
-              <button 
-                className="bulk-change-modal-close-btn"
-                onClick={handleCloseBulkChangeModal}
-                disabled={isBulkChanging}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="bulk-change-modal-content">
-              <div className="bulk-change-description">
-                평가 점수를 기준으로 상위 지원자들의 상태를 일괄 변경합니다.
-              </div>
-              
-              <div className="bulk-change-controls">
-                <div className="bulk-count-section">
-                  <label htmlFor="bulk-count" className="bulk-count-label">
-                    변경할 인원수
-                  </label>
-                  <div className="bulk-count-input-wrapper">
-                    <input 
-                      id="bulk-count"
-                      type="number" 
-                      value={bulkChangeCount}
-                      onChange={(e) => setBulkChangeCount(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="bulk-count-input"
-                      min="1"
-                      max="100"
-                      disabled={isBulkChanging}
-                    />
-                    <span className="bulk-count-suffix">명</span>
-                  </div>
-                </div>
-
-                <div className="bulk-status-section">
-                  <label className="bulk-status-label">변경할 상태 선택</label>
-                  <div className="bulk-status-buttons">
-                    <button 
-                      className="bulk-status-btn first-pass"
-                      onClick={() => handleTopNStatusChange('FIRST_PASS')}
-                      disabled={isBulkChanging}
-                    >
-                      1차 합격
-                    </button>
-                    <button 
-                      className="bulk-status-btn final-pass"
-                      onClick={() => handleTopNStatusChange('FINAL_PASS')}
-                      disabled={isBulkChanging}
-                    >
-                      최종 합격
-                    </button>
-                    <button 
-                      className="bulk-status-btn failed"
-                      onClick={() => handleTopNStatusChange('FAILED')}
-                      disabled={isBulkChanging}
-                    >
-                      불합격
-                    </button>
-                    <button 
-                      className="bulk-status-btn pending"
-                      onClick={() => handleTopNStatusChange('PENDING')}
-                      disabled={isBulkChanging}
-                    >
-                      평가 대기
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              {isBulkChanging && (
-                <div className="bulk-change-loading">
-                  <div className="loading-spinner"></div>
-                  <span>상태 변경 중...</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <BulkStatusChangeModal
+        isOpen={showBulkChangeModal}
+        onClose={handleCloseBulkChangeModal}
+        bulkChangeCount={bulkChangeCount}
+        setBulkChangeCount={setBulkChangeCount}
+        isBulkChanging={isBulkChanging}
+        onStatusChange={handleTopNStatusChange}
+      />
     </div>
   );
 };
