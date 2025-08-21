@@ -15,15 +15,6 @@ const BulkStatusChangeModal = ({
     setBulkChangeCount(Math.max(1, parseInt(e.target.value) || 1));
   };
 
-  const getStatusDisplayName = (passStatus) => {
-    switch (passStatus) {
-      case 'PENDING': return '평가 대기';
-      case 'FIRST_PASS': return '1차 합격';
-      case 'FINAL_PASS': return '최종 합격';
-      case 'FAILED': return '불합격';
-      default: return '알 수 없음';
-    }
-  };
 
   const handleStatusClick = (passStatus) => {
     onStatusChange(passStatus);
