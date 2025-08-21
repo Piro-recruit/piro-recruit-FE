@@ -58,8 +58,12 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
     setIsDeleting(true);
     try {
       await googleFormsAPI.deleteForm(recruitingInfo.id);
-      navigate(ROUTES.RECRUITING_MANAGE);
-      return { success: true };
+      return { 
+        success: true, 
+        message: '리쿠르팅이 성공적으로 삭제되었습니다.',
+        shouldRedirect: true,
+        redirectPath: ROUTES.ADMIN_RECRUITING
+      };
     } catch (error) {
       console.error('삭제 실패:', error);
       return { 

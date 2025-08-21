@@ -260,7 +260,12 @@ const RecruitingDetailPageInner = () => {
   // 리쿠르팅 삭제 확인 핸들러
   const handleConfirmDelete = async () => {
     const result = await deleteRecruiting();
-    if (!result.success) {
+    if (result.success) {
+      alert(result.message);
+      if (result.shouldRedirect && result.redirectPath) {
+        navigate(result.redirectPath);
+      }
+    } else {
       alert(result.message);
     }
   };
