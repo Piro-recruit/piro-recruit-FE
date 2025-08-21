@@ -1,5 +1,5 @@
-import apiClient from './apiClient.js';
-import logger from '../../utils/logger.js';
+import apiClient from '../../core/apiClient.js';
+import logger from '../../../../utils/logger.js';
 
 export const aiSummaryAPI = {
   getApplicationSummary: async (webhookApplicationId) => {

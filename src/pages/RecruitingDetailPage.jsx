@@ -13,7 +13,7 @@ import RecruitingHeader from '../components/recruiting/RecruitingHeader';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { sortApplicants } from '../utils/sort';
-import { useRecruitingData } from '../hooks/useRecruitingData';
+import { useRecruitingData } from '../hooks/legacy/useRecruitingData';
 import { useStateManagement } from '../hooks/useStateManagement';
 import LoadingIndicator from '../components/common/LoadingIndicator';
 import ErrorIndicator from '../components/common/ErrorIndicator';

@@ -1,9 +1,20 @@
-// 중앙화된 API 내보내기
-export { googleFormsAPI } from './googleFormsAPI.js';
-export { applicationsAPI } from './applicationsAPI.js';
-export { adminAPI } from './adminAPI.js';
-export { evaluationAPI } from './evaluationAPI.js';
-export { integrationAPI } from './integrationAPI.js';
-export { aiSummaryAPI } from './aiSummaryAPI.js';
-export { applicationStatusAPI } from './applicationStatusAPI.js';
-export { default as apiClient } from './apiClient.js';
+// 🔥 새로운 도메인 기반 API 구조
+// 각 도메인별로 구조화된 API를 import하세요
+
+// 🔧 코어 유틸리티
+export { default as apiClient } from './core/apiClient.js';
+
+// 👨‍💼 관리자 도메인 APIs
+export { adminAPI, googleFormsAPI } from './domains/admin';
+
+// 📄 지원서 도메인 APIs  
+export { applicationsAPI, applicationStatusAPI } from './domains/applications';
+
+// ⭐ 평가 도메인 APIs
+export { evaluationAPI, aiSummaryAPI } from './domains/evaluation';
+
+// 🔗 통합 도메인 APIs
+export { integrationAPI } from './domains/integration';
+
+// 📚 하위 호환성을 위한 기존 방식 (deprecated)
+// 새로운 개발에서는 위의 도메인별 import를 사용하세요

@@ -1,4 +1,4 @@
-import apiClient from './apiClient.js';
+import apiClient from '../../core/apiClient.js';
 
 export const adminAPI = {
   getPassStatusStatistics: async () => {

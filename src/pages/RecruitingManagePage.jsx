@@ -8,9 +8,9 @@ import CreateRecruitingModal from '../features/admin/CreateRecruitingModal';
 import RecruitingSearchFilter from '../features/recruiting/RecruitingSearchFilter';
 import RecruitingStats from '../features/recruiting/RecruitingStats';
 import RecruitingList from '../features/recruiting/RecruitingList';
-import Pagination from '../components/ui/Pagination';
-import { useRecruitingManagement } from '../hooks/useRecruitingManagement';
-import { useModalManagement } from '../hooks/useModalManagement';
+import Pagination from '../components/common/Pagination';
+import { useRecruitingManagement } from '../hooks/legacy/useRecruitingManagement';
+import { useModalManagement } from '../hooks/legacy/useModalManagement';
 import { ROUTES } from '../constants/routes';
 import './RecruitingManagePage.css';
 

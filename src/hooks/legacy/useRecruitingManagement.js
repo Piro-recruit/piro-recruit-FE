@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
-import { googleFormsAPI } from '../services/api';
-import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../constants/recruitment';
+import { googleFormsAPI } from '../../services/api';
+import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../../constants/recruitment';
 
 export const useRecruitingManagement = () => {
   // 기본 상태

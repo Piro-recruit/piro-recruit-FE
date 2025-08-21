@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { useEvaluationData } from '../hooks/useEvaluationData';
-import { useEvaluationHandlers } from '../hooks/useEvaluationHandlers';
+import { useEvaluationHandlers } from '../hooks/legacy/useEvaluationHandlers';
 
 // Context 생성
 const EvaluationContext = createContext();

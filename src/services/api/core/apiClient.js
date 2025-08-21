@@ -1,5 +1,5 @@
 import axios from 'axios';
-import logger from '../../utils/logger';
+import logger from '../../../utils/logger';
 
 // API 기본 설정
 const API_BASE_URL = 'http://localhost:8080';

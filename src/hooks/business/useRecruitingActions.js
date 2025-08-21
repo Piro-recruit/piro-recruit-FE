@@ -17,7 +17,9 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
   };
 
   const handleToggleStatus = async () => {
-    if (!recruitingInfo?.id) return;
+    if (!recruitingInfo?.id) {
+      return { success: false, message: '리쿠르팅 정보가 없습니다.' };
+    }
     
     setIsToggling(true);
     try {
@@ -27,31 +29,43 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
         await googleFormsAPI.activateForm(recruitingInfo.id);
       }
       await refetchRecruitingInfo();
+      return { success: true };
     } catch (error) {
       console.error('상태 변경 실패:', error);
-      alert('상태 변경에 실패했습니다.');
+      return { 
+        success: false, 
+        message: error.response?.data?.message || '상태 변경에 실패했습니다.' 
+      };
     } finally {
       setIsToggling(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!recruitingInfo?.id) return;
+    if (!recruitingInfo?.id) {
+      return { success: false, message: '리쿠르팅 정보가 없습니다.' };
+    }
     
     setIsDeleting(true);
     try {
       await googleFormsAPI.deleteForm(recruitingInfo.id);
       navigate(ROUTES.RECRUITING_MANAGE);
+      return { success: true };
     } catch (error) {
       console.error('삭제 실패:', error);
-      alert('삭제에 실패했습니다.');
+      return { 
+        success: false, 
+        message: error.response?.data?.message || '삭제에 실패했습니다.' 
+      };
     } finally {
       setIsDeleting(false);
     }
   };
 
   const handleFieldUpdate = async (field, value) => {
-    if (!recruitingInfo?.id) return;
+    if (!recruitingInfo?.id) {
+      return { success: false, message: '리쿠르팅 정보가 없습니다.' };
+    }
     
     setIsUpdating(true);
     try {
@@ -69,9 +83,13 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
           throw new Error(`Unknown field: ${field}`);
       }
       await refetchRecruitingInfo();
+      return { success: true };
     } catch (error) {
       console.error(`${field} 업데이트 실패:`, error);
-      alert(`${field} 업데이트에 실패했습니다.`);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || `${field} 업데이트에 실패했습니다.` 
+      };
     } finally {
       setIsUpdating(false);
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { googleFormsAPI, applicationsAPI } from '../services/api';
-import { PASS_STATUS_KOREAN } from '../constants/recruitment';
+import { googleFormsAPI, applicationsAPI } from '../../services/api';
+import { PASS_STATUS_KOREAN } from '../../constants/recruitment';
 
 export const useRecruitingData = (id) => {
   // 상태들

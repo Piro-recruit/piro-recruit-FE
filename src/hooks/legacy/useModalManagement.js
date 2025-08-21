@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { authService } from '../services/authService';
-import { googleFormsAPI } from '../services/api';
+import { authService } from '../../services/authService';
+import { googleFormsAPI } from '../../services/api';
 
 export const useModalManagement = (onRefreshData) => {
   // 모달 상태들
