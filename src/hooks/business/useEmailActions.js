@@ -8,8 +8,8 @@ export const useEmailActions = (formStates, loadingStates, modalStates) => {
   const fetchSubscriberCount = async () => {
     try {
       const result = await mailService.getSubscriberCount();
-      if (result.success && result.data?.totalCount !== undefined) {
-        setSubscriberCount(result.data.totalCount);
+      if (result.success && result.count !== undefined) {
+        setSubscriberCount(result.count);
       }
     } catch (error) {
       // 에러는 이미 apiClient에서 로깅됨
