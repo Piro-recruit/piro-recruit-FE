@@ -18,6 +18,10 @@ import { sortApplicants } from '../utils/sort';
 import { useRecruitingData } from '../hooks/useRecruitingData';
 import { useEvaluationData } from '../hooks/useEvaluationData';
 import { useStateManagement } from '../hooks/useStateManagement';
+import { useEvaluationHandlers } from '../hooks/useEvaluationHandlers';
+import LoadingIndicator from '../components/common/LoadingIndicator';
+import ErrorIndicator from '../components/common/ErrorIndicator';
+import ApplicantListSection from '../components/recruiting/ApplicantListSection';
 import './RecruitingDetailPage.css';
 
 
@@ -85,6 +89,16 @@ const RecruitingDetailPage = () => {
     closeDeleteModal
   } = useStateManagement(recruitingInfo, refetchRecruitingInfo, refetchApplications, allApplicants);
   
+  // 평가 핸들러 커스텀 훅
+  const {
+    editingEvaluation,
+    handleEvaluationSubmit,
+    handleEvaluationUpdate,
+    handleEvaluationDelete,
+    handleEditEvaluation,
+    handleCancelEdit
+  } = useEvaluationHandlers(createEvaluation, updateEvaluation, deleteEvaluation, evaluations);
+  
   // UI 상태
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('전체 상태');
@@ -92,7 +106,6 @@ const RecruitingDetailPage = () => {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedApplicants, setExpandedApplicants] = useState(new Set());
-  const [editingEvaluation, setEditingEvaluation] = useState(null);
   const [showRecruitingDetails, setShowRecruitingDetails] = useState(false);
 
 
@@ -191,89 +204,25 @@ const RecruitingDetailPage = () => {
     setSelectedApplicant(null);
   };
 
-  const handleEvaluationSubmit = async (applicantId, evaluationData) => {
-    const result = await createEvaluation(applicantId, evaluationData);
-    
-    if (result.success) {
-      setEditingEvaluation(null); // 편집 모드 종료
-      console.log('평가가 성공적으로 등록되었습니다.');
-    } else {
-      // 구체적인 에러 메시지 표시
-      if (result.error?.response?.status === 409) {
-        alert('이미 이 지원서에 대한 평가를 등록하셨습니다.');
-      } else if (result.error?.response?.status === 404) {
-        alert('지원서를 찾을 수 없습니다.');
-      } else if (result.error?.response?.status === 400) {
-        alert('평가 데이터가 올바르지 않습니다. (점수: 0-100점)');
-      } else {
-        alert(result.message || '평가 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
+  // 평가 핸들러들에 에러 처리 추가
+  const handleEvaluationSubmitWithAlert = async (applicantId, evaluationData) => {
+    const result = await handleEvaluationSubmit(applicantId, evaluationData);
+    if (!result.success) {
+      alert(result.message);
     }
   };
 
-  const handleEditEvaluation = (applicantId) => {
-    setEditingEvaluation(applicantId);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingEvaluation(null);
-  };
-
-  // 평가 수정 핸들러
-  const handleEvaluationUpdate = async (applicantId, evaluationData) => {
-    const result = await updateEvaluation(applicantId, evaluationData);
-    
-    if (result.success) {
-      setEditingEvaluation(null); // 편집 모드 종료
-      console.log('평가가 성공적으로 수정되었습니다.');
-    } else {
-      // 구체적인 에러 메시지 표시
-      if (result.error?.response?.status === 403) {
-        alert('이 평가를 수정할 권한이 없습니다. (본인이 작성한 평가만 수정 가능)');
-      } else if (result.error?.response?.status === 404) {
-        alert('수정할 평가를 찾을 수 없습니다.');
-      } else if (result.error?.response?.status === 400) {
-        alert('평가 데이터가 올바르지 않습니다. (점수: 0-100점)');
-      } else {
-        alert(result.message || '평가 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
+  const handleEvaluationUpdateWithAlert = async (applicantId, evaluationData) => {
+    const result = await handleEvaluationUpdate(applicantId, evaluationData);
+    if (!result.success) {
+      alert(result.message);
     }
   };
 
-  // 평가 삭제 핸들러
-  const handleEvaluationDelete = async (applicantId) => {
-    // 현재 저장된 내 평가 확인
-    const currentEvaluations = evaluations[applicantId];
-    if (!currentEvaluations || !currentEvaluations.myEvaluation || !currentEvaluations.myEvaluation.id) {
-      alert('삭제할 평가를 찾을 수 없습니다.');
-      return;
-    }
-
-    const myEvaluation = currentEvaluations.myEvaluation;
-    
-    // 삭제 확인
-    const confirmDelete = window.confirm(
-      `${myEvaluation.applicantName || '지원자'}에 대한 내 평가를 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
-    );
-    
-    if (!confirmDelete) {
-      return;
-    }
-
-    const result = await deleteEvaluation(applicantId);
-    
-    if (result.success) {
-      setEditingEvaluation(null); // 편집 모드 종료
-      console.log('평가가 성공적으로 삭제되었습니다.');
-    } else {
-      // 구체적인 에러 메시지 표시
-      if (result.error?.response?.status === 403) {
-        alert('이 평가를 삭제할 권한이 없습니다. (본인이 작성한 평가만 삭제 가능)');
-      } else if (result.error?.response?.status === 404) {
-        alert('삭제할 평가를 찾을 수 없습니다.');
-      } else {
-        alert(result.message || '평가 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
+  const handleEvaluationDeleteWithAlert = async (applicantId) => {
+    const result = await handleEvaluationDelete(applicantId);
+    if (!result.success && !result.cancelled) {
+      alert(result.message);
     }
   };
 
@@ -362,12 +311,12 @@ const RecruitingDetailPage = () => {
         <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" onClick={handleHeaderClick} />
         <main className="recruiting-detail-main">
           <div className="recruiting-detail-container">
-            <div className="error-indicator">
-              <p>{error || '리쿠르팅 정보를 찾을 수 없습니다.'}</p>
-              <button onClick={() => navigate(ROUTES.ADMIN_RECRUITING)} className="back-btn">
-                목록으로 돌아가기
-              </button>
-            </div>
+            <ErrorIndicator
+              error={error || '리쿠르팅 정보를 찾을 수 없습니다.'}
+              title="리쿠르팅 정보 오류"
+              actionText="목록으로 돌아가기"
+              onAction={() => navigate(ROUTES.ADMIN_RECRUITING)}
+            />
           </div>
         </main>
       </div>
@@ -382,9 +331,7 @@ const RecruitingDetailPage = () => {
         <div className="recruiting-detail-container">
           {/* 로딩 상태 표시 */}
           {(isLoadingRecruiting || isLoadingApplications) && (
-            <div className="loading-indicator">
-              <p>데이터를 불러오는 중...</p>
-            </div>
+            <LoadingIndicator message="데이터를 불러오는 중..." />
           )}
 
           {/* 실제 콘텐츠 - 로딩 완료 후에만 표시 */}
@@ -427,68 +374,35 @@ const RecruitingDetailPage = () => {
               />
 
               {/* 지원자 목록 */}
-              <div className="applicants-section">
-                <div className="applicants-header">
-                  <h2 className="section-title">지원자 목록</h2>
-                  
-                  {/* 검색 및 필터 */}
-                  <ApplicantFilters
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    statusFilter={statusFilter}
-                    onStatusFilterChange={setStatusFilter}
-                    sortBy={sortBy}
-                    onSortChange={setSortBy}
-                  />
-                </div>
-
-                <div className="applicants-list">
-                  {currentApplicants.map((applicant) => {
-                    const isExpanded = expandedApplicants.has(applicant.id);
-                    const evaluationData = evaluations[applicant.id] || { allEvaluations: [], myEvaluation: null };
-                    const aiSummary = aiSummaries[applicant.id];
-                    
-                    return (
-                      <ApplicantCard
-                        key={applicant.id}
-                        applicant={applicant}
-                        isExpanded={isExpanded}
-                        evaluation={evaluationData.myEvaluation} // 내 평가만 편집 가능
-                        allEvaluations={evaluationData.allEvaluations} // 모든 평가 목록 표시
-                        editingEvaluation={editingEvaluation}
-                        aiSummary={aiSummary}
-                        isLoadingAi={isLoadingAiSummaries}
-                        isLoadingEvaluation={isLoadingEvaluations}
-                        onToggle={handleToggleApplicant}
-                        onShowOriginal={handleShowOriginal}
-                        onEvaluationSubmit={handleEvaluationSubmit}
-                        onEvaluationUpdate={handleEvaluationUpdate}
-                        onEvaluationDelete={handleEvaluationDelete}
-                        onEditEvaluation={handleEditEvaluation}
-                        onCancelEdit={handleCancelEdit}
-                        onStatusChange={handleStatusChange}
-                      />
-                    );
-                  })}
-                </div>
-
-                {/* 결과 없음 */}
-                {filteredApplicants.length === 0 && (
-                  <div className="no-results">
-                    <p>검색 결과가 없습니다.</p>
-                  </div>
-                )}
-
-                {/* 페이지네이션 */}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  startIndex={startIndex}
-                  endIndex={endIndex}
-                  totalItems={filteredApplicants.length}
-                  onPageChange={setCurrentPage}
-                />
-          </div>
+              <ApplicantListSection
+                searchTerm={searchTerm}
+                statusFilter={statusFilter}
+                sortBy={sortBy}
+                onSearchChange={setSearchTerm}
+                onStatusFilterChange={setStatusFilter}
+                onSortChange={setSortBy}
+                currentApplicants={currentApplicants}
+                filteredApplicants={filteredApplicants}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                startIndex={startIndex}
+                endIndex={endIndex}
+                onPageChange={setCurrentPage}
+                evaluations={evaluations}
+                aiSummaries={aiSummaries}
+                isLoadingAiSummaries={isLoadingAiSummaries}
+                isLoadingEvaluations={isLoadingEvaluations}
+                expandedApplicants={expandedApplicants}
+                editingEvaluation={editingEvaluation}
+                onToggleApplicant={handleToggleApplicant}
+                onShowOriginal={handleShowOriginal}
+                onEvaluationSubmit={handleEvaluationSubmitWithAlert}
+                onEvaluationUpdate={handleEvaluationUpdateWithAlert}
+                onEvaluationDelete={handleEvaluationDeleteWithAlert}
+                onEditEvaluation={handleEditEvaluation}
+                onCancelEdit={handleCancelEdit}
+                onStatusChange={handleStatusChange}
+              />
         </>
       )}
         </div>
