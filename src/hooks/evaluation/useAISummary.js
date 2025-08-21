@@ -24,7 +24,7 @@ export const useAISummary = (allApplicants, isLoadingApplications) => {
             return null;
           }
         } catch (error) {
-          console.error(`지원자 ${applicant.id} AI Summary 조회 오류:`, error);
+          // 에러는 이미 apiClient에서 로깅됨
           return null;
         }
       });
@@ -41,7 +41,7 @@ export const useAISummary = (allApplicants, isLoadingApplications) => {
       
       setAiSummaries(newAiSummaries);
     } catch (error) {
-      console.error('AI Summary 조회 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
     } finally {
       setIsLoadingAiSummaries(false);
     }

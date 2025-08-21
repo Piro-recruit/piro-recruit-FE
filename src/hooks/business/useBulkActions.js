@@ -33,7 +33,7 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications) =
         return { success: false, message: result.message || '상태 변경에 실패했습니다.' };
       }
     } catch (error) {
-      console.error('일괄 상태 변경 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
       
       let message = '상태 변경 중 오류가 발생했습니다.';
       if (error.response?.status === 400) {
@@ -69,7 +69,7 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications) =
         return { success: false, message: result.message || '상태 변경에 실패했습니다.' };
       }
     } catch (error) {
-      console.error('개별 상태 변경 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
       
       let message = '상태 변경 중 오류가 발생했습니다.';
       if (error.response?.status === 400) {

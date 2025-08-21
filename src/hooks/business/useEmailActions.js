@@ -12,7 +12,7 @@ export const useEmailActions = (formStates, loadingStates, modalStates) => {
         setSubscriberCount(result.data.totalCount);
       }
     } catch (error) {
-      console.error('구독자 수 조회 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
     }
   };
 
@@ -38,7 +38,7 @@ export const useEmailActions = (formStates, loadingStates, modalStates) => {
         return { success: false, message: result.message || '메일 전송에 실패했습니다.' };
       }
     } catch (error) {
-      console.error('이메일 전송 중 예상치 못한 오류:', error);
+      // 에러는 이미 apiClient에서 로깅됨
       return { success: false, error, message: '메일 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' };
     } finally {
       setIsEmailSending(false);
