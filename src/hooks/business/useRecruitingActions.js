@@ -22,14 +22,23 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
     }
     
     setIsToggling(true);
+    const isCurrentlyActive = recruitingInfo.status === '활성';
+    
     try {
-      if (recruitingInfo.status === 'ACTIVE') {
+      if (isCurrentlyActive) {
         await googleFormsAPI.deactivateForm(recruitingInfo.id);
       } else {
         await googleFormsAPI.activateForm(recruitingInfo.id);
       }
+      
       await refetchRecruitingInfo();
-      return { success: true };
+      
+      return { 
+        success: true, 
+        message: isCurrentlyActive 
+          ? '리쿠르팅이 비활성화되었습니다.' 
+          : '리쿠르팅이 활성화되었습니다.'
+      };
     } catch (error) {
       console.error('상태 변경 실패:', error);
       return { 

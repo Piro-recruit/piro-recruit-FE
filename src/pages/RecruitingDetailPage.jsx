@@ -242,7 +242,9 @@ const RecruitingDetailPageInner = () => {
   // 리쿠르팅 활성화/비활성화 토글 핸들러
   const handleToggleActivation = async () => {
     const result = await toggleActivation();
-    if (!result.success) {
+    if (result.success) {
+      alert(result.message);
+    } else {
       alert(result.message);
     }
   };
