@@ -7,14 +7,3 @@ export { integrationAPI } from './integrationAPI.js';
 export { aiSummaryAPI } from './aiSummaryAPI.js';
 export { applicationStatusAPI } from './applicationStatusAPI.js';
 export { default as apiClient } from './apiClient.js';
-
-// 하위 호환성을 위한 기존 API 재내보내기
-export {
-  googleFormsAPI,
-  applicationsAPI,
-  adminAPI,
-  evaluationAPI,
-  integrationAPI,
-  aiSummaryAPI,
-  applicationStatusAPI
-};
