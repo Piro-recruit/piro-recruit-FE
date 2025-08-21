@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { authService } from '../../services/authService';
-import { googleFormsAPI } from '../../services/api';
+import { authAPI, googleFormsAPI } from '../../services/api/index.js';
 
 export const useModalManagement = (onRefreshData) => {
   // 모달 상태들
@@ -21,7 +20,7 @@ export const useModalManagement = (onRefreshData) => {
     setIsGenerating(true);
     
     try {
-      const result = await authService.createGeneralAdmins(count, expirationDays);
+      const result = await authAPI.createGeneralAdmins(count, expirationDays);
       
       if (!result.success) {
         if (result.error?.status === 401) {
@@ -88,7 +87,7 @@ export const useModalManagement = (onRefreshData) => {
   // 관리자 관리 버튼 클릭 핸들러
   const handleManageAdminClick = async () => {
     try {
-      await authService.getAllGeneralAdmins();
+      await authAPI.getAllGeneralAdmins();
       setIsManageModalOpen(true);
     } catch (error) {
       if (error.response?.status === 401) {

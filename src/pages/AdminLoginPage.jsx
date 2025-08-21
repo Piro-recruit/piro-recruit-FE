@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminHeader from '../features/admin/AdminHeader';
-import { authService } from '../services/authService';
+import { authAPI } from '../services/api/domains/admin';
 import { ROUTES } from '../constants/routes';
 import './AdminLoginPage.css';
 
@@ -23,7 +23,7 @@ const AdminLoginPage = () => {
     }
 
     try {
-      const result = await authService.login(loginCode);
+      const result = await authAPI.login(loginCode);
       
       if (result.success) {
         navigate(ROUTES.ADMIN_RECRUITING);

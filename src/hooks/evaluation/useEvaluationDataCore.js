@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { evaluationAPI } from '../../services/api';
+import { evaluationAPI } from '../../services/api/index.js';
 import { useUserMatcher } from './useUserMatcher';
 
 export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {

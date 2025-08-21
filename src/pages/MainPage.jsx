@@ -4,8 +4,7 @@ import NavigationHeader from '../components/layout/NavigationHeader';
 import HeroSection from '../components/layout/HeroSection';
 import Footer from '../components/layout/Footer';
 import { ROUTES } from '../constants/routes';
-import { mailService } from '../services/mailService';
-import { googleFormsAPI } from '../services/api';
+import { mailAPI, googleFormsAPI } from '../services/api/index.js';
 import './MainPage.css';
 
 const PiroMainPage = () => {
@@ -58,7 +57,7 @@ const PiroMainPage = () => {
     setEmailMessage('');
     
     try {
-      const result = await mailService.registerSubscriber(email);
+      const result = await mailAPI.registerSubscriber(email);
       
       if (result.success) {
         setEmailMessage(result.message || '알림 신청이 완료되었습니다!');

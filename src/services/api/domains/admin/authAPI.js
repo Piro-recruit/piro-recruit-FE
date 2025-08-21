@@ -1,7 +1,6 @@
-import apiClient from './api.js';
+import apiClient from '../../core/apiClient.js';
 
-// 인증 관련 API 서비스
-export const authService = {
+export const authAPI = {
   /**
    * 관리자 로그인 (login-code 사용)
    * @param {string} loginCode - 로그인 코드
@@ -224,5 +223,3 @@ export const authService = {
     }
   }
 };
-
-export default authService;

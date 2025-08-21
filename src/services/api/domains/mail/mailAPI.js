@@ -1,7 +1,6 @@
-import apiClient from './api.js';
+import apiClient from '../../core/apiClient.js';
 
-// 메일 관련 API 서비스
-export const mailService = {
+export const mailAPI = {
   /**
    * 일괄 메일 전송
    * @param {Object} emailData - 이메일 데이터
@@ -134,5 +133,3 @@ export const mailService = {
     }
   }
 };
-
-export default mailService;

@@ -1,4 +1,4 @@
-import { applicationStatusAPI } from '../../services/api';
+import { applicationStatusAPI } from '../../services/api/index.js';
 
 export const useBulkActions = (formStates, loadingStates, refetchApplications) => {
   const { bulkChangeCount } = formStates;

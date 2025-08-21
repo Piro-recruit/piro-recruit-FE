@@ -1,4 +1,4 @@
-import { mailService } from '../../services/mailService';
+import { mailAPI } from '../../services/api/domains/mail';
 
 export const useEmailActions = (formStates, loadingStates, modalStates) => {
   const { emailContent, subscriberCount, setSubscriberCount } = formStates;
@@ -7,7 +7,7 @@ export const useEmailActions = (formStates, loadingStates, modalStates) => {
 
   const fetchSubscriberCount = async () => {
     try {
-      const result = await mailService.getSubscriberCount();
+      const result = await mailAPI.getSubscriberCount();
       if (result.success && result.count !== undefined) {
         setSubscriberCount(result.count);
       }
@@ -25,7 +25,7 @@ export const useEmailActions = (formStates, loadingStates, modalStates) => {
     setIsEmailSending(true);
     
     try {
-      const result = await mailService.sendBulkEmail({
+      const result = await mailAPI.sendBulkEmail({
         subject: emailContent.subject,
         content: emailContent.message
       });

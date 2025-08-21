@@ -1,4 +1,4 @@
-import { integrationAPI, googleFormsAPI } from '../../services/api';
+import { integrationAPI, googleFormsAPI } from '../../services/api/index.js';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../../utils/csvExport';
 
 export const useCSVExport = (recruitingInfo, allApplicants, loadingStates) => {

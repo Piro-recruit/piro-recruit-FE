@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { aiSummaryAPI } from '../../services/api';
+import { aiSummaryAPI } from '../../services/api/index.js';
 
 export const useAISummary = (allApplicants, isLoadingApplications) => {
   const [aiSummaries, setAiSummaries] = useState({});

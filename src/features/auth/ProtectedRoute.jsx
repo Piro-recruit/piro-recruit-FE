@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { authService } from '../../services/authService';
+import { authAPI } from '../../services/api/domains/admin';
 import { ROUTES } from '../../constants/routes';
 
 const ProtectedRoute = ({ children }) => {
@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAuth = () => {
       try {
-        const authenticated = authService.isAuthenticated();
+        const authenticated = authAPI.isAuthenticated();
         setIsAuthenticated(authenticated);
       } catch (error) {
         console.error('인증 상태 확인 중 오류:', error);

@@ -5,7 +5,7 @@
 export { default as apiClient } from './core/apiClient.js';
 
 // 👨‍💼 관리자 도메인 APIs
-export { adminAPI, googleFormsAPI } from './domains/admin';
+export { adminAPI, googleFormsAPI, authAPI } from './domains/admin';
 
 // 📄 지원서 도메인 APIs  
 export { applicationsAPI, applicationStatusAPI } from './domains/applications';
@@ -15,6 +15,9 @@ export { evaluationAPI, aiSummaryAPI } from './domains/evaluation';
 
 // 🔗 통합 도메인 APIs
 export { integrationAPI } from './domains/integration';
+
+// 📧 메일 도메인 APIs
+export { mailAPI } from './domains/mail';
 
 // 📚 하위 호환성을 위한 기존 방식 (deprecated)
 // 새로운 개발에서는 위의 도메인별 import를 사용하세요

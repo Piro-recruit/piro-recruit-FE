@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { googleFormsAPI } from '../../services/api';
+import { googleFormsAPI } from '../../services/api/index.js';
 import { ROUTES } from '../../constants/routes';
 
 export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, loadingStates) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
-import { authService } from '../../services/authService';
+import { authAPI } from '../../services/api/domains/admin';
 import { ROUTES } from '../../constants/routes';
 import logoImage from '../../assets/pirologo.png';
 import './AdminHeader.css';
@@ -11,7 +11,7 @@ const AdminHeader = ({ pageType, title, onClick }) => {
 
   const handleLogout = async () => {
     try {
-      await authService.logout();
+      await authAPI.logout();
       navigate(ROUTES.ADMIN_LOGIN);
     } catch (error) {
       console.error('로그아웃 중 오류:', error);

@@ -1,4 +1,4 @@
-import { evaluationAPI } from '../../services/api';
+import { evaluationAPI } from '../../services/api/index.js';
 
 export const useEvaluationCRUD = (evaluations, setEvaluations) => {
   const createEvaluation = async (applicantId, evaluationData) => {

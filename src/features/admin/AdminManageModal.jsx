@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, X, Trash2, Calendar, Clock, AlertTriangle, Download } from 'lucide-react';
-import { authService } from '../../services/authService';
-import { integrationAPI } from '../../services/api';
+import { authAPI, integrationAPI } from '../../services/api/index.js';
 import { createCSVDownloader, generateAdminsCSVFilename } from '../../utils/csvExport';
 import './AdminManageModal.css';
 
@@ -24,7 +23,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     setError('');
     
     try {
-      const response = await authService.getAllGeneralAdmins();
+      const response = await authAPI.getAllGeneralAdmins();
       console.log('관리자 계정 조회 성공 응답:', response);
       
       // 응답이 직접 배열 형태로 오는 경우
@@ -60,7 +59,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     setError('');
 
     try {
-      await authService.deleteExpiredAdmins();
+      await authAPI.deleteExpiredAdmins();
       alert('만료된 관리자 계정이 삭제되었습니다.');
       await loadAdmins(); // 목록 새로고침
     } catch (err) {
@@ -87,7 +86,7 @@ const AdminManageModal = ({ isOpen, onClose }) => {
     setError('');
 
     try {
-      await authService.deleteAllAdmins();
+      await authAPI.deleteAllAdmins();
       alert('모든 관리자 계정이 삭제되었습니다.');
       await loadAdmins(); // 목록 새로고침
     } catch (err) {

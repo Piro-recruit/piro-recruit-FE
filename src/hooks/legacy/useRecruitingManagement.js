@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { googleFormsAPI } from '../../services/api';
+import { googleFormsAPI } from '../../services/api/index.js';
 import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../../constants/recruitment';
 
 export const useRecruitingManagement = () => {
