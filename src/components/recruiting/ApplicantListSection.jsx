@@ -2,48 +2,50 @@ import React from 'react';
 import ApplicantCard from '../../features/recruiting/ApplicantCard';
 import ApplicantFilters from './ApplicantFilters';
 import Pagination from '../common/Pagination';
+import { useRecruitingDetail } from '../../contexts/RecruitingDetailContext.jsx';
+import { useEvaluation } from '../../contexts/EvaluationContext.jsx';
 import './ApplicantListSection.css';
 
 const ApplicantListSection = ({
-  // 필터링 관련
-  searchTerm,
-  statusFilter,
-  sortBy,
-  onSearchChange,
-  onStatusFilterChange,
-  onSortChange,
-  
-  // 지원자 데이터
+  // 지원자 데이터 (여전히 부모에서 계산된 데이터 필요)
   currentApplicants,
   filteredApplicants,
   
-  // 페이지네이션
-  currentPage,
+  // 페이지네이션 (계산된 데이터)
   totalPages,
   startIndex,
   endIndex,
-  onPageChange,
   
-  // 평가 데이터
-  evaluations,
-  aiSummaries,
-  isLoadingAiSummaries,
-  isLoadingEvaluations,
-  
-  // 상태 관리
-  expandedApplicants,
-  editingEvaluation,
-  
-  // 핸들러들
-  onToggleApplicant,
+  // 핸들러들 (비즈니스 로직은 여전히 부모에서)
   onShowOriginal,
-  onEvaluationSubmit,
-  onEvaluationUpdate,
-  onEvaluationDelete,
-  onEditEvaluation,
-  onCancelEdit,
   onStatusChange
 }) => {
+  // Context에서 상태와 액션들 가져오기
+  const {
+    searchTerm,
+    statusFilter,
+    sortBy,
+    currentPage,
+    expandedApplicants,
+    setSearchTerm,
+    setStatusFilter,
+    setSortBy,
+    setCurrentPage,
+    toggleApplicant
+  } = useRecruitingDetail();
+
+  const {
+    evaluations,
+    aiSummaries,
+    isLoadingAiSummaries,
+    isLoadingEvaluations,
+    editingEvaluation,
+    handleEvaluationSubmit,
+    handleEvaluationUpdate,
+    handleEvaluationDelete,
+    handleEditEvaluation,
+    handleCancelEdit
+  } = useEvaluation();
   return (
     <div className="applicants-section">
       <div className="applicants-header">
@@ -52,11 +54,11 @@ const ApplicantListSection = ({
         {/* 검색 및 필터 */}
         <ApplicantFilters
           searchTerm={searchTerm}
-          onSearchChange={onSearchChange}
+          onSearchChange={setSearchTerm}
           statusFilter={statusFilter}
-          onStatusFilterChange={onStatusFilterChange}
+          onStatusFilterChange={setStatusFilter}
           sortBy={sortBy}
-          onSortChange={onSortChange}
+          onSortChange={setSortBy}
         />
       </div>
 
@@ -77,13 +79,13 @@ const ApplicantListSection = ({
               aiSummary={aiSummary}
               isLoadingAi={isLoadingAiSummaries}
               isLoadingEvaluation={isLoadingEvaluations}
-              onToggle={onToggleApplicant}
+              onToggle={toggleApplicant}
               onShowOriginal={onShowOriginal}
-              onEvaluationSubmit={onEvaluationSubmit}
-              onEvaluationUpdate={onEvaluationUpdate}
-              onEvaluationDelete={onEvaluationDelete}
-              onEditEvaluation={onEditEvaluation}
-              onCancelEdit={onCancelEdit}
+              onEvaluationSubmit={handleEvaluationSubmit}
+              onEvaluationUpdate={handleEvaluationUpdate}
+              onEvaluationDelete={handleEvaluationDelete}
+              onEditEvaluation={handleEditEvaluation}
+              onCancelEdit={handleCancelEdit}
               onStatusChange={onStatusChange}
             />
           );
@@ -104,7 +106,7 @@ const ApplicantListSection = ({
         startIndex={startIndex}
         endIndex={endIndex}
         totalItems={filteredApplicants.length}
-        onPageChange={onPageChange}
+        onPageChange={setCurrentPage}
       />
     </div>
   );

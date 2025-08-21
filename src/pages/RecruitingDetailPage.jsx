@@ -1,30 +1,27 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { RecruitingDetailProvider, useRecruitingDetail } from '../contexts/RecruitingDetailContext.jsx';
+import { EvaluationProvider, useEvaluation } from '../contexts/EvaluationContext.jsx';
 import AdminHeader from '../features/admin/AdminHeader';
 import StatsSection from '../features/recruiting/StatsSection';
-import ApplicantCard from '../features/recruiting/ApplicantCard';
 import ApplicantModal from '../features/recruiting/ApplicantModal';
 import EmailModal from '../features/recruiting/EmailModal';
-import Pagination from '../components/common/Pagination';
 import DeleteConfirmModal from '../components/common/DeleteConfirmModal';
 import BulkStatusChangeModal from '../components/recruiting/BulkStatusChangeModal';
 import RecruitingInfoSection from '../components/recruiting/RecruitingInfoSection';
 import RecruitingHeader from '../components/recruiting/RecruitingHeader';
-import ApplicantFilters from '../components/recruiting/ApplicantFilters';
-import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
+import { RECRUITMENT_CONFIG, SORT_OPTIONS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { sortApplicants } from '../utils/sort';
 import { useRecruitingData } from '../hooks/useRecruitingData';
-import { useEvaluationData } from '../hooks/useEvaluationData';
 import { useStateManagement } from '../hooks/useStateManagement';
-import { useEvaluationHandlers } from '../hooks/useEvaluationHandlers';
 import LoadingIndicator from '../components/common/LoadingIndicator';
 import ErrorIndicator from '../components/common/ErrorIndicator';
 import ApplicantListSection from '../components/recruiting/ApplicantListSection';
 import './RecruitingDetailPage.css';
 
 
-const RecruitingDetailPage = () => {
+const RecruitingDetailPageInner = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   
@@ -40,17 +37,6 @@ const RecruitingDetailPage = () => {
     refetchRecruitingInfo,
     refetchApplications
   } = useRecruitingData(id);
-  
-  // 평가 관리 커스텀 훅
-  const {
-    aiSummaries,
-    evaluations,
-    isLoadingAiSummaries,
-    isLoadingEvaluations,
-    createEvaluation,
-    updateEvaluation,
-    deleteEvaluation
-  } = useEvaluationData(allApplicants, isLoadingApplications);
   
   // 상태 관리 커스텀 훅
   const {
@@ -88,24 +74,22 @@ const RecruitingDetailPage = () => {
     closeDeleteModal
   } = useStateManagement(recruitingInfo, refetchRecruitingInfo, refetchApplications, allApplicants);
   
-  // 평가 핸들러 커스텀 훅
-  const {
-    editingEvaluation,
-    handleEvaluationSubmit,
-    handleEvaluationUpdate,
-    handleEvaluationDelete,
-    handleEditEvaluation,
-    handleCancelEdit
-  } = useEvaluationHandlers(createEvaluation, updateEvaluation, deleteEvaluation, evaluations);
-  
-  // UI 상태
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('전체 상태');
-  const [sortBy, setSortBy] = useState(SORT_OPTIONS.APPLICATION_DATE);
-  const [selectedApplicant, setSelectedApplicant] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [expandedApplicants, setExpandedApplicants] = useState(new Set());
+  // UI 상태 (Context로 이동한 것들은 제거)
   const [showRecruitingDetails, setShowRecruitingDetails] = useState(false);
+  
+  // Context에서 상태들 가져오기
+  const {
+    searchTerm,
+    statusFilter,
+    sortBy,
+    selectedApplicant,
+    currentPage,
+    setSelectedApplicant,
+    setStatusFilter
+  } = useRecruitingDetail();
+
+  // 평가 Context에서 evaluations 가져오기 (정렬에 필요)
+  const { evaluations } = useEvaluation();
 
 
 
@@ -159,10 +143,7 @@ const RecruitingDetailPage = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentApplicants = filteredApplicants.slice(startIndex, endIndex);
 
-  // 필터나 검색이 변경될 때 첫 페이지로 이동
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, sortBy]);
+  // 필터나 검색이 변경될 때 첫 페이지로 이동은 Context에서 처리됨
 
   // 통계 계산 - API 데이터 우선, 없으면 클라이언트 계산
   const stats = useMemo(() => {
@@ -212,16 +193,6 @@ const RecruitingDetailPage = () => {
     navigate(ROUTES.ADMIN_RECRUITING);
   };
 
-  const handleToggleApplicant = (applicantId) => {
-    const newExpanded = new Set(expandedApplicants);
-    if (newExpanded.has(applicantId)) {
-      newExpanded.delete(applicantId);
-    } else {
-      newExpanded.add(applicantId);
-    }
-    setExpandedApplicants(newExpanded);
-  };
-
   const handleShowOriginal = (applicant) => {
     setSelectedApplicant(applicant);
   };
@@ -230,27 +201,7 @@ const RecruitingDetailPage = () => {
     setSelectedApplicant(null);
   };
 
-  // 평가 핸들러들에 에러 처리 추가
-  const handleEvaluationSubmitWithAlert = async (applicantId, evaluationData) => {
-    const result = await handleEvaluationSubmit(applicantId, evaluationData);
-    if (!result.success) {
-      alert(result.message);
-    }
-  };
-
-  const handleEvaluationUpdateWithAlert = async (applicantId, evaluationData) => {
-    const result = await handleEvaluationUpdate(applicantId, evaluationData);
-    if (!result.success) {
-      alert(result.message);
-    }
-  };
-
-  const handleEvaluationDeleteWithAlert = async (applicantId) => {
-    const result = await handleEvaluationDelete(applicantId);
-    if (!result.success && !result.cancelled) {
-      alert(result.message);
-    }
-  };
+  // 평가 관련 핸들러는 Context에서 처리됨
 
   // 지원서 상태 변경 핸들러
   const handleStatusChange = async (applicantId, newPassStatus) => {
@@ -401,32 +352,12 @@ const RecruitingDetailPage = () => {
 
               {/* 지원자 목록 */}
               <ApplicantListSection
-                searchTerm={searchTerm}
-                statusFilter={statusFilter}
-                sortBy={sortBy}
-                onSearchChange={setSearchTerm}
-                onStatusFilterChange={setStatusFilter}
-                onSortChange={setSortBy}
                 currentApplicants={currentApplicants}
                 filteredApplicants={filteredApplicants}
-                currentPage={currentPage}
                 totalPages={totalPages}
                 startIndex={startIndex}
                 endIndex={endIndex}
-                onPageChange={setCurrentPage}
-                evaluations={evaluations}
-                aiSummaries={aiSummaries}
-                isLoadingAiSummaries={isLoadingAiSummaries}
-                isLoadingEvaluations={isLoadingEvaluations}
-                expandedApplicants={expandedApplicants}
-                editingEvaluation={editingEvaluation}
-                onToggleApplicant={handleToggleApplicant}
                 onShowOriginal={handleShowOriginal}
-                onEvaluationSubmit={handleEvaluationSubmitWithAlert}
-                onEvaluationUpdate={handleEvaluationUpdateWithAlert}
-                onEvaluationDelete={handleEvaluationDeleteWithAlert}
-                onEditEvaluation={handleEditEvaluation}
-                onCancelEdit={handleCancelEdit}
                 onStatusChange={handleStatusChange}
               />
         </>
@@ -473,6 +404,32 @@ const RecruitingDetailPage = () => {
         onStatusChange={handleTopNStatusChange}
       />
     </div>
+  );
+};
+
+// Context Provider로 감싼 메인 컴포넌트
+const RecruitingDetailPage = () => {
+  const { id } = useParams();
+  
+  return (
+    <RecruitingDetailProvider>
+      <RecruitingDetailPageContent id={id} />
+    </RecruitingDetailProvider>
+  );
+};
+
+// EvaluationProvider도 포함한 실제 컴포넌트
+const RecruitingDetailPageContent = ({ id }) => {
+  // 지원서 데이터 페칭
+  const {
+    allApplicants,
+    isLoadingApplications
+  } = useRecruitingData(id);
+
+  return (
+    <EvaluationProvider allApplicants={allApplicants} isLoadingApplications={isLoadingApplications}>
+      <RecruitingDetailPageInner />
+    </EvaluationProvider>
   );
 };
 
