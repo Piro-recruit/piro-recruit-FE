@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { 
   User, 
   ChevronDown, 
@@ -16,7 +16,7 @@ import {
 import EvaluationForm from './EvaluationForm';
 import './EvaluationStyles.css';
 
-const ApplicantCard = ({ 
+const ApplicantCard = memo(({ 
   applicant, 
   isExpanded, 
   evaluation, 
@@ -356,6 +356,6 @@ const ApplicantCard = ({
       )}
     </div>
   );
-};
+});
 
 export default ApplicantCard;

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import logger from '../../utils/logger';
 
 // API 기본 설정
 const API_BASE_URL = 'http://localhost:8080';
@@ -21,15 +22,25 @@ apiClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+    logger.apiRequest(config.method || 'GET', config.url || '');
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    logger.error('API Request Error', error);
+    return Promise.reject(error);
+  }
 );
 
 // 응답 인터셉터
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    logger.apiResponse(response.status, response.config.url || '');
+    return response;
+  },
   async (error) => {
+    const status = error.response?.status || 0;
+    const url = error.config?.url || '';
+    
     // Blob 응답 에러 처리
     if (error.response?.data instanceof Blob) {
       try {
@@ -41,16 +52,17 @@ apiClient.interceptors.response.use(
           error.response.data = { message: errorText };
         }
       } catch (blobError) {
-        console.error('Blob 읽기 실패:', blobError);
+        logger.error('Blob 읽기 실패', blobError);
       }
     }
     
     // 401 인증 에러 처리
-    if (error.response?.status === 401) {
-      const isCSVExport = error.config?.url?.includes('/api/integration/export');
-      const isAdminAPI = error.config?.url?.includes('/api/admin/') || 
-                         error.config?.url?.includes('/api/integration/') ||
-                         error.config?.url?.includes('/api/ai-summary/');
+    if (status === 401) {
+      logger.warn('인증 에러 발생', { url, status });
+      const isCSVExport = url.includes('/api/integration/export');
+      const isAdminAPI = url.includes('/api/admin/') || 
+                         url.includes('/api/integration/') ||
+                         url.includes('/api/ai-summary/');
       const isAdminPage = window.location.pathname.startsWith('/admin');
       
       if (!isCSVExport && (isAdminAPI || isAdminPage)) {
@@ -63,6 +75,7 @@ apiClient.interceptors.response.use(
       }
     }
     
+    logger.apiError(status, url, error.response?.data);
     return Promise.reject(error);
   }
 );

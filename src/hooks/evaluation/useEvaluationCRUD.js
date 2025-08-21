@@ -38,7 +38,7 @@ export const useEvaluationCRUD = (evaluations, setEvaluations) => {
         return { success: false, message: response.message || '평가 등록에 실패했습니다.' };
       }
     } catch (error) {
-      console.error('평가 등록 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
       return { success: false, error };
     }
   };
@@ -88,7 +88,7 @@ export const useEvaluationCRUD = (evaluations, setEvaluations) => {
         return { success: false, message: response.message || '평가 수정에 실패했습니다.' };
       }
     } catch (error) {
-      console.error('평가 수정 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
       return { success: false, error };
     }
   };
@@ -126,7 +126,7 @@ export const useEvaluationCRUD = (evaluations, setEvaluations) => {
         return { success: false, message: response.message || '평가 삭제에 실패했습니다.' };
       }
     } catch (error) {
-      console.error('평가 삭제 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
       return { success: false, error };
     }
   };

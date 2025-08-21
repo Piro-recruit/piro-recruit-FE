@@ -44,7 +44,7 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
             };
           }
         } catch (error) {
-          console.error(`지원자 ${applicant.id} 평가 조회 오류:`, error);
+          // 에러는 이미 apiClient에서 로깅됨
           return {
             applicantId: applicant.id,
             allEvaluations: [],
@@ -74,7 +74,7 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
       
       setEvaluations(newEvaluations);
     } catch (error) {
-      console.error('평가 조회 실패:', error);
+      // 에러는 이미 apiClient에서 로깅됨
     } finally {
       setIsLoadingEvaluations(false);
     }
