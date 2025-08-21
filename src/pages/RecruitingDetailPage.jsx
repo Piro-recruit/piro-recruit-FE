@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Search, Calendar, Mail, Download } from 'lucide-react';
 import AdminHeader from '../features/admin/AdminHeader';
 import StatsSection from '../features/recruiting/StatsSection';
 import ApplicantCard from '../features/recruiting/ApplicantCard';
@@ -10,6 +9,8 @@ import Pagination from '../components/common/Pagination';
 import DeleteConfirmModal from '../components/common/DeleteConfirmModal';
 import BulkStatusChangeModal from '../components/recruiting/BulkStatusChangeModal';
 import RecruitingInfoSection from '../components/recruiting/RecruitingInfoSection';
+import RecruitingHeader from '../components/recruiting/RecruitingHeader';
+import ApplicantFilters from '../components/recruiting/ApplicantFilters';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS, APPLICANT_STATUS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { calculateApplicantStats } from '../utils/evaluation';
@@ -1179,33 +1180,13 @@ const RecruitingDetailPage = () => {
           {!isLoadingRecruiting && !isLoadingApplications && recruitingInfo && (
             <>
               {/* 제목 및 액션 */}
-              <div className="detail-header">
-                <div className="recruiting-title-section">
-                  <h1 className="recruiting-main-title">{recruitingInfo.title}</h1>
-                  <div className="recruiting-meta">
-                    <span className="recruiting-period">
-                      <Calendar size={16} />
-                      {recruitingInfo.period}
-                    </span>
-                    <span className={`status-badge ${recruitingInfo.statusColor}`}>
-                      {recruitingInfo.status}
-                    </span>
-                  </div>
-                </div>
-                <div className="action-buttons">
-                  <button className="csv-export-btn" onClick={handleCSVExport} disabled={isCSVExporting}>
-                    <Download size={20} />
-                    {isCSVExporting ? 'CSV 내보내는 중...' : 'CSV 내보내기'}
-                  </button>
-                  <button className="bulk-email-btn" onClick={handleShowEmailModal}>
-                    <Mail size={20} />
-                    일괄 이메일 전송
-                  </button>
-                  <button className="bulk-change-btn" onClick={handleShowBulkChangeModal}>
-                    일괄 상태 변경
-                  </button>
-                </div>
-              </div>
+              <RecruitingHeader
+                recruitingInfo={recruitingInfo}
+                isCSVExporting={isCSVExporting}
+                onCSVExport={handleCSVExport}
+                onShowEmailModal={handleShowEmailModal}
+                onShowBulkChangeModal={handleShowBulkChangeModal}
+              />
 
               {/* 리쿠르팅 정보 및 관리 */}
               <RecruitingInfoSection
@@ -1240,38 +1221,14 @@ const RecruitingDetailPage = () => {
                   <h2 className="section-title">지원자 목록</h2>
                   
                   {/* 검색 및 필터 */}
-                  <div className="applicant-controls">
-                    <div className="search-box">
-                      <Search size={20} className="search-icon" />
-                      <input
-                        type="text"
-                        placeholder="이름, 이메일, 학교로 검색..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="search-input"
-                      />
-                    </div>
-                    <select 
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="status-filter"
-                    >
-                      <option>전체 상태</option>
-                      <option>{APPLICANT_STATUS.REVIEWING}</option>
-                      <option>{APPLICANT_STATUS.PASSED}</option>
-                      <option>{APPLICANT_STATUS.FAILED}</option>
-                    </select>
-                    <select 
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="sort-filter"
-                    >
-                      <option value={SORT_OPTIONS.APPLICATION_DATE}>지원순</option>
-                      <option value={SORT_OPTIONS.AI_SCORE}>AI 스코어순</option>
-                      <option value={SORT_OPTIONS.EVALUATION_SCORE}>채점 스코어순</option>
-                      <option value={SORT_OPTIONS.NAME}>이름순</option>
-                    </select>
-                  </div>
+                  <ApplicantFilters
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                  />
                 </div>
 
                 <div className="applicants-list">
