@@ -1,9 +1,9 @@
 import React from 'react';
 import { Clock, CheckCircle, XCircle, Users } from 'lucide-react';
-import { RECRUITMENT_STATUS } from '../../constants/recruitment';
-import './RecruitingStats.css';
+import { RECRUITMENT_STATUS } from '../../../../constants/recruitment';
+import './StatsGrid.css';
 
-const RecruitingStats = ({ stats, onStatCardClick }) => {
+const StatsGrid = ({ stats, onStatCardClick }) => {
   return (
     <div className="recruitment-management-stats-grid">
       <div className="recruitment-management-stat-card clickable" onClick={() => onStatCardClick('all')}>
@@ -49,4 +49,4 @@ const RecruitingStats = ({ stats, onStatCardClick }) => {
   );
 };
 
-export default RecruitingStats;
+export default StatsGrid;

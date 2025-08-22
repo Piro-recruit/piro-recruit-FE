@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RecruitingDetailProvider, useRecruitingDetail } from '../contexts/RecruitingDetailContext.jsx';
 import { EvaluationProvider, useEvaluation } from '../contexts/EvaluationContext.jsx';
-import AdminHeader from '../features/admin/AdminHeader';
+import { AdminHeader } from '../components/admin';
 import StatsSection from '../features/recruiting/StatsSection';
 import ApplicantModal from '../features/recruiting/ApplicantModal';
 import EmailModal from '../features/recruiting/EmailModal';

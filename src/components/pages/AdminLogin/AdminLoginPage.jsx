@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminHeader from '../features/admin/AdminHeader';
-import { authAPI } from '../services/api/domains/admin';
-import { ROUTES } from '../constants/routes';
+import { AdminHeader } from '../../admin';
+import { LoginForm } from './components';
+import { authAPI } from '../../../services/api/domains/admin';
+import { ROUTES } from '../../../constants/routes';
 import './AdminLoginPage.css';
 
 const AdminLoginPage = () => {
@@ -44,33 +45,13 @@ const AdminLoginPage = () => {
       
       <main className="admin-login-main">
         <div className="admin-login-container">
-          <div className="admin-login-form-wrapper">
-            <h2 className="admin-login-title">로그인 코드</h2>
-            
-            <form onSubmit={handleSubmit} className="admin-login-form">
-              <div className="admin-login-input-wrapper">
-                <input
-                  type="password"
-                  id="loginCode"
-                  value={loginCode}
-                  onChange={(e) => setLoginCode(e.target.value)}
-                  placeholder=""
-                  disabled={isLoading}
-                  className="admin-login-input"
-                />
-              </div>
-
-              {error && <div className="admin-login-error-message">{error}</div>}
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="admin-login-btn"
-              >
-                {isLoading ? '로그인 중...' : '로그인'}
-              </button>
-            </form>
-          </div>
+          <LoginForm
+            loginCode={loginCode}
+            setLoginCode={setLoginCode}
+            isLoading={isLoading}
+            error={error}
+            onSubmit={handleSubmit}
+          />
         </div>
       </main>
     </div>

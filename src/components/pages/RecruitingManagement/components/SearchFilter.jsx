@@ -1,9 +1,9 @@
 import React from 'react';
 import { Search, Plus, Settings } from 'lucide-react';
-import { RECRUITMENT_STATUS } from '../../constants/recruitment';
-import './RecruitingSearchFilter.css';
+import { RECRUITMENT_STATUS } from '../../../../constants/recruitment';
+import './SearchFilter.css';
 
-const RecruitingSearchFilter = ({
+const SearchFilter = ({
   searchTerm,
   onSearchChange,
   statusFilter,
@@ -65,4 +65,4 @@ const RecruitingSearchFilter = ({
   );
 };
 
-export default RecruitingSearchFilter;
+export default SearchFilter;

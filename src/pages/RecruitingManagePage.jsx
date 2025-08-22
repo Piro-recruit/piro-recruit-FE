@@ -1,13 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminHeader from '../features/admin/AdminHeader';
+import { AdminHeader } from '../components/admin';
 import AdminCodeModal from '../features/admin/AdminCodeModal';
 import AdminCodeResultModal from '../features/admin/AdminCodeResultModal';
 import AdminManageModal from '../features/admin/AdminManageModal';
 import CreateRecruitingModal from '../features/admin/CreateRecruitingModal';
-import RecruitingSearchFilter from '../features/recruiting/RecruitingSearchFilter';
-import RecruitingStats from '../features/recruiting/RecruitingStats';
-import RecruitingList from '../features/recruiting/RecruitingList';
+import { SearchFilter, StatsGrid, RecruitingList } from '../components/pages/RecruitingManagement/components';
 import Pagination from '../components/common/Pagination';
 import { useRecruitingManagement } from '../hooks/legacy/useRecruitingManagement';
 import { useModalManagement } from '../hooks/legacy/useModalManagement';
@@ -74,7 +72,7 @@ const RecruitingManagePage = () => {
       <main className="recruitment-management-page-main">
         <div className="recruitment-management-page-container">
           {/* 검색 및 상단 액션 영역 */}
-          <RecruitingSearchFilter
+          <SearchFilter
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             statusFilter={statusFilter}
@@ -87,7 +85,7 @@ const RecruitingManagePage = () => {
           />
 
           {/* 통계 카드 영역 */}
-          <RecruitingStats 
+          <StatsGrid 
             stats={stats}
             onStatCardClick={handleStatCardClick}
           />

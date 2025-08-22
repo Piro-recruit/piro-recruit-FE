@@ -1,0 +1,26 @@
+/* Admin Login Page Styles */
+.admin-login-page-unique {
+  min-height: 100vh;
+  background-color: var(--color-black);
+  font-family: var(--font-family);
+}
+
+.admin-login-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+}
+
+.admin-login-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .admin-login-main {
+    padding: 1rem;
+  }
+}
