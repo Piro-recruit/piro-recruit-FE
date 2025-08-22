@@ -113,14 +113,54 @@
   .main-page-contact-description {
     font-size: 1rem;
     margin: 1rem 0 2rem;
+    line-height: 1.6;
   }
   
   .main-page-contact-links {
     gap: 1rem;
+    max-width: 100%;
+  }
+  
+  .main-page-contact-link {
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    min-height: 56px;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .main-page-contact-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-page-contact {
+    padding: 2.5rem 0;
+  }
+  
+  .main-page-contact-content {
+    padding: 0 0.75rem;
+  }
+  
+  .main-page-contact-description {
+    font-size: 0.9rem;
+    margin: 0.75rem 0 1.5rem;
+  }
+  
+  .main-page-contact-links {
+    gap: 0.75rem;
   }
   
   .main-page-contact-link {
     padding: 0.875rem 1rem;
     font-size: 0.875rem;
+    min-height: 52px;
+  }
+  
+  .main-page-contact-icon {
+    width: 20px;
+    height: 20px;
   }
 }
