@@ -1,7 +1,7 @@
 import React from 'react';
 import { Instagram, MessageCircle, Mail } from 'lucide-react';
-import { ROUTES } from '../../../constants/routes';
-import '../../../styles/common-sections.css';
+import { ROUTES } from '../../../../constants/routes';
+import '../../../../styles/common-sections.css';
 import './ContactSection.css';
 
 const ContactSection = () => {

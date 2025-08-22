@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import { APPLICANT_STATUS, SORT_OPTIONS, PASS_STATUS_KOREAN } from '../../../constants/recruitment';
+import { APPLICANT_STATUS, SORT_OPTIONS, PASS_STATUS_KOREAN } from '../../../../constants/recruitment';
 import './ApplicantFilters.css';
 
 const ApplicantFilters = ({

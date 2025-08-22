@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/layout/Header/Header';
 import HeroSection from '../components/layout/HeroSection/HeroSection';
-import CategoriesSection from '../components/sections/CategoriesSection/CategoriesSection';
-import InfoSection from '../components/sections/InfoSection/InfoSection';
-import ContactSection from '../components/sections/ContactSection/ContactSection';
+import CategoriesSection from '../components/pages/Main/CategoriesSection/CategoriesSection';
+import InfoSection from '../components/pages/Main/InfoSection/InfoSection';
+import ContactSection from '../components/pages/Main/ContactSection/ContactSection';
 import Footer from '../components/layout/Footer/Footer';
 import { mailAPI, googleFormsAPI } from '../services/api/index.js';
 import './MainPage.css';

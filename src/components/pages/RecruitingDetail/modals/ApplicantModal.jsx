@@ -1,5 +1,5 @@
 import React from 'react';
-import { sortApplicationQuestions } from '../../../utils/sort';
+import { sortApplicationQuestions } from '../../../../utils/sort';
 
 const ApplicantModal = ({ selectedApplicant, onClose }) => {
   if (!selectedApplicant) return null;
