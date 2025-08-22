@@ -3,12 +3,6 @@
 /* Base Modal Components */
 @import './modals/BaseModal.css';
 
-/* Original Application Modal */
-@import './modals/OriginalApplicationModal.css';
-
-/* Email Modal */
-@import './modals/EmailModal.css';
-
 /* Modal Animations */
 @import './modals/ModalAnimations.css';
 
