@@ -6,19 +6,26 @@ const RecruitingInfoSection = ({
   recruitingInfo,
   showRecruitingDetails,
   setShowRecruitingDetails,
-  editingField,
-  editingValue,
-  setEditingValue,
-  isUpdating,
-  isToggling,
-  isDeleting,
   allApplicantsLength,
-  onStartEdit,
-  onCancelEdit,
-  onSaveEdit,
-  onToggleActivation,
-  onShowDeleteModal
+  editingState,
+  managementState
 }) => {
+  const {
+    editingField,
+    editingValue,
+    setEditingValue,
+    isUpdating,
+    onStartEdit,
+    onCancelEdit,
+    onSaveEdit
+  } = editingState;
+
+  const {
+    isToggling,
+    isDeleting,
+    onToggleActivation,
+    onShowDeleteModal
+  } = managementState;
   return (
     <div className="recruiting-detail-info-recruiting-overview-section">
       <div className="recruiting-detail-info-overview-header">

@@ -332,18 +332,22 @@ const RecruitingDetailPageInner = () => {
                 recruitingInfo={recruitingInfo}
                 showRecruitingDetails={showRecruitingDetails}
                 setShowRecruitingDetails={setShowRecruitingDetails}
-                editingField={editingField}
-                editingValue={editingValue}
-                setEditingValue={setEditingValue}
-                isUpdating={isUpdating}
-                isToggling={isToggling}
-                isDeleting={isDeleting}
                 allApplicantsLength={allApplicants.length}
-                onStartEdit={handleStartEdit}
-                onCancelEdit={handleCancelFieldEdit}
-                onSaveEdit={handleSaveEdit}
-                onToggleActivation={handleToggleActivation}
-                onShowDeleteModal={handleShowDeleteModal}
+                editingState={{
+                  editingField,
+                  editingValue,
+                  setEditingValue,
+                  isUpdating,
+                  onStartEdit: handleStartEdit,
+                  onCancelEdit: handleCancelFieldEdit,
+                  onSaveEdit: handleSaveEdit
+                }}
+                managementState={{
+                  isToggling,
+                  isDeleting,
+                  onToggleActivation: handleToggleActivation,
+                  onShowDeleteModal: handleShowDeleteModal
+                }}
               />
 
               {/* 통계 카드 */}
