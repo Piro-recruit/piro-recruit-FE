@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, Clock, CheckCircle, XCircle, FileText } from 'lucide-react';
-import { APPLICANT_STATUS, PASS_STATUS_KOREAN } from '../../constants/recruitment';
+import { APPLICANT_STATUS, PASS_STATUS_KOREAN } from '../../../constants/recruitment';
 import './StatsSection.css';
 
 const StatsSection = ({ stats, statusFilter, onStatCardClick, isLoading = false }) => {

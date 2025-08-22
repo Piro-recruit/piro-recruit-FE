@@ -1,9 +1,9 @@
 import React from 'react';
-import ApplicantCard from '../../features/recruiting/ApplicantCard';
-import ApplicantFilters from './ApplicantFilters';
-import Pagination from '../common/Pagination';
-import { useRecruitingDetail } from '../../contexts/RecruitingDetailContext.jsx';
-import { useEvaluation } from '../../contexts/EvaluationContext.jsx';
+import ApplicantCard from './ApplicantCard';
+import { ApplicantFilters } from '../filters';
+import Pagination from '../../common/Pagination';
+import { useRecruitingDetail } from '../../../contexts/RecruitingDetailContext.jsx';
+import { useEvaluation } from '../../../contexts/EvaluationContext.jsx';
 import './ApplicantListSection.css';
 
 const ApplicantListSection = ({

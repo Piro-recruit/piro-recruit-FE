@@ -3,13 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { RecruitingDetailProvider, useRecruitingDetail } from '../contexts/RecruitingDetailContext.jsx';
 import { EvaluationProvider, useEvaluation } from '../contexts/EvaluationContext.jsx';
 import { AdminHeader } from '../components/admin';
-import StatsSection from '../features/recruiting/StatsSection';
-import ApplicantModal from '../features/recruiting/ApplicantModal';
-import EmailModal from '../features/recruiting/EmailModal';
+import { StatsSection } from '../components/recruiting/stats';
+import { ApplicantModal, EmailModal, BulkStatusChangeModal } from '../components/recruiting/modals';
 import DeleteConfirmModal from '../components/common/DeleteConfirmModal';
-import BulkStatusChangeModal from '../components/recruiting/BulkStatusChangeModal';
-import RecruitingInfoSection from '../components/recruiting/RecruitingInfoSection';
-import RecruitingHeader from '../components/recruiting/RecruitingHeader';
+import { RecruitingInfoSection, RecruitingHeader, ApplicantListSection } from '../components/recruiting/detail';
 import { RECRUITMENT_CONFIG, SORT_OPTIONS } from '../constants/recruitment';
 import { ROUTES } from '../constants/routes';
 import { sortApplicants } from '../utils/sort';
@@ -17,7 +14,6 @@ import { useRecruitingData } from '../hooks/legacy/useRecruitingData';
 import { useStateManagement } from '../hooks/useStateManagement';
 import LoadingIndicator from '../components/common/LoadingIndicator';
 import ErrorIndicator from '../components/common/ErrorIndicator';
-import ApplicantListSection from '../components/recruiting/ApplicantListSection';
 import './RecruitingDetailPage.css';
 
 

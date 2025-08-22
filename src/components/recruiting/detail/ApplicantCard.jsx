@@ -13,8 +13,8 @@ import {
   Save, 
   X 
 } from 'lucide-react';
-import EvaluationForm from './EvaluationForm';
-import './EvaluationStyles.css';
+import { EvaluationForm } from '../evaluation';
+import '../evaluation/EvaluationStyles.css';
 
 const ApplicantCard = memo(({ 
   applicant, 

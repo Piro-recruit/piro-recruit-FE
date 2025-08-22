@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AdminHeader } from '../../admin';
-import { LoginForm } from './components';
-import { authAPI } from '../../../services/api/domains/admin';
-import { ROUTES } from '../../../constants/routes';
+import { AdminHeader } from '../components/admin';
+import LoginForm from '../components/pages/AdminLogin/LoginForm';
+import { authAPI } from '../services/api/domains/admin';
+import { ROUTES } from '../constants/routes';
 import './AdminLoginPage.css';
 
 const AdminLoginPage = () => {
