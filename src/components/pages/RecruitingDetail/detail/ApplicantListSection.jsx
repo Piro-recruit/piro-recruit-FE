@@ -1,6 +1,5 @@
 import React from 'react';
-import ApplicantCard from './ApplicantCard';
-import { ApplicantFilters } from '../filters';
+import { ApplicantCard, ApplicantFilters } from '../../../recruiting';
 import Pagination from '../../../common/Pagination';
 import { useRecruitingDetail } from '../../../../contexts/RecruitingDetailContext.jsx';
 import { useEvaluation } from '../../../../contexts/EvaluationContext.jsx';
