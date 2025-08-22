@@ -68,7 +68,7 @@ const ApplicantCard = memo(({
   }, [evaluation, allEvaluations, applicant.name]);
 
   return (
-    <div className="recruiting-detail-applicant-card">
+    <div className={`recruiting-detail-applicant-card ${showStatusDropdown ? 'dropdown-active' : ''}`}>
       {/* 기본 지원자 정보 박스 */}
       <div 
         className="recruiting-detail-applicant-summary"
