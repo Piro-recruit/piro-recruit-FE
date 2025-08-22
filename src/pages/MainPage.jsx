@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Instagram, MessageCircle, Mail } from 'lucide-react';
-import NavigationHeader from '../components/layout/NavigationHeader';
-import HeroSection from '../components/layout/HeroSection';
-import Footer from '../components/layout/Footer';
-import { ROUTES } from '../constants/routes';
+import Header from '../components/layout/Header/Header';
+import HeroSection from '../components/layout/HeroSection/HeroSection';
+import CategoriesSection from '../components/sections/CategoriesSection/CategoriesSection';
+import InfoSection from '../components/sections/InfoSection/InfoSection';
+import ContactSection from '../components/sections/ContactSection/ContactSection';
+import Footer from '../components/layout/Footer/Footer';
 import { mailAPI, googleFormsAPI } from '../services/api/index.js';
 import './MainPage.css';
 
@@ -83,7 +84,7 @@ const PiroMainPage = () => {
 
   return (
       <div className="main-page-container">
-        <NavigationHeader />
+        <Header />
 
         <HeroSection
           isLoadingRecruitmentStatus={isLoadingRecruitmentStatus}
@@ -96,77 +97,9 @@ const PiroMainPage = () => {
           onApply={handleApply}
         />
 
-        <section className="main-page-categories">
-          <div className="main-page-categories-content">
-            <h2 className="main-page-section-title">모집 대상</h2>
-
-            <div className="main-page-categories-grid">
-              <div className="main-page-category-card">
-                <div className="main-page-category-icon">🔥</div>
-                <h3 className="main-page-category-title">열정</h3>
-              </div>
-
-              <div className="main-page-category-card">
-                <div className="main-page-category-icon">👥</div>
-                <h3 className="category-title">협력</h3>
-              </div>
-
-              <div className="main-page-category-card">
-                <div className="main-page-category-icon">📚</div>
-                <h3 className="main-page-category-title">성장</h3>
-              </div>
-            </div>
-
-            <p className="main-page-categories-description">
-              을 목표로 하는 수도권에서 활동 가능한 대학생
-              <span className="main-page-highlight"> 비전공자</span> / <span className="main-page-highlight">전공자</span>
-            </p>
-          </div>
-        </section>
-
-        <section className="main-page-info-section">
-          <div className="main-page-info-content">
-            <h2 className="main-page-section-title">FAQ & 모집 일정</h2>
-            <p className="main-page-info-message">자세한 질문과 답변 및 모집일정은 메인 페이지를 참고해주세요</p>
-          </div>
-        </section>
-
-        <section className="main-page-contact">
-          <div className="main-page-contact-content">
-            <h2 className="main-page-section-title">문의 하기</h2>
-            <p className="main-page-contact-description">궁금한점이나 문의사항을 보내주세요</p>
-
-            <div className="main-page-contact-links">
-              <a
-                  href={ROUTES.SOCIAL.INSTAGRAM}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="main-page-contact-link main-page-instagram"
-              >
-                <Instagram className="main-page-contact-icon" />
-                @pirogramming_official
-              </a>
-
-              <a
-                  href={ROUTES.SOCIAL.KAKAO}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="main-page-contact-link main-page-kakao"
-              >
-                <MessageCircle className="main-page-contact-icon" />
-                피로그래밍
-              </a>
-
-              <a
-                  href={ROUTES.SOCIAL.EMAIL}
-                  className="main-page-contact-link main-page-email"
-              >
-                <Mail className="main-page-contact-icon" />
-                pirogramming.official@gmail.com
-              </a>
-            </div>
-          </div>
-        </section>
+        <CategoriesSection />
+        <InfoSection />
+        <ContactSection />
 
         <Footer />
       </div>

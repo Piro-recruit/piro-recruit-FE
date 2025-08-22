@@ -1,0 +1,223 @@
+/* Hero Section Styles */
+.main-page-hero {
+  padding: 5rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.main-page-hero-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.main-page-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--color-white);
+  line-height: 1.2;
+}
+
+.main-page-hero-subtitle {
+  font-size: 1.5rem;
+  color: var(--color-white);
+  margin-bottom: 3rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.main-page-highlight {
+  color: var(--color-green-0);
+  font-weight: 600;
+}
+
+/* Email Form Styles */
+.main-page-email-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 28rem;
+  margin: 0 auto;
+  background-color: var(--color-white);
+  border-radius: 50px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  gap: 0.5rem;
+}
+
+.main-page-email-input {
+  flex: 1;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  color: var(--color-gray-8);
+  font-size: 1rem;
+  outline: none;
+  border-radius: 50px;
+}
+
+.main-page-email-input::placeholder {
+  color: var(--color-gray-5);
+}
+
+.main-page-email-btn {
+  width: 100%;
+  padding: 0.75rem 2rem;
+  background-color: var(--color-black);
+  color: var(--color-green-0);
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.main-page-email-btn:hover:not(:disabled) {
+  background-color: var(--color-green-1);
+  color: var(--color-white);
+  transform: translateY(-2px);
+}
+
+.main-page-email-btn:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.main-page-email-success-message {
+  color: var(--color-green-1);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  max-width: 28rem;
+}
+
+/* Recruitment Actions */
+.main-page-recruitment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.main-page-apply-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.main-page-apply-btn.primary {
+  background: linear-gradient(135deg, var(--color-green-0), var(--color-green-1));
+  color: var(--color-white);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.main-page-apply-btn.primary:hover {
+  background: linear-gradient(135deg, var(--color-green-1), var(--color-green-2));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* Loading Status */
+.main-page-loading-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.main-page-loading-spinner {
+  font-size: 2rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 반응형 디자인 */
+@media (min-width: 640px) {
+  .main-page-email-form {
+    flex-direction: row;
+    gap: 0;
+  }
+
+  .main-page-email-input {
+    width: auto;
+  }
+
+  .main-page-email-btn {
+    width: auto;
+  }
+
+  .main-page-hero h1 {
+    font-size: 4rem;
+  }
+
+  .main-page-hero-subtitle {
+    font-size: 2rem;
+  }
+
+  .main-page-recruitment-actions {
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .main-page-apply-btn {
+    width: auto;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-page-hero {
+    padding: 3rem 1rem;
+  }
+
+  .main-page-hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .main-page-hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .main-page-email-form,
+  .main-page-recruitment-actions {
+    max-width: 24rem;
+  }
+}

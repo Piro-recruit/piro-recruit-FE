@@ -1,0 +1,126 @@
+/* 문의하기 섹션 */
+.main-page-contact {
+  padding: 5rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-page-contact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.main-page-contact-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.main-page-contact-description {
+  color: var(--color-gray-1);
+  font-size: 1.125rem;
+  margin: 1.5rem 0 3rem;
+}
+
+.main-page-contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.main-page-contact-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+}
+
+.main-page-contact-link:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.main-page-contact-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Instagram 링크 */
+.main-page-instagram {
+  background: linear-gradient(135deg, #e4405f, #c13584);
+  border: 1px solid rgba(228, 64, 95, 0.3);
+}
+
+.main-page-instagram:hover {
+  background: linear-gradient(135deg, #f56040, #d63384);
+  border-color: #e4405f;
+  box-shadow: 0 10px 25px rgba(228, 64, 95, 0.3);
+}
+
+/* 카카오톡 링크 */
+.main-page-kakao {
+  background: linear-gradient(135deg, #f39800, #ffb800);
+  color: var(--color-white);
+  border: 1px solid rgba(243, 152, 0, 0.3);
+}
+
+.main-page-kakao:hover {
+  background: linear-gradient(135deg, #ff9f00, #ffcc00);
+  border-color: #f39800;
+  box-shadow: 0 10px 25px rgba(243, 152, 0, 0.3);
+}
+
+/* 이메일 링크 */
+.main-page-email {
+  background: linear-gradient(135deg, var(--color-green-0), var(--color-green-1));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.main-page-email:hover {
+  background: linear-gradient(135deg, var(--color-green-1), var(--color-green-2));
+  border-color: var(--color-green-0);
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .main-page-contact {
+    padding: 3rem 0;
+  }
+  
+  .main-page-contact-content {
+    padding: 0 1rem;
+  }
+  
+  .main-page-contact-description {
+    font-size: 1rem;
+    margin: 1rem 0 2rem;
+  }
+  
+  .main-page-contact-links {
+    gap: 1rem;
+  }
+  
+  .main-page-contact-link {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+}
