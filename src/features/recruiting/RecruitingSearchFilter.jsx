@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Plus, Settings } from 'lucide-react';
 import { RECRUITMENT_STATUS } from '../../constants/recruitment';
+import './RecruitingSearchFilter.css';
 
 const RecruitingSearchFilter = ({
   searchTerm,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Users } from 'lucide-react';
+import './RecruitingList.css';
 
 const RecruitingList = ({ recruitings, onRecruitingClick, isLoading }) => {
   if (isLoading) {

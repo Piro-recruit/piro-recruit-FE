@@ -13,6 +13,7 @@ import { useRecruitingManagement } from '../hooks/legacy/useRecruitingManagement
 import { useModalManagement } from '../hooks/legacy/useModalManagement';
 import { ROUTES } from '../constants/routes';
 import './RecruitingManagePage.css';
+import './RecruitingManagePage.layout.css';
 
 const RecruitingManagePage = () => {
   const navigate = useNavigate();
