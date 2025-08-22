@@ -7,7 +7,7 @@ export const LazyRecruitingManagePage = lazy(() => import('../../pages/Recruitin
 export const LazyRecruitingDetailPage = lazy(() => import('../../pages/RecruitingDetailPage'));
 
 // 모달 컴포넌트들 지연 로딩
-export const LazyCreateRecruitingModal = lazy(() => import('../../features/admin/CreateRecruitingModal'));
-export const LazyAdminCodeModal = lazy(() => import('../../features/admin/AdminCodeModal'));
-export const LazyAdminManageModal = lazy(() => import('../../features/admin/AdminManageModal'));
-export const LazyEmailModal = lazy(() => import('../RecruitingDetail/modals/EmailModal'));
+export const LazyCreateRecruitingModal = lazy(() => import('../pages/RecruitingManagement/modals/CreateRecruitingModal'));
+export const LazyAdminCodeModal = lazy(() => import('../pages/RecruitingManagement/modals/AdminCodeModal'));
+export const LazyAdminManageModal = lazy(() => import('../pages/RecruitingManagement/modals/AdminManageModal'));
+export const LazyEmailModal = lazy(() => import('../pages/RecruitingDetail/modals/EmailModal'));

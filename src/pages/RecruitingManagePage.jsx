@@ -1,13 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminHeader } from '../components/admin';
-import AdminCodeModal from '../features/admin/AdminCodeModal';
-import AdminCodeResultModal from '../features/admin/AdminCodeResultModal';
-import AdminManageModal from '../features/admin/AdminManageModal';
-import CreateRecruitingModal from '../features/admin/CreateRecruitingModal';
-import SearchFilter from '../components/pages/RecruitingManagement/SearchFilter';
-import StatsGrid from '../components/pages/RecruitingManagement/StatsGrid';
-import RecruitingList from '../components/pages/RecruitingManagement/RecruitingList';
+import { AdminCodeModal, AdminCodeResultModal, AdminManageModal, CreateRecruitingModal } from '../components/pages/RecruitingManagement';
+import { SearchFilter, StatsGrid, RecruitingList } from '../components/pages/RecruitingManagement';
 import Pagination from '../components/common/Pagination';
 import { useRecruitingManagement } from '../hooks/legacy/useRecruitingManagement';
 import { useModalManagement } from '../hooks/legacy/useModalManagement';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, X, Trash2, Calendar, Clock, AlertTriangle, Download } from 'lucide-react';
-import { authAPI, integrationAPI } from '../../services/api/index.js';
-import { createCSVDownloader, generateAdminsCSVFilename } from '../../utils/csvExport';
+import { authAPI, integrationAPI } from '../../../../services/api/index.js';
+import { createCSVDownloader, generateAdminsCSVFilename } from '../../../../utils/csvExport';
 import './AdminManageModal.css';
 
 const AdminManageModal = ({ isOpen, onClose }) => {
