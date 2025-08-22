@@ -1,7 +1,7 @@
 /* MainPage Styles using project colors and fonts */
 
 /* Layout */
-.piro-main {
+.main-page-container {
   min-height: 100vh;
   background-color: var(--color-black);
   color: var(--color-white);
@@ -9,13 +9,13 @@
 }
 
 /* MainPage Header */
-.main-header {
+.main-page-header {
   background: linear-gradient(to top, transparent 0%, var(--color-black) 100%);
   padding: 1rem 1.5rem;
   box-shadow: none;
 }
 
-.nav {
+.main-page-nav {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -23,23 +23,23 @@
   align-items: center;
 }
 
-.main-logo {
+.main-page-logo {
   display: flex;
   align-items: center;
 }
 
-.logo-image {
+.main-page-logo-image {
   height: 60px;
   width: auto;
 }
 
-.nav-links {
+.main-page-nav-links {
   display: flex;
   gap: 2rem;
   list-style: none;
 }
 
-.nav-links a {
+.main-page-nav-links a {
   color: var(--color-white);
   text-decoration: none;
   transition: color 0.3s;
@@ -47,41 +47,41 @@
   font-size: 1.2rem;
 }
 
-.nav-links a:hover {
+.main-page-nav-links a:hover {
   color: var(--color-green-0);
   text-decoration-line: none;
 }
 
-.nav-links a.active {
+.main-page-nav-links a.active {
   color: var(--color-green-0);
 }
 
 /* Hero Section */
-.hero {
+.main-page-hero {
   padding: 5rem 1.5rem;
   text-align: center;
 }
 
-.hero-content {
+.main-page-hero-content {
   max-width: 1000px;
   margin: 0 auto;
 }
 
-.hero h1 {
+.main-page-hero h1 {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: var(--color-white);
 }
 
-.hero-subtitle {
+.main-page-hero-subtitle {
   font-size: 1.5rem;
   color: var(--color-white);
   margin-bottom: 3rem;
   font-weight: 400;
 }
 
-.email-form {
+.main-page-email-form {
   display: flex;
   align-items: center;
   max-width: 28rem;
@@ -92,7 +92,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.email-input {
+.main-page-email-input {
   flex: 1;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -102,11 +102,11 @@
   outline: none;
 }
 
-.email-input::placeholder {
+.main-page-email-input::placeholder {
   color: var(--color-gray-5);
 }
 
-.email-btn {
+.main-page-email-btn {
   padding: 0.75rem 2rem;
   background-color: var(--color-black);
   color: var(--color-green-0);
@@ -119,18 +119,18 @@
   white-space: nowrap;
 }
 
-.email-btn:hover {
+.main-page-email-btn:hover {
   background-color: var(--color-green-1);
   color: var(--color-white);
 }
 
-.email-btn:disabled {
+.main-page-email-btn:disabled {
   background-color: #666;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.email-success-message {
+.main-page-email-success-message {
   color: var(--color-green-1, #0bec12);
   font-size: 0.9rem;
   margin-top: 1rem;
@@ -142,7 +142,7 @@
 }
 
 /* Recruitment Actions */
-.recruitment-actions {
+.main-page-recruitment-actions {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -150,7 +150,7 @@
   margin: 0 auto;
 }
 
-.apply-btn {
+.main-page-apply-btn {
   width: 100%;
   padding: 1rem 2rem;
   border: none;
@@ -162,28 +162,28 @@
   white-space: nowrap;
 }
 
-.apply-btn.primary {
+.main-page-apply-btn.primary {
   background-color: var(--color-green-1);
   color: var(--color-white);
 }
 
-.apply-btn.primary:hover {
+.main-page-apply-btn.primary:hover {
   background-color: var(--color-green-2);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(11, 236, 18, 0.3);
 }
 
 /* Categories Section */
-.categories {
+.main-page-categories {
   padding: 4rem 1.5rem;
 }
 
-.categories-content {
+.main-page-categories-content {
   max-width: 1000px;
   margin: 0 auto;
 }
 
-.section-title {
+.main-page-section-title {
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
@@ -191,14 +191,14 @@
   color: var(--color-white);
 }
 
-.categories-grid {
+.main-page-categories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
 }
 
-.category-card {
+.main-page-category-card {
   background-color: var(--color-gray-0);
   border-radius: 1rem;
   padding: 2rem;
@@ -206,67 +206,67 @@
   color: var(--color-gray-8);
 }
 
-.category-icon {
+.main-page-category-icon {
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
 
-.category-title {
+.main-page-category-title {
   font-size: 1.25rem;
   font-weight: 700;
 }
 
-.categories-description {
+.main-page-categories-description {
   text-align: center;
   color: var(--color-gray-1);
   margin-top: 2rem;
 }
 
-.highlight {
+.main-page-highlight {
   color: var(--color-green-0);
   font-weight: 600;
 }
 
 /* Info Section (FAQ & Schedule combined) */
-.info-section {
+.main-page-info-section {
   padding: 4rem 1.5rem;
 }
 
-.info-content {
+.main-page-info-content {
   max-width: 1000px;
   margin: 0 auto;
   text-align: center;
 }
 
-.info-message {
+.main-page-info-message {
   color: var(--color-gray-1);
   font-size: 1.1rem;
 }
 
 /* Contact Section */
-.contact {
+.main-page-contact {
   padding: 4rem 1.5rem;
 }
 
-.contact-content {
+.main-page-contact-content {
   max-width: 24rem;
   margin: 0 auto;
   text-align: center;
 }
 
-.contact-description {
+.main-page-contact-description {
   color: var(--color-green-0);
   margin-bottom: 2rem;
   font-weight: 500;
 }
 
-.contact-links {
+.main-page-contact-links {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.contact-link {
+.main-page-contact-link {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,37 +278,37 @@
   transition: opacity 0.3s;
 }
 
-.contact-link:hover {
+.main-page-contact-link:hover {
   opacity: 0.9;
 }
 
-.contact-link.instagram {
+.main-page-contact-link.main-page-instagram {
   background-color: #db2777;
   color: var(--color-white);
 }
 
-.contact-link.kakao {
+.main-page-contact-link.main-page-kakao {
   background-color: #eab308;
   color: var(--color-black);
 }
 
-.contact-link.email {
+.main-page-contact-link.main-page-email {
   background-color: var(--color-green-1);
   color: var(--color-white);
 }
 
-.contact-icon {
+.main-page-contact-icon {
   width: 1.25rem;
   height: 1.25rem;
 }
 
 /* Footer */
-.footer {
+.main-page-footer {
   background-color: var(--color-black);
   padding: 2rem 1.5rem;
 }
 
-.footer-content {
+.main-page-footer-content {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -317,114 +317,114 @@
   gap: 1rem;
 }
 
-.footer-info {
+.main-page-footer-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 }
 
-.footer-brand {
+.main-page-footer-brand {
   color: var(--color-white);
   font-weight: 600;
 }
 
-.footer-socials {
+.main-page-footer-socials {
   display: flex;
   gap: 1rem;
 }
 
-.footer-socials a {
+.main-page-footer-socials a {
   transition: transform 0.3s;
 }
 
-.footer-socials a:hover {
+.main-page-footer-socials a:hover {
   transform: translateY(-2px);
 }
 
-.footer-social-icon {
+.main-page-footer-social-icon {
   width: 1.25rem;
   height: 1.25rem;
   color: var(--color-white);
   transition: color 0.3s;
 }
 
-.footer-socials a:hover .footer-social-icon {
+.main-page-footer-socials a:hover .main-page-footer-social-icon {
   color: var(--color-green-0);
 }
 
-.footer-email {
+.main-page-footer-email {
   color: var(--color-white);
   font-weight: 500;
   text-decoration: none;
   transition: color 0.3s;
 }
 
-.footer-email:hover {
+.main-page-footer-email:hover {
   color: var(--color-green-0);
 }
 
-.footer-links {
+.main-page-footer-links {
   display: flex;
   gap: 2rem;
   font-size: 0.875rem;
 }
 
-.footer-links a {
+.main-page-footer-links a {
   color: var(--color-gray-3);
   text-decoration: none;
   transition: color 0.3s;
   font-weight: 500;
 }
 
-.footer-links a:hover {
+.main-page-footer-links a:hover {
   color: var(--color-white);
 }
 
 /* Mobile Responsiveness */
 @media (min-width: 640px) {
-  .email-form {
+  .main-page-email-form {
     flex-direction: row;
   }
 
-  .hero h1 {
+  .main-page-hero h1 {
     font-size: 4rem;
   }
 
-  .hero-subtitle {
+  .main-page-hero-subtitle {
     font-size: 2rem;
   }
 
-  .recruitment-actions {
+  .main-page-recruitment-actions {
     flex-direction: row;
     gap: 1rem;
   }
 }
 
 @media (min-width: 768px) {
-  .categories-grid {
+  .main-page-categories-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .footer-content {
+  .main-page-footer-content {
     flex-direction: row;
     justify-content: space-between;
   }
 
-  .footer-info {
+  .main-page-footer-info {
     flex-direction: row;
   }
 }
 
 /* 로딩 상태 스타일 */
-.loading-status {
+.main-page-loading-status {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 }
 
-.loading-spinner {
+.main-page-loading-spinner {
   font-size: 2rem;
   animation: spin 2s linear infinite;
 }

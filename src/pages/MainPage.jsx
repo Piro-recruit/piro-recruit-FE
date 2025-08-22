@@ -82,7 +82,7 @@ const PiroMainPage = () => {
 
 
   return (
-      <div className="piro-main">
+      <div className="main-page-container">
         <NavigationHeader />
 
         <HeroSection
@@ -96,54 +96,54 @@ const PiroMainPage = () => {
           onApply={handleApply}
         />
 
-        <section className="categories">
-          <div className="categories-content">
-            <h2 className="section-title">모집 대상</h2>
+        <section className="main-page-categories">
+          <div className="main-page-categories-content">
+            <h2 className="main-page-section-title">모집 대상</h2>
 
-            <div className="categories-grid">
-              <div className="category-card">
-                <div className="category-icon">🔥</div>
-                <h3 className="category-title">열정</h3>
+            <div className="main-page-categories-grid">
+              <div className="main-page-category-card">
+                <div className="main-page-category-icon">🔥</div>
+                <h3 className="main-page-category-title">열정</h3>
               </div>
 
-              <div className="category-card">
-                <div className="category-icon">👥</div>
+              <div className="main-page-category-card">
+                <div className="main-page-category-icon">👥</div>
                 <h3 className="category-title">협력</h3>
               </div>
 
-              <div className="category-card">
-                <div className="category-icon">📚</div>
-                <h3 className="category-title">성장</h3>
+              <div className="main-page-category-card">
+                <div className="main-page-category-icon">📚</div>
+                <h3 className="main-page-category-title">성장</h3>
               </div>
             </div>
 
-            <p className="categories-description">
+            <p className="main-page-categories-description">
               을 목표로 하는 수도권에서 활동 가능한 대학생
-              <span className="highlight"> 비전공자</span> / <span className="highlight">전공자</span>
+              <span className="main-page-highlight"> 비전공자</span> / <span className="main-page-highlight">전공자</span>
             </p>
           </div>
         </section>
 
-        <section className="info-section">
-          <div className="info-content">
-            <h2 className="section-title">FAQ & 모집 일정</h2>
-            <p className="info-message">자세한 질문과 답변 및 모집일정은 메인 페이지를 참고해주세요</p>
+        <section className="main-page-info-section">
+          <div className="main-page-info-content">
+            <h2 className="main-page-section-title">FAQ & 모집 일정</h2>
+            <p className="main-page-info-message">자세한 질문과 답변 및 모집일정은 메인 페이지를 참고해주세요</p>
           </div>
         </section>
 
-        <section className="contact">
-          <div className="contact-content">
-            <h2 className="section-title">문의 하기</h2>
-            <p className="contact-description">궁금한점이나 문의사항을 보내주세요</p>
+        <section className="main-page-contact">
+          <div className="main-page-contact-content">
+            <h2 className="main-page-section-title">문의 하기</h2>
+            <p className="main-page-contact-description">궁금한점이나 문의사항을 보내주세요</p>
 
-            <div className="contact-links">
+            <div className="main-page-contact-links">
               <a
                   href={ROUTES.SOCIAL.INSTAGRAM}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="contact-link instagram"
+                  className="main-page-contact-link main-page-instagram"
               >
-                <Instagram className="contact-icon" />
+                <Instagram className="main-page-contact-icon" />
                 @pirogramming_official
               </a>
 
@@ -151,17 +151,17 @@ const PiroMainPage = () => {
                   href={ROUTES.SOCIAL.KAKAO}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="contact-link kakao"
+                  className="main-page-contact-link main-page-kakao"
               >
-                <MessageCircle className="contact-icon" />
+                <MessageCircle className="main-page-contact-icon" />
                 피로그래밍
               </a>
 
               <a
                   href={ROUTES.SOCIAL.EMAIL}
-                  className="contact-link email"
+                  className="main-page-contact-link main-page-email"
               >
-                <Mail className="contact-icon" />
+                <Mail className="main-page-contact-icon" />
                 pirogramming.official@gmail.com
               </a>
             </div>

@@ -4,14 +4,14 @@ import logoImage from '../../assets/pirologo.png';
 
 const NavigationHeader = () => {
   return (
-    <header className="main-header">
-      <nav className="nav">
-        <div className="main-logo">
+    <header className="main-page-header">
+      <nav className="main-page-nav">
+        <div className="main-page-logo">
           <a href={ROUTES.PIROGRAMMING.HOME}>
-            <img src={logoImage} alt="피로그래밍 로고" className="logo-image" />
+            <img src={logoImage} alt="피로그래밍 로고" className="main-page-logo-image" />
           </a>
         </div>
-        <div className="nav-links">
+        <div className="main-page-nav-links">
           <a href={ROUTES.PIROGRAMMING.HOME}>
             Home
           </a>
