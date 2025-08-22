@@ -68,25 +68,25 @@ const ApplicantCard = memo(({
   }, [evaluation, allEvaluations, applicant.name]);
 
   return (
-    <div className="applicant-card">
+    <div className="recruiting-detail-applicant-card">
       {/* 기본 지원자 정보 박스 */}
       <div 
-        className="applicant-summary"
+        className="recruiting-detail-applicant-summary"
         onClick={() => onToggle(applicant.id)}
       >
-        <div className="applicant-icon">
-          <div className="icon-wrapper">
+        <div className="recruiting-detail-applicant-icon">
+          <div className="recruiting-detail-icon-wrapper">
             <User size={20} />
           </div>
         </div>
         
-        <div className="applicant-content">
-          <div className="applicant-left-info">
-            <div className="applicant-main-row">
-              <h3 className="applicant-name">{applicant.name}</h3>
-              <div className="status-change-container" ref={statusDropdownRef}>
+        <div className="recruiting-detail-applicant-content">
+          <div className="recruiting-detail-applicant-left-info">
+            <div className="recruiting-detail-applicant-main-row">
+              <h3 className="recruiting-detail-applicant-name">{applicant.name}</h3>
+              <div className="recruiting-detail-status-change-container" ref={statusDropdownRef}>
                 <div 
-                  className={`status-badge ${applicant.statusColor} clickable`}
+                  className={`recruiting-detail-status-badge ${applicant.statusColor} clickable`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowStatusDropdown(!showStatusDropdown);
@@ -142,43 +142,43 @@ const ApplicantCard = memo(({
                   </div>
                 )}
               </div>
-              <span className="applicant-university">
+              <span className="recruiting-detail-applicant-university">
                 <MapPin size={14} />
                 {applicant.university}
               </span>
-              <span className="applicant-department">
+              <span className="recruiting-detail-applicant-department">
                 <GraduationCap size={14} />
                 {applicant.department}
               </span>
-              <span className="applicant-grade">
+              <span className="recruiting-detail-applicant-grade">
                 <Users size={14} />
                 {applicant.grade}
               </span>
-              <span className="applicant-major-status">
+              <span className="recruiting-detail-applicant-major-status">
                 <Users2 size={14} />
                 {applicant.majorStatus}
               </span>
             </div>
           </div>
-          <div className="applicant-right-info">
-            <span className="applied-date">{applicant.appliedDate}</span>
-            <span className="applicant-score">
+          <div className="recruiting-detail-applicant-right-info">
+            <span className="recruiting-detail-applied-date">{applicant.appliedDate}</span>
+            <span className="recruiting-detail-applicant-score">
               AI 점수: {isLoadingAi ? '로딩중...' : aiSummary?.scoreOutOf100 ? `${aiSummary.scoreOutOf100}점` : '분석 대기'}
             </span>
             {evaluation && (
-              <span className="evaluation-score">평가: {evaluation.score}점</span>
+              <span className="recruiting-detail-evaluation-score">평가: {evaluation.score}점</span>
             )}
           </div>
         </div>
         
-        <div className="toggle-btn">
+        <div className="recruiting-detail-toggle-btn">
           {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
       </div>
 
       {/* 토글 확장 영역 - AI 요약 및 평가 */}
       {isExpanded && (
-        <div className="applicant-details-toggle">
+        <div className="recruiting-detail-applicant-details-toggle">
           {/* AI 요약 섹션 */}
           <div className="ai-summary-section">
             <div className="ai-summary-header">

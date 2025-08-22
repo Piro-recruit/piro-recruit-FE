@@ -19,11 +19,11 @@ const RecruitingInfoSection = ({
   onShowDeleteModal
 }) => {
   return (
-    <div className="recruiting-overview-section">
-      <div className="overview-header">
-        <h2 className="section-title">리쿠르팅 설정</h2>
+    <div className="recruiting-detail-info-recruiting-overview-section">
+      <div className="recruiting-detail-info-overview-header">
+        <h2 className="recruiting-detail-applicants-section-title">리쿠르팅 설정</h2>
         <button 
-          className="details-toggle-btn"
+          className="recruiting-detail-info-details-toggle-btn"
           onClick={() => setShowRecruitingDetails(!showRecruitingDetails)}
         >
           {showRecruitingDetails ? '닫기' : '정보 및 관리'}
@@ -32,13 +32,13 @@ const RecruitingInfoSection = ({
 
       {/* 정보 및 관리 토글 영역 */}
       {showRecruitingDetails && (
-        <div className="recruiting-details-area">
+        <div className="detail-info-recruiting-details-area">
           {/* 상세 정보 */}
-          <div className="info-section">
-            <h3 className="subsection-title">리쿠르팅 정보</h3>
-            <div className="recruiting-info-grid">
-              <div className="info-item">
-                <span className="info-label">기수</span>
+          <div className="detail-info-section">
+            <h3 className="detail-info-subsection-title">리쿠르팅 정보</h3>
+            <div className="detail-info-recruiting-info-grid">
+              <div className="detail-info-item">
+                <span className="detail-info-label">기수</span>
                 {editingField === 'generation' ? (
                   <div className="edit-field">
                     <input
@@ -68,7 +68,7 @@ const RecruitingInfoSection = ({
                   </div>
                 ) : (
                   <span 
-                    className="info-value editable"
+                    className="detail-info-value editable"
                     onClick={() => onStartEdit('generation', recruitingInfo.generation)}
                     title="클릭하여 편집"
                   >
@@ -76,28 +76,28 @@ const RecruitingInfoSection = ({
                   </span>
                 )}
               </div>
-              <div className="info-item">
-                <span className="info-label">폼 ID</span>
-                <span className="info-value">{recruitingInfo.formId}</span>
+              <div className="detail-info-item">
+                <span className="detail-info-label">폼 ID</span>
+                <span className="detail-info-value">{recruitingInfo.formId}</span>
               </div>
-              <div className="info-item">
-                <span className="info-label">상태</span>
-                <span className={`info-value status-${recruitingInfo.statusColor}`}>
+              <div className="detail-info-item">
+                <span className="detail-info-label">상태</span>
+                <span className={`detail-info-value status-${recruitingInfo.statusColor}`}>
                   {recruitingInfo.status}
                 </span>
               </div>
-              <div className="info-item">
-                <span className="info-label">지원자 수</span>
-                <span className="info-value">{allApplicantsLength}명</span>
+              <div className="detail-info-item">
+                <span className="detail-info-label">지원자 수</span>
+                <span className="detail-info-value">{allApplicantsLength}명</span>
               </div>
               {recruitingInfo.description && (
-                <div className="info-item full-width">
-                  <span className="info-label">설명</span>
-                  <span className="info-value">{recruitingInfo.description}</span>
+                <div className="detail-info-item full-width">
+                  <span className="detail-info-label">설명</span>
+                  <span className="detail-info-value">{recruitingInfo.description}</span>
                 </div>
               )}
-              <div className="info-item full-width">
-                <span className="info-label">구글 폼 URL</span>
+              <div className="detail-info-item full-width">
+                <span className="detail-info-label">구글 폼 URL</span>
                 {editingField === 'formUrl' ? (
                   <div className="edit-field">
                     <input
@@ -127,7 +127,7 @@ const RecruitingInfoSection = ({
                   </div>
                 ) : (
                   <div className="url-field">
-                    <a href={recruitingInfo.formUrl} target="_blank" rel="noopener noreferrer" className="form-url-link">
+                    <a href={recruitingInfo.formUrl} target="_blank" rel="noopener noreferrer" className="detail-info-form-url-link">
                       {recruitingInfo.formUrl}
                     </a>
                     <button 
@@ -140,8 +140,8 @@ const RecruitingInfoSection = ({
                   </div>
                 )}
               </div>
-              <div className="info-item full-width">
-                <span className="info-label">구글 시트 URL</span>
+              <div className="detail-info-item full-width">
+                <span className="detail-info-label">구글 시트 URL</span>
                 {editingField === 'sheetUrl' ? (
                   <div className="edit-field">
                     <input
@@ -172,7 +172,7 @@ const RecruitingInfoSection = ({
                 ) : (
                   <div className="url-field">
                     {recruitingInfo.sheetUrl ? (
-                      <a href={recruitingInfo.sheetUrl} target="_blank" rel="noopener noreferrer" className="form-url-link">
+                      <a href={recruitingInfo.sheetUrl} target="_blank" rel="noopener noreferrer" className="detail-info-form-url-link">
                         {recruitingInfo.sheetUrl}
                       </a>
                     ) : (
@@ -192,8 +192,8 @@ const RecruitingInfoSection = ({
           </div>
 
           {/* 관리 기능 */}
-          <div className="management-section">
-            <h3 className="subsection-title">리쿠르팅 관리</h3>
+          <div className="detail-info-management-section">
+            <h3 className="detail-info-subsection-title">리쿠르팅 관리</h3>
             <div className="management-actions">
               <div className="toggle-section">
                 <div className="toggle-info">

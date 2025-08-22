@@ -291,10 +291,10 @@ const RecruitingDetailPageInner = () => {
   // 에러 상태 처리
   if (error || (!isLoadingRecruiting && !recruitingInfo)) {
     return (
-      <div className="recruiting-detail-page">
+      <div className="recruiting-detail-page-unique-wrapper">
         <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" onClick={handleHeaderClick} />
-        <main className="recruiting-detail-main">
-          <div className="recruiting-detail-container">
+        <main className="recruiting-detail-page-unique-main">
+          <div className="recruiting-detail-page-unique-container">
             <ErrorIndicator
               error={error || '리쿠르팅 정보를 찾을 수 없습니다.'}
               title="리쿠르팅 정보 오류"
@@ -308,11 +308,11 @@ const RecruitingDetailPageInner = () => {
   }
 
   return (
-    <div className="recruiting-detail-page">
+    <div className="recruiting-detail-page-unique-wrapper">
       <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" onClick={handleHeaderClick} />
       
-      <main className="recruiting-detail-main">
-        <div className="recruiting-detail-container">
+      <main className="recruiting-detail-page-unique-main">
+        <div className="recruiting-detail-page-unique-container">
           {/* 로딩 상태 표시 */}
           {(isLoadingRecruiting || isLoadingApplications) && (
             <LoadingIndicator message="데이터를 불러오는 중..." />

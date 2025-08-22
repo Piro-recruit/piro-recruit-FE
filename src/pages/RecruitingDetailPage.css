@@ -1,28 +1,28 @@
 /* Recruiting Detail Page Styles */
-.recruiting-detail-page {
+.recruiting-detail-page-unique-wrapper {
   min-height: 100vh;
   background-color: var(--color-black);
   font-family: var(--font-family);
 }
 
-.recruiting-detail-main {
+.recruiting-detail-page-unique-main {
   padding: 2rem;
 }
 
-.recruiting-detail-container {
+.recruiting-detail-page-unique-container {
   max-width: 1200px;
   margin: 0 auto;
 }
 
 /* 섹션 공통 스타일 */
-.section-title {
+.recruiting-detail-page-section-title {
   color: var(--color-white);
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 0.75rem 0;
 }
 
-.back-btn {
+.recruiting-detail-page-back-btn {
   padding: 0.75rem 1.5rem;
   background-color: var(--color-green-0);
   border: none;
@@ -34,13 +34,13 @@
   transition: all 0.2s;
 }
 
-.back-btn:hover {
+.recruiting-detail-page-back-btn:hover {
   background-color: var(--color-green-1);
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  .recruiting-detail-main {
+  .recruiting-detail-page-unique-main {
     padding: 1rem;
   }
 }

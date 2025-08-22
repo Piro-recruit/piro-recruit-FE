@@ -1,20 +1,20 @@
 /* 리쿠르팅 정보 및 관리 통합 섹션 */
-.recruiting-overview-section {
+.recruiting-detail-info-recruiting-overview-section {
   margin-bottom: 1.5rem;
 }
 
 /* 통계 섹션 */
-.applicant-stats-section {
+.recruiting-detail-info-applicant-stats-section {
   margin-bottom: 2rem;
 }
 
-.stats-grid {
+.recruiting-detail-info-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
-.stat-card {
+.recruiting-detail-info-stat-card {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -25,27 +25,27 @@
   transition: all 0.3s;
 }
 
-.stat-card:hover {
+.recruiting-detail-info-stat-card:hover {
   background-color: var(--color-gray-6);
 }
 
-.stat-card.clickable {
+.recruiting-detail-info-stat-card.clickable {
   cursor: pointer;
   user-select: none;
 }
 
-.stat-card.clickable:hover {
+.recruiting-detail-info-stat-card.clickable:hover {
   background-color: var(--color-gray-6);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.stat-card.active {
+.recruiting-detail-info-stat-card.active {
   background-color: var(--color-gray-6);
   box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
 }
 
-.stat-icon {
+.recruiting-detail-info-stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,55 +54,55 @@
   border-radius: 8px;
 }
 
-.stat-icon.blue {
+.recruiting-detail-info-stat-icon.blue {
   background-color: rgba(59, 130, 246, 0.2);
   color: #3b82f6;
 }
 
-.stat-icon.yellow {
+.recruiting-detail-info-stat-icon.yellow {
   background-color: rgba(245, 158, 11, 0.2);
   color: #f59e0b;
 }
 
-.stat-icon.green {
+.recruiting-detail-info-stat-icon.green {
   background-color: rgba(34, 197, 94, 0.2);
   color: #22c55e;
 }
 
-.stat-icon.red {
+.recruiting-detail-info-stat-icon.red {
   background-color: rgba(239, 68, 68, 0.2);
   color: #ef4444;
 }
 
-.stat-icon.purple {
+.recruiting-detail-info-stat-icon.purple {
   background-color: rgba(168, 85, 247, 0.2);
   color: #a855f7;
 }
 
-.stat-info {
+.recruiting-detail-info-stat-info {
   flex: 1;
 }
 
-.stat-label {
+.recruiting-detail-info-stat-label {
   color: var(--color-gray-2);
   font-size: 0.875rem;
   margin-bottom: 0.25rem;
 }
 
-.stat-value {
+.recruiting-detail-info-stat-value {
   color: var(--color-white);
   font-size: 1.5rem;
   font-weight: 700;
 }
 
-.overview-header {
+.recruiting-detail-info-overview-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
 }
 
-.details-toggle-btn {
+.recruiting-detail-info-details-toggle-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -117,13 +117,13 @@
   transition: all 0.2s;
 }
 
-.details-toggle-btn:hover {
+.recruiting-detail-info-details-toggle-btn:hover {
   background-color: var(--color-green-1);
   transform: translateY(-1px);
 }
 
 /* 통합된 상세 영역 */
-.recruiting-details-area {
+.detail-info-recruiting-details-area {
   margin-top: 0.75rem;
   padding: 1rem;
   background-color: var(--color-gray-8);
@@ -133,17 +133,17 @@
   animation: slideDown 0.3s ease-out;
 }
 
-.info-section,
-.management-section {
+.detail-info-section,
+.detail-info-management-section {
   margin-bottom: 1.5rem;
 }
 
-.info-section:last-child,
-.management-section:last-child {
+.detail-info-section:last-child,
+.detail-info-management-section:last-child {
   margin-bottom: 0;
 }
 
-.subsection-title {
+.detail-info-subsection-title {
   color: var(--color-white);
   font-size: 1rem;
   font-weight: 600;
@@ -163,7 +163,7 @@
   }
 }
 
-.recruiting-info-grid {
+.detail-info-recruiting-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.75rem;
@@ -173,17 +173,17 @@
   padding: 0.875rem;
 }
 
-.info-item {
+.detail-info-item {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
 }
 
-.info-item.full-width {
+.detail-info-item.full-width {
   grid-column: 1 / -1;
 }
 
-.info-label {
+.detail-info-label {
   color: var(--color-gray-3);
   font-size: 0.75rem;
   font-weight: 500;
@@ -191,21 +191,21 @@
   letter-spacing: 0.05em;
 }
 
-.info-value {
+.detail-info-value {
   color: var(--color-white);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
-.info-value.status-green {
+.detail-info-value.status-green {
   color: #22c55e;
 }
 
-.info-value.status-red {
+.detail-info-value.status-red {
   color: #ef4444;
 }
 
-.form-url-link {
+.detail-info-form-url-link {
   color: var(--color-green-0);
   text-decoration: none;
   word-break: break-all;
@@ -213,19 +213,19 @@
   flex: 1;
 }
 
-.form-url-link:hover {
+.detail-info-form-url-link:hover {
   color: var(--color-green-1);
   text-decoration: underline;
 }
 
 /* 편집 가능한 필드 */
-.info-value.editable {
+.detail-info-value.editable {
   cursor: pointer;
   border-bottom: 1px dashed var(--color-gray-5);
   transition: all 0.2s;
 }
 
-.info-value.editable:hover {
+.detail-info-value.editable:hover {
   background-color: var(--color-gray-6);
   border-bottom-color: var(--color-green-0);
 }

@@ -47,9 +47,9 @@ const ApplicantListSection = ({
     handleCancelEdit
   } = useEvaluation();
   return (
-    <div className="applicants-section">
-      <div className="applicants-header">
-        <h2 className="section-title">지원자 목록</h2>
+    <div className="recruiting-detail-applicants-section">
+      <div className="recruiting-detail-applicants-header">
+        <h2 className="recruiting-detail-applicants-section-title">지원자 목록</h2>
         
         {/* 검색 및 필터 */}
         <ApplicantFilters
@@ -62,7 +62,7 @@ const ApplicantListSection = ({
         />
       </div>
 
-      <div className="applicants-list">
+      <div className="recruiting-detail-applicants-list">
         {currentApplicants.map((applicant) => {
           const isExpanded = expandedApplicants.has(applicant.id);
           const evaluationData = evaluations[applicant.id] || { allEvaluations: [], myEvaluation: null };
@@ -94,7 +94,7 @@ const ApplicantListSection = ({
 
       {/* 결과 없음 */}
       {filteredApplicants.length === 0 && (
-        <div className="no-results">
+        <div className="recruiting-detail-no-results">
           <p>검색 결과가 없습니다.</p>
         </div>
       )}

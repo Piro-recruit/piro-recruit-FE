@@ -1,5 +1,5 @@
 /* 헤더 섹션 스타일 */
-.detail-header {
+.recruiting-detail-header-wrapper {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -7,11 +7,11 @@
   margin-bottom: 2rem;
 }
 
-.recruiting-title-section {
+.recruiting-detail-header-recruiting-title-section {
   flex: 1;
 }
 
-.recruiting-main-title {
+.recruiting-detail-header-recruiting-main-title {
   color: var(--color-white);
   font-size: 1.75rem;
   font-weight: 700;
@@ -19,13 +19,13 @@
   line-height: 1.3;
 }
 
-.recruiting-meta {
+.recruiting-detail-header-recruiting-meta {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.recruiting-period {
+.recruiting-detail-header-recruiting-period {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -33,37 +33,37 @@
   font-size: 0.875rem;
 }
 
-.status-badge {
+.recruiting-detail-header-status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
-.status-badge.green {
+.recruiting-detail-header-status-badge.green {
   background-color: rgba(34, 197, 94, 0.2);
   color: #22c55e;
 }
 
-.status-badge.blue {
+.recruiting-detail-header-status-badge.blue {
   background-color: rgba(59, 130, 246, 0.2);
   color: #3b82f6;
 }
 
-.status-badge.red {
+.recruiting-detail-header-status-badge.red {
   background-color: rgba(239, 68, 68, 0.2);
   color: #ef4444;
 }
 
 /* Action buttons container */
-.action-buttons {
+.recruiting-detail-header-action-buttons {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
-.csv-export-btn {
+.recruiting-detail-header-csv-export-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -79,18 +79,18 @@
   white-space: nowrap;
 }
 
-.csv-export-btn:hover:not(:disabled) {
+.recruiting-detail-header-csv-export-btn:hover:not(:disabled) {
   background-color: var(--color-gray-5);
   transform: translateY(-1px);
 }
 
-.csv-export-btn:disabled {
+.recruiting-detail-header-csv-export-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-.bulk-email-btn {
+.recruiting-detail-header-bulk-email-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -106,11 +106,11 @@
   white-space: nowrap;
 }
 
-.bulk-email-btn:hover {
+.recruiting-detail-header-bulk-email-btn:hover {
   background-color: var(--color-green-1);
 }
 
-.bulk-change-btn {
+.recruiting-detail-header-bulk-change-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -126,26 +126,26 @@
   white-space: nowrap;
 }
 
-.bulk-change-btn:hover {
+.recruiting-detail-header-bulk-change-btn:hover {
   background-color: var(--color-green-0);
   color: var(--color-white);
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  .detail-header {
+  .recruiting-detail-header-wrapper {
     flex-direction: column;
     align-items: stretch;
     gap: 1.5rem;
   }
 
-  .action-buttons {
+  .recruiting-detail-header-action-buttons {
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 0;
   }
 
-  .recruiting-meta {
+  .recruiting-detail-header-recruiting-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
