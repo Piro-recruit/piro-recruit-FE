@@ -25,6 +25,7 @@ const RecruitingInfoDisplay = ({
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
                 className="recruiting-info-display__edit-input"
+                name="recruiting-level-input"
                 min="1"
                 disabled={isUpdating}
                 autoFocus
@@ -90,6 +91,7 @@ const RecruitingInfoDisplay = ({
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
                 className="recruiting-info-display__edit-input"
+                name="recruiting-form-url-input"
                 placeholder="https://forms.google.com/..."
                 disabled={isUpdating}
                 autoFocus
@@ -143,6 +145,7 @@ const RecruitingInfoDisplay = ({
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
                 className="recruiting-info-display__edit-input"
+                name="recruiting-sheet-url-input"
                 placeholder="https://docs.google.com/spreadsheets/..."
                 disabled={isUpdating}
                 autoFocus
