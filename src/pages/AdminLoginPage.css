@@ -1,11 +1,11 @@
 /* Admin Login Page Styles */
-.admin-login-page {
+.admin-login-page-unique {
   min-height: 100vh;
   background-color: var(--color-black);
   font-family: var(--font-family);
 }
 
-.admin-main {
+.admin-login-main {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,94 +13,14 @@
   padding: 2rem;
 }
 
-.login-container {
+.admin-login-container {
   width: 100%;
   max-width: 400px;
 }
 
-.login-form-wrapper {
-  background-color: var(--color-black);
-  padding: 2rem;
-  border-radius: 8px;
-}
-
-.login-title {
-  color: var(--color-white);
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.input-wrapper {
-  position: relative;
-}
-
-.login-input {
-  width: 100%;
-  padding: 1rem;
-  background-color: var(--color-white);
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: var(--color-gray-8);
-  outline: none;
-}
-
-.login-input::placeholder {
-  color: var(--color-gray-5);
-}
-
-.login-input:focus {
-  box-shadow: 0 0 0 2px var(--color-green-0);
-}
-
-.login-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 1rem;
-  background-color: var(--color-green-0);
-  color: var(--color-white);
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.login-btn:hover:not(:disabled) {
-  background-color: var(--color-green-1);
-}
-
-.login-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.error-message {
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-top: -0.5rem;
-}
-
 /* Responsive */
 @media (max-width: 480px) {
-  .admin-main {
+  .admin-login-main {
     padding: 1rem;
-  }
-  
-  .login-form-wrapper {
-    padding: 1.5rem;
   }
 }

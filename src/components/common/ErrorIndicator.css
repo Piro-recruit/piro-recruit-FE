@@ -1,0 +1,53 @@
+/* 에러 인디케이터 스타일 */
+.error-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  min-height: 300px;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-icon {
+  color: var(--color-red-0);
+  margin-bottom: 1rem;
+}
+
+.error-title {
+  color: var(--color-white);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.error-message {
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.error-action-btn {
+  background-color: var(--color-green-0);
+  color: var(--color-gray-9);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.error-action-btn:hover {
+  background-color: var(--color-green-1);
+}
+
+.error-action-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-green-0-alpha);
+}

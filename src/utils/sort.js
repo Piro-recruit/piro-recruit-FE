@@ -31,3 +31,37 @@ export const sortApplicants = (applicants, sortBy, evaluations) => {
       return sorted;
   }
 };
+
+/**
+ * 지원서 질문들을 정렬합니다.
+ * 숫자로 시작하는 질문들을 오름차순으로 정렬하여 마지막에 배치합니다.
+ * @param {Object} applicationData - 지원서 데이터 객체
+ * @returns {Array} [question, answer] 형태의 정렬된 배열
+ */
+export const sortApplicationQuestions = (applicationData) => {
+  const entries = Object.entries(applicationData);
+  
+  // 숫자로 시작하는 질문과 일반 질문 분리
+  const numberedQuestions = [];
+  const regularQuestions = [];
+  
+  entries.forEach(([question, answer]) => {
+    if (/^\d+\./.test(question)) {
+      // 숫자로 시작하는 질문 (예: "1. 본인의 가치관...")
+      const questionNumber = parseInt(question.match(/^(\d+)\./)[1]);
+      numberedQuestions.push({ question, answer, number: questionNumber });
+    } else {
+      // 일반 질문
+      regularQuestions.push([question, answer]);
+    }
+  });
+  
+  // 숫자 질문들을 번호순으로 정렬
+  numberedQuestions.sort((a, b) => a.number - b.number);
+  
+  // 일반 질문 + 정렬된 숫자 질문 순서로 결합
+  return [
+    ...regularQuestions,
+    ...numberedQuestions.map(({ question, answer }) => [question, answer])
+  ];
+};

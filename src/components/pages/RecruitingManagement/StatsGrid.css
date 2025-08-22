@@ -1,0 +1,138 @@
+/* RecruitingStats Component Styles */
+
+/* 통계 카드 영역 */
+.recruitment-management-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.recruitment-management-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1.0rem;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.recruitment-management-stat-card:hover {
+  background-color: var(--color-gray-6);
+}
+
+.recruitment-management-stat-card.clickable {
+  cursor: pointer;
+}
+
+.recruitment-management-stat-card.clickable:hover {
+  background-color: var(--color-gray-6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.recruitment-management-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.recruitment-management-stat-icon.blue {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.recruitment-management-stat-icon.yellow {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.recruitment-management-stat-icon.green {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.recruitment-management-stat-icon.red {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.recruitment-management-stat-icon.purple {
+  background-color: rgba(168, 85, 247, 0.2);
+  color: #a855f7;
+}
+
+.recruitment-management-stat-info {
+  flex: 1;
+}
+
+.recruitment-management-stat-label {
+  color: var(--color-gray-2);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.recruitment-management-stat-value {
+  color: var(--color-white);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .recruitment-management-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .recruitment-management-stat-card {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+  
+  .recruitment-management-stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .recruitment-management-stat-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .recruitment-management-stat-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .recruitment-management-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .recruitment-management-stat-card {
+    padding: 0.75rem;
+    gap: 0.625rem;
+  }
+  
+  .recruitment-management-stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .recruitment-management-stat-label {
+    font-size: 0.75rem;
+  }
+  
+  .recruitment-management-stat-value {
+    font-size: 1.125rem;
+  }
+}

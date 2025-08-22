@@ -5,7 +5,7 @@ import { RECRUITMENT_CONFIG, APPLICANT_STATUS } from '../constants/recruitment';
  * @param {Object} evaluations - 평가 데이터 객체
  * @returns {number} 합격 커트라인 점수
  */
-export const calculateCutlineScore = (evaluations) => {
+const calculateCutlineScore = (evaluations) => {
   const { LIMIT, DEFAULT_CUTLINE } = RECRUITMENT_CONFIG;
   
   // 평가된 지원자들의 점수를 가져와서 정렬 (내림차순)
