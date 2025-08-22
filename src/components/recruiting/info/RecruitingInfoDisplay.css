@@ -82,7 +82,10 @@
 .recruiting-info-display__cancel-btn{
   background-color: var(--color-gray-6);
   color: var(--color-white);
+}
 
+.recruiting-info-display__cancel-btn:hover {
+  background-color: var(--color-gray-5);
 }
 
 .recruiting-info-display__label {
@@ -118,9 +121,6 @@
   color: #ef4444;
 }
 
-.recruiting-info-display__status--yellow {
-  color: #f59e0b;
-}
 
 .recruiting-info-display__url-field {
   display: flex;
@@ -133,11 +133,6 @@
   flex: 1;
 }
 
-.recruiting-info-display__no-url {
-  color: var(--color-gray-4);
-  font-style: italic;
-  flex: 1;
-}
 
 .recruiting-info-display__edit-btn {
   padding: .25rem .5rem;
