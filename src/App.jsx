@@ -1,42 +1,54 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import MainPage from './pages/MainPage';
-import AdminLoginPage from './pages/AdminLoginPage';
-import RecruitingManagePage from './pages/RecruitingManagePage';
-import RecruitingDetailPage from './pages/RecruitingDetailPage';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { 
+  LazyMainPage, 
+  LazyAdminLoginPage, 
+  LazyRecruitingManagePage, 
+  LazyRecruitingDetailPage 
+} from './components/common/LazyComponents';
 import { ROUTES } from './constants/routes';
 import './App.css';
 
+const LoadingSpinner = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '100vh' 
+  }}>
+    <div>로딩 중...</div>
+  </div>
+);
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* 메인 페이지 */}
-        <Route path={ROUTES.HOME} element={
-            <MainPage />
-        } />
-        
-        {/* 어드민 로그인 페이지 */}
-        <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLoginPage />} />
-        
-        {/* 어드민 대시보드 페이지들 - 인증 필요 */}
-        <Route path={ROUTES.ADMIN_RECRUITING} element={
-          <ProtectedRoute>
-            <RecruitingManagePage />
-          </ProtectedRoute>
-        } />
-        <Route path={ROUTES.ADMIN_RECRUITING_DETAIL} element={
-          <ProtectedRoute>
-            <RecruitingDetailPage />
-          </ProtectedRoute>
-        } />
-        
-        {/* TODO: 추가 어드민 페이지들 */}
-        {/* <Route path="/admin/recruiting/create" element={<CreateRecruiting />} /> */}
-      </Routes>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            {/* 메인 페이지 */}
+            <Route path={ROUTES.HOME} element={<LazyMainPage />} />
+            
+            {/* 어드민 로그인 페이지 */}
+            <Route path={ROUTES.ADMIN_LOGIN} element={<LazyAdminLoginPage />} />
+            
+            {/* 어드민 대시보드 페이지들 - 인증 필요 */}
+            <Route path={ROUTES.ADMIN_RECRUITING} element={
+              <ProtectedRoute>
+                <LazyRecruitingManagePage />
+              </ProtectedRoute>
+            } />
+            <Route path={ROUTES.ADMIN_RECRUITING_DETAIL} element={
+              <ProtectedRoute>
+                <LazyRecruitingDetailPage />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </Suspense>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

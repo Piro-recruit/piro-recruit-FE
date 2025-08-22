@@ -1,0 +1,76 @@
+/* RecruitingInfoEdit 스타일 - 원본과 일치하게 */
+.recruiting-info-edit {
+  margin-bottom: 1.5rem;
+}
+
+.recruiting-info-edit__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recruiting-info-edit__input {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--color-gray-8);
+  border: 1px solid var(--color-green-0);
+  border-radius: 4px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.recruiting-info-edit__input:focus {
+  border-color: var(--color-green-1);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.recruiting-info-edit__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.recruiting-info-edit__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.recruiting-info-edit__save-btn,
+.recruiting-info-edit__cancel-btn {
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.recruiting-info-edit__save-btn {
+  background-color: var(--color-green-0);
+  color: var(--color-white);
+}
+
+.recruiting-info-edit__save-btn:hover:not(:disabled) {
+  background-color: var(--color-green-1);
+}
+
+.recruiting-info-edit__save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.recruiting-info-edit__cancel-btn {
+  background-color: var(--color-gray-6);
+  color: var(--color-white);
+}
+
+.recruiting-info-edit__cancel-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-5);
+}
+
+.recruiting-info-edit__cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

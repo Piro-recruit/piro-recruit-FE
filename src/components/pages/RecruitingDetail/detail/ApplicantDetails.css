@@ -1,0 +1,286 @@
+/* 토글 확장 영역 스타일 */
+.recruiting-detail-applicant-details-toggle {
+  border-top: 1px solid var(--color-gray-6);
+  background-color: var(--color-gray-8);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 섹션 제목 */
+.section-subtitle {
+  color: var(--color-white);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+/* AI Summary Section */
+.ai-summary-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid var(--color-blue-1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ai-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.ai-summary-header .section-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-blue-1);
+  margin: 0;
+}
+
+.ai-score-badge-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  background: linear-gradient(135deg, var(--color-green-0), var(--color-green-1));
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.ai-score-badge-header .score-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.ai-score-badge-header .score-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: var(--color-gray-4);
+  font-size: 0.875rem;
+}
+
+.ai-score-reason-box {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.score-reason-label {
+  color: var(--color-blue-1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.score-reason-text {
+  color: var(--color-gray-1);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ai-question-summaries {
+  margin-top: 1.25rem;
+}
+
+.summaries-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-blue-1);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-question-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.ai-question-card:hover {
+  border-color: var(--color-gray-4);
+  transform: translateY(-1px);
+}
+
+.question-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.question-number {
+  background-color: var(--color-blue-1);
+  color: var(--color-white);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.question-title {
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ai-answer {
+  color: var(--color-gray-1);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding-left: 2.75rem;
+}
+
+.no-ai-summary {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-gray-4);
+}
+
+.no-ai-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.no-ai-icon {
+  color: var(--color-gray-5);
+}
+
+.fallback-summary {
+  background-color: var(--color-gray-8);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.fallback-label {
+  color: var(--color-gray-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fallback-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-gray-7);
+}
+
+.fallback-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.fallback-question {
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.fallback-answer {
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Evaluation Section */
+.evaluation-section {
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-6);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.evaluation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ai-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-gray-3);
+  font-size: 0.875rem;
+}
+
+.star-icon {
+  color: var(--color-yellow-0);
+}
+
+.comment-label {
+  color: var(--color-gray-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.comment-content {
+  color: var(--color-gray-2);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Detail Actions */
+.detail-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-original-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-gray-6);
+  border: 1px solid var(--color-gray-5);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-original-btn:hover {
+  background-color: var(--color-gray-5);
+}

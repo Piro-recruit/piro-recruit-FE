@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminHeader from '../components/common/AdminHeader';
-import { authService } from '../services/authService';
+import { AdminHeader } from '../components/admin';
+import LoginForm from '../components/pages/AdminLogin/LoginForm';
+import { authAPI } from '../services/api/domains/admin';
 import { ROUTES } from '../constants/routes';
 import './AdminLoginPage.css';
 
@@ -23,14 +24,9 @@ const AdminLoginPage = () => {
     }
 
     try {
-      console.log('Admin login attempt with code:', loginCode);
-      
-      // API 호출
-      const result = await authService.login(loginCode);
+      const result = await authAPI.login(loginCode);
       
       if (result.success) {
-        console.log('로그인 성공:', result.data);
-        // 로그인 성공 시 RecruitingManagePage로 이동
         navigate(ROUTES.ADMIN_RECRUITING);
       } else {
         setError(result.message || '로그인에 실패했습니다.');
@@ -44,38 +40,18 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="admin-login-page">
+    <div className="admin-login-page-unique">
       <AdminHeader pageType="지원자 관리 시스템" title="admin 로그인" />
       
-      <main className="admin-main">
-        <div className="login-container">
-          <div className="login-form-wrapper">
-            <h2 className="login-title">로그인 코드</h2>
-            
-            <form onSubmit={handleSubmit} className="login-form">
-              <div className="input-wrapper">
-                <input
-                  type="password"
-                  id="loginCode"
-                  value={loginCode}
-                  onChange={(e) => setLoginCode(e.target.value)}
-                  placeholder=""
-                  disabled={isLoading}
-                  className="login-input"
-                />
-              </div>
-
-              {error && <div className="error-message">{error}</div>}
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="login-btn"
-              >
-                {isLoading ? '로그인 중...' : '로그인'}
-              </button>
-            </form>
-          </div>
+      <main className="admin-login-main">
+        <div className="admin-login-container">
+          <LoginForm
+            loginCode={loginCode}
+            setLoginCode={setLoginCode}
+            isLoading={isLoading}
+            error={error}
+            onSubmit={handleSubmit}
+          />
         </div>
       </main>
     </div>

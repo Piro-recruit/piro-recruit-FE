@@ -1,0 +1,10 @@
+/* 공통 모달 스타일 - 분리된 모듈 임포트 */
+
+/* Base Modal Components */
+@import './modals/BaseModal.css';
+
+/* Modal Animations */
+@import './modals/ModalAnimations.css';
+
+/* Modal Responsive Styles */
+@import './modals/ModalResponsive.css';

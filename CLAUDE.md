@@ -176,12 +176,72 @@ The application uses a dual authentication approach:
 - Delete expired or all admin accounts
 - API key exchange for alternative authentication
 
+## Component Architecture
+
+The project follows a strict component organization strategy based on usage patterns and domain separation:
+
+### Component Categories
+- **`common/`**: App-wide reusable UI components (Button, Modal, Pagination) - must be used in 3+ different features
+- **`layout/`**: Structural components for page layout (Header, Footer, NavigationHeader, HeroSection)
+- **`recruiting/`**: Domain-specific components with business logic
+  - `applicant/`: ApplicantCard, ApplicantFilters, ApplicantModal
+  - `evaluation/`: EvaluationForm
+  - `stats/`: StatsSection
+- **`pages/`**: Page-specific components with low reusability
+  - Each page has its own subdirectory with `detail/` and `modals/` subfolders
+- **`admin/`**: Admin-only components (AdminHeader)
+- **`auth/`**: Authentication components (ProtectedRoute)
+
+### Component Placement Decision Flow
+1. Used in 3+ features? → `common/`
+2. Layout/structural element? → `layout/`
+3. Recruiting domain related? → `recruiting/` (with appropriate subdirectory)
+4. Admin-only? → `admin/`
+5. Authentication related? → `auth/`
+6. Page-specific? → `pages/[PageName]/`
+
+### CSS Naming Conventions
+- **BEM methodology**: `.component-name__element--modifier`
+- **Component prefixes**: Each component uses kebab-case naming
+- **Modular CSS**: Component-specific CSS files co-located with JSX
+- **CSS splitting**: Large CSS files split into logical modules (BaseModal.css, EmailModal.css, etc.)
+
+## API Architecture
+
+Centralized API management with domain-based organization:
+
+### Service Structure
+- **`api/core/`**: Core HTTP client configuration (`apiClient.js`)
+- **`api/domains/`**: Domain-specific API modules
+  - `admin/`: Authentication, user management, Google Forms APIs
+  - `applications/`: Application data and status management
+  - `evaluation/`: AI summary and evaluation APIs
+  - `integration/`: CSV export and bulk operations
+  - `mail/`: Email sending and subscriber management
+
+### HTTP Client Features
+- Automatic JWT token injection for authenticated requests
+- Request/response logging via custom logger utility
+- Blob response error handling for CSV exports
+- 30-second timeout with automatic token cleanup on 401 responses
+- Base URL: `http://localhost:8080` (configurable via API_BASE_URL)
+
+## Modular CSS Architecture
+
+Large CSS files are systematically split into logical modules:
+- **Base styles**: Core modal, button, and layout styles
+- **Feature-specific**: Email modals, application modals, evaluation forms
+- **Responsive**: Dedicated responsive CSS modules for different breakpoints
+- **Animations**: Separated animation definitions
+- **Import structure**: Main CSS files use `@import` to include modular components
+
 ## Development Notes
 
 - Backend fully integrated with comprehensive API coverage
 - ESLint configured with React hooks and refresh plugins
 - Vite configured with asset chunking and file naming strategies for optimal builds
 - Branch-based development workflow
-- Services: `api.js` (HTTP client), `authService.js` (authentication), `mailService.js` (email)
+- Comprehensive logging system with environment-based log levels
 - Google Forms integration for recruitment management
 - CSV export functionality for applicant and admin data
+- Component architecture follows strict domain separation and reusability patterns

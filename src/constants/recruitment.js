@@ -16,6 +16,14 @@ export const APPLICANT_STATUS = {
   FAILED: '불합격',
 };
 
+// Pass Status에 대한 한글 매핑
+export const PASS_STATUS_KOREAN = {
+  PENDING: '대기중',
+  FAILED: '불합격', 
+  FIRST_PASS: '1차 합격',
+  FINAL_PASS: '최종 합격'
+};
+
 export const SORT_OPTIONS = {
   AI_SCORE: 'AI스코어순',
   EVALUATION_SCORE: '채점스코어순',

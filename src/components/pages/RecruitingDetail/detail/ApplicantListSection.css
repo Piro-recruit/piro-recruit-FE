@@ -1,0 +1,54 @@
+/* 지원자 목록 섹션 기본 레이아웃 */
+@import './ApplicantCard.css';
+@import './ApplicantDropdown.css';
+@import './ApplicantDetails.css';
+@import './ApplicantResponsive.css';
+
+.recruiting-detail-applicants-section {
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: visible;
+  z-index: auto;
+}
+
+.recruiting-detail-applicants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.recruiting-detail-applicants-section-title {
+  color: var(--color-white);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.recruiting-detail-applicants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: auto;
+  overflow: visible;
+}
+
+/* 검색 결과 없음 표시 */
+.recruiting-detail-no-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.recruiting-detail-no-results p {
+  color: var(--color-gray-3);
+  font-size: 1.125rem;
+  margin: 0;
+}
+
