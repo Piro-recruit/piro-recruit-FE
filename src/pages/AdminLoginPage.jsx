@@ -39,16 +39,16 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="admin-login-page">
+    <div className="admin-login-page-unique">
       <AdminHeader pageType="지원자 관리 시스템" title="admin 로그인" />
       
-      <main className="admin-main">
-        <div className="login-container">
-          <div className="login-form-wrapper">
-            <h2 className="login-title">로그인 코드</h2>
+      <main className="admin-login-main">
+        <div className="admin-login-container">
+          <div className="admin-login-form-wrapper">
+            <h2 className="admin-login-title">로그인 코드</h2>
             
-            <form onSubmit={handleSubmit} className="login-form">
-              <div className="input-wrapper">
+            <form onSubmit={handleSubmit} className="admin-login-form">
+              <div className="admin-login-input-wrapper">
                 <input
                   type="password"
                   id="loginCode"
@@ -56,16 +56,16 @@ const AdminLoginPage = () => {
                   onChange={(e) => setLoginCode(e.target.value)}
                   placeholder=""
                   disabled={isLoading}
-                  className="login-input"
+                  className="admin-login-input"
                 />
               </div>
 
-              {error && <div className="error-message">{error}</div>}
+              {error && <div className="admin-login-error-message">{error}</div>}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="login-btn"
+                className="admin-login-btn"
               >
                 {isLoading ? '로그인 중...' : '로그인'}
               </button>

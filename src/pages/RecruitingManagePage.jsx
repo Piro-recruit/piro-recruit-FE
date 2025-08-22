@@ -67,11 +67,11 @@ const RecruitingManagePage = () => {
 
 
   return (
-    <div className="recruiting-manage-page">
+    <div className="recruitment-management-page-wrapper">
       <AdminHeader pageType="리쿠르팅 관리 시스템" title="지원서 & 관리" />
       
-      <main className="recruiting-main">
-        <div className="recruiting-container">
+      <main className="recruitment-management-page-main">
+        <div className="recruitment-management-page-container">
           {/* 검색 및 상단 액션 영역 */}
           <RecruitingSearchFilter
             searchTerm={searchTerm}
