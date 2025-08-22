@@ -10,4 +10,4 @@ export const LazyRecruitingDetailPage = lazy(() => import('../../pages/Recruitin
 export const LazyCreateRecruitingModal = lazy(() => import('../../features/admin/CreateRecruitingModal'));
 export const LazyAdminCodeModal = lazy(() => import('../../features/admin/AdminCodeModal'));
 export const LazyAdminManageModal = lazy(() => import('../../features/admin/AdminManageModal'));
-export const LazyEmailModal = lazy(() => import('../recruiting/modals/EmailModal'));
+export const LazyEmailModal = lazy(() => import('../RecruitingDetail/modals/EmailModal'));

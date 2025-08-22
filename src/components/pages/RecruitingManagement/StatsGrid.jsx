@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clock, CheckCircle, XCircle, Users } from 'lucide-react';
-import { RECRUITMENT_STATUS } from '../../../../constants/recruitment';
+import { RECRUITMENT_STATUS } from '../../../constants/recruitment';
 import './StatsGrid.css';
 
 const StatsGrid = ({ stats, onStatCardClick }) => {
