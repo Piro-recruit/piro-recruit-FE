@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/layout/Header/Header';
-import HeroSection from '../components/layout/HeroSection/HeroSection';
-import CategoriesSection from '../components/sections/CategoriesSection/CategoriesSection';
-import InfoSection from '../components/sections/InfoSection/InfoSection';
-import ContactSection from '../components/sections/ContactSection/ContactSection';
-import Footer from '../components/layout/Footer/Footer';
-import { mailAPI, googleFormsAPI } from '../services/api/index.js';
+import Header from '../../layout/Header/Header';
+import HeroSection from '../../layout/HeroSection/HeroSection';
+import CategoriesSection from '../../sections/CategoriesSection/CategoriesSection';
+import InfoSection from '../../sections/InfoSection/InfoSection';
+import ContactSection from '../../sections/ContactSection/ContactSection';
+import Footer from '../../layout/Footer/Footer';
+import { mailAPI, googleFormsAPI } from '../../../services/api/index.js';
 import './MainPage.css';
 
 const PiroMainPage = () => {
