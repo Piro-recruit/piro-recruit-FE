@@ -23,6 +23,9 @@ export const EvaluationProvider = ({ children, allApplicants, isLoadingApplicati
     isLoadingAiSummaries: evaluationData.isLoadingAiSummaries,
     isLoadingEvaluations: evaluationData.isLoadingEvaluations,
     
+    // 평가 함수들
+    fetchApplicantEvaluation: evaluationData.fetchApplicantEvaluation,
+    
     // 평가 핸들러
     editingEvaluation: evaluationHandlers.editingEvaluation,
     handleEvaluationSubmit: evaluationHandlers.handleEvaluationSubmit,

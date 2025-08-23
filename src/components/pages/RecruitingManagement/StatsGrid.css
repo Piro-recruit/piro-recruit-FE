@@ -62,6 +62,11 @@
   color: #ef4444;
 }
 
+.recruitment-management-stat-icon.orange {
+  background-color: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+}
+
 .recruitment-management-stat-icon.purple {
   background-color: rgba(168, 85, 247, 0.2);
   color: #a855f7;

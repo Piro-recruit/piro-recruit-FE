@@ -36,6 +36,7 @@ const SearchFilter = ({
             <option>전체 상태</option>
             <option>{RECRUITMENT_STATUS.ACTIVE}</option>
             <option>{RECRUITMENT_STATUS.INACTIVE}</option>
+            <option>{RECRUITMENT_STATUS.CLOSED}</option>
           </select>
           <select 
             value={sortBy}

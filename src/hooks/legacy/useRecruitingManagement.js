@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { googleFormsAPI } from '../../services/api/index.js';
-import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS } from '../../constants/recruitment';
+import { RECRUITMENT_CONFIG, RECRUITMENT_STATUS, FORM_STATUS_COLORS, FORM_STATUS_KOREAN } from '../../constants/recruitment';
 
 export const useRecruitingManagement = () => {
   // 기본 상태
@@ -42,8 +42,8 @@ export const useRecruitingManagement = () => {
         : form.createdAt 
         ? `${new Date(form.createdAt).toLocaleDateString()} ~ 진행중`
         : '기간 미정',
-      status: form.isActive ? RECRUITMENT_STATUS.ACTIVE : RECRUITMENT_STATUS.INACTIVE,
-      statusColor: form.isActive ? 'green' : 'red',
+      status: FORM_STATUS_KOREAN[form.status] || RECRUITMENT_STATUS.INACTIVE,
+      statusColor: FORM_STATUS_COLORS[form.status] || 'gray',
       applicants: form.applicationCount || 0,
       comments: 0,
       formId: form.formId,
@@ -105,6 +105,7 @@ export const useRecruitingManagement = () => {
     totalRecruitings: allRecruitings.length,
     active: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.ACTIVE).length,
     inactive: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.INACTIVE).length,
+    closed: allRecruitings.filter(r => r.status === RECRUITMENT_STATUS.CLOSED).length,
     totalApplicants: allRecruitings.reduce((sum, r) => sum + r.applicants, 0)
   }), [allRecruitings]);
 
@@ -128,6 +129,9 @@ export const useRecruitingManagement = () => {
         break;
       case 'inactive':
         setStatusFilter(RECRUITMENT_STATUS.INACTIVE);
+        break;
+      case 'closed':
+        setStatusFilter(RECRUITMENT_STATUS.CLOSED);
         break;
       default:
         break;

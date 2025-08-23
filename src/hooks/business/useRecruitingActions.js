@@ -1,5 +1,6 @@
 import { googleFormsAPI } from '../../services/api/index.js';
 import { ROUTES } from '../../constants/routes';
+import { FORM_STATUS_KOREAN } from '../../constants/recruitment';
 
 export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, loadingStates) => {
   const { setIsToggling, setIsDeleting, setIsUpdating } = loadingStates;
@@ -14,28 +15,34 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
     }
   };
 
-  const handleToggleStatus = async () => {
+
+  const handleChangeStatus = async (newStatus) => {
     if (!recruitingInfo?.id) {
       return { success: false, message: '리쿠르팅 정보가 없습니다.' };
     }
     
     setIsToggling(true);
-    const isCurrentlyActive = recruitingInfo.status === '활성';
     
     try {
-      if (isCurrentlyActive) {
-        await googleFormsAPI.deactivateForm(recruitingInfo.id);
-      } else {
-        await googleFormsAPI.activateForm(recruitingInfo.id);
+      switch (newStatus) {
+        case 'ACTIVE':
+          await googleFormsAPI.activateForm(recruitingInfo.id);
+          break;
+        case 'INACTIVE':
+          await googleFormsAPI.deactivateForm(recruitingInfo.id);
+          break;
+        case 'CLOSED':
+          await googleFormsAPI.closeForm(recruitingInfo.id);
+          break;
+        default:
+          throw new Error(`Unknown status: ${newStatus}`);
       }
       
       await refetchRecruitingInfo();
       
       return { 
         success: true, 
-        message: isCurrentlyActive 
-          ? '리쿠르팅이 비활성화되었습니다.' 
-          : '리쿠르팅이 활성화되었습니다.'
+        message: `리쿠르팅이 ${FORM_STATUS_KOREAN[newStatus]}으로 변경되었습니다.`
       };
     } catch (error) {
       console.error('상태 변경 실패:', error);
@@ -108,7 +115,7 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
 
   return {
     getStatusDisplayName,
-    handleToggleStatus,
+    handleChangeStatus,
     handleDelete,
     handleFieldUpdate
   };

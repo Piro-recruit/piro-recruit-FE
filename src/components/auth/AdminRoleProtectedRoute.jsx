@@ -30,9 +30,9 @@ const AdminRoleProtectedRoute = ({ children, requireRootAdmin = false, recruitin
         // RootAdmin 권한 확인
         const isRoot = authAPI.isRootAdmin();
         
-        // 비활성 리쿠르팅 접근 제한 로직
-        if (recruitingStatus === 'INACTIVE' && !isRoot) {
-          console.log('비활성 리쿠르팅 접근 거부: RootAdmin 권한 필요');
+        // 마감 리쿠르팅 접근 제한 로직 (GeneralAdmin은 활성, 비활성 접근 가능)
+        if (recruitingStatus === 'CLOSED' && !isRoot) {
+          console.log('마감 리쿠르팅 접근 거부: RootAdmin 권한 필요');
           setIsAuthorized(false);
         } else {
           setIsAuthorized(true);

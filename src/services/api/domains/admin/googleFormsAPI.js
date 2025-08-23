@@ -65,5 +65,10 @@ export const googleFormsAPI = {
   getCurrentGeneration: async () => {
     const response = await apiClient.get('/api/google-forms/current-generation');
     return response.data;
+  },
+
+  closeForm: async (id) => {
+    const response = await apiClient.put(`/api/google-forms/${id}/close`);
+    return response.data;
   }
 };
