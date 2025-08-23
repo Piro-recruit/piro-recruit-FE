@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RecruitingDetailProvider, useRecruitingDetail } from '../contexts/RecruitingDetailContext.jsx';
 import { EvaluationProvider, useEvaluation } from '../contexts/EvaluationContext.jsx';

@@ -84,6 +84,7 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
     if (allApplicants.length > 0 && !isLoadingApplications) {
       fetchEvaluations();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

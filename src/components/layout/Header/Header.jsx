@@ -9,7 +9,14 @@ const Header = () => {
       <nav className="main-page-nav">
         <div className="main-page-logo">
           <a href={ROUTES.PIROGRAMMING.HOME}>
-            <img src={logoImage} alt="피로그래밍 로고" className="main-page-logo-image" />
+            <img 
+              src={logoImage} 
+              alt="피로그래밍 로고" 
+              className="main-page-logo-image"
+              width="120"
+              height="40"
+              loading="eager"
+            />
           </a>
         </div>
         <div className="main-page-nav-links">

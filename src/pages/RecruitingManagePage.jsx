@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminHeader } from '../components/admin';
-import { AdminCodeModal, AdminCodeResultModal, AdminManageModal, CreateRecruitingModal } from '../components/pages/RecruitingManagement';
+import { AdminCodeResultModal } from '../components/pages/RecruitingManagement';
 import { SearchFilter, StatsGrid, RecruitingList } from '../components/pages/RecruitingManagement';
 import Pagination from '../components/common/Pagination';
+import LoadingIndicator from '../components/common/LoadingIndicator';
+
+// Lazy load modals
+const LazyAdminCodeModal = React.lazy(() => import('../components/pages/RecruitingManagement/modals/AdminCodeModal'));
+const LazyAdminManageModal = React.lazy(() => import('../components/pages/RecruitingManagement/modals/AdminManageModal'));
+const LazyCreateRecruitingModal = React.lazy(() => import('../components/pages/RecruitingManagement/modals/CreateRecruitingModal'));
+
 import { useRecruitingManagement } from '../hooks/legacy/useRecruitingManagement';
 import { useModalManagement } from '../hooks/legacy/useModalManagement';
 import { ROUTES } from '../constants/routes';
@@ -106,27 +113,39 @@ const RecruitingManagePage = () => {
       </main>
 
       {/* 모달들 */}
-      <AdminCodeModal
-        isOpen={isCodeModalOpen}
-        onClose={handleCloseCodeModal}
-        onGenerate={handleGenerateAdminCodes}
-        isLoading={isGenerating}
-      />
+      {isCodeModalOpen && (
+        <Suspense fallback={<LoadingIndicator />}>
+          <LazyAdminCodeModal
+            isOpen={isCodeModalOpen}
+            onClose={handleCloseCodeModal}
+            onGenerate={handleGenerateAdminCodes}
+            isLoading={isGenerating}
+          />
+        </Suspense>
+      )}
       <AdminCodeResultModal
         isOpen={isResultModalOpen}
         onClose={handleCloseResultModal}
         result={codeGenerationResult}
       />
-      <AdminManageModal
-        isOpen={isManageModalOpen}
-        onClose={handleCloseManageModal}
-      />
-      <CreateRecruitingModal
-        isOpen={isCreateModalOpen}
-        onClose={handleCloseCreateModal}
-        onSubmit={handleCreateRecruiting}
-        isLoading={isCreating}
-      />
+      {isManageModalOpen && (
+        <Suspense fallback={<LoadingIndicator />}>
+          <LazyAdminManageModal
+            isOpen={isManageModalOpen}
+            onClose={handleCloseManageModal}
+          />
+        </Suspense>
+      )}
+      {isCreateModalOpen && (
+        <Suspense fallback={<LoadingIndicator />}>
+          <LazyCreateRecruitingModal
+            isOpen={isCreateModalOpen}
+            onClose={handleCloseCreateModal}
+            onSubmit={handleCreateRecruiting}
+            isLoading={isCreating}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };
