@@ -11,7 +11,7 @@ export const useEmailActions = (formStates, loadingStates, modalStates) => {
       if (result.success && result.count !== undefined) {
         setSubscriberCount(result.count);
       }
-    } catch (error) {
+    } catch {
       // 에러는 이미 apiClient에서 로깅됨
     }
   };

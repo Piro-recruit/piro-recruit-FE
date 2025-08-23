@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { evaluationAPI } from '../../services/api/index.js';
 import { useUserMatcher } from './useUserMatcher';
 
@@ -7,7 +7,7 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
   const [isLoadingEvaluations, setIsLoadingEvaluations] = useState(false);
   const { findCurrentUserEvaluation } = useUserMatcher();
 
-  const fetchEvaluations = async () => {
+  const fetchEvaluations = useCallback(async () => {
     if (!allApplicants.length) return;
     
     setIsLoadingEvaluations(true);
@@ -43,7 +43,7 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
               myEvaluation: null
             };
           }
-        } catch (error) {
+        } catch {
           // 에러는 이미 apiClient에서 로깅됨
           return {
             applicantId: applicant.id,
@@ -73,18 +73,18 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
       });
       
       setEvaluations(newEvaluations);
-    } catch (error) {
+    } catch {
       // 에러는 이미 apiClient에서 로깅됨
     } finally {
       setIsLoadingEvaluations(false);
     }
-  };
+  }, [allApplicants, findCurrentUserEvaluation]);
 
   useEffect(() => {
     if (allApplicants.length > 0 && !isLoadingApplications) {
       fetchEvaluations();
     }
-  }, [allApplicants.length, isLoadingApplications]);
+  }, []);
 
   return {
     evaluations,

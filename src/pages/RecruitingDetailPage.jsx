@@ -91,25 +91,14 @@ const RecruitingDetailPageInner = () => {
 
 
 
-  // 상태 변화 디버깅
-  useEffect(() => {
-    console.log('상태 변화:', {
-      isLoadingRecruiting,
-      isLoadingApplications,
-      allApplicantsLength: allApplicants.length,
-      recruitingInfo: !!recruitingInfo
-    });
-  }, [isLoadingRecruiting, isLoadingApplications, allApplicants.length, recruitingInfo]);
 
   // 필터링 및 정렬된 지원자 목록
   const filteredApplicants = useMemo(() => {
     // 로딩 중이면 빈 배열 반환
     if (isLoadingApplications) {
-      console.log('로딩 중이므로 빈 배열 반환');
       return [];
     }
     
-    console.log('필터링 시작 - allApplicants:', allApplicants.length);
     let filtered = allApplicants;
 
     // 검색 필터

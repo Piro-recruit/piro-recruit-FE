@@ -30,3 +30,18 @@ export const SORT_OPTIONS = {
   NAME: '이름순',
   APPLICATION_DATE: '지원순',
 };
+
+// 관리자 권한 타입
+export const ADMIN_TYPES = {
+  ROOT: 'ROOT',
+  ROOT_ADMIN: 'ROOT_ADMIN',
+  MASTER: 'MASTER',
+  GENERAL: 'GENERAL',
+};
+
+// 권한 관련 메시지
+export const PERMISSION_MESSAGES = {
+  INACTIVE_ACCESS_DENIED: '접근 권한이 없습니다. 비활성 리쿠르팅은 RootAdmin만 접근할 수 있습니다.',
+  ROOT_ADMIN_REQUIRED: 'RootAdmin 권한이 필요합니다.',
+  ACCESS_RESTRICTED: 'RootAdmin만 접근 가능합니다',
+};

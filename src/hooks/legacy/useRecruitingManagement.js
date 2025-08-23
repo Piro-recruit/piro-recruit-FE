@@ -92,7 +92,7 @@ export const useRecruitingManagement = () => {
     }
 
     return filtered;
-  }, [searchTerm, statusFilter, sortBy, allRecruitings, isLoadingForms]);
+  }, [searchTerm, statusFilter, sortBy, allRecruitings, isLoadingForms, googleForms.length]);
 
   // 페이지네이션
   const totalPages = Math.ceil(filteredRecruitings.length / itemsPerPage);
