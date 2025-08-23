@@ -11,15 +11,17 @@ export const sortApplicants = (applicants, sortBy, evaluations) => {
   const sorted = [...applicants];
   
   switch (sortBy) {
-    case SORT_OPTIONS.AI_SCORE:
-      return sorted.sort((a, b) => b.averageScore - a.averageScore);
-      
-    case SORT_OPTIONS.EVALUATION_SCORE:
+    case SORT_OPTIONS.AI_EVALUATION_SCORE:
+      // AI 평가 점수 정렬 (AI가 매긴 점수)
       return sorted.sort((a, b) => {
-        const aScore = evaluations[a.id]?.score || 0;
-        const bScore = evaluations[b.id]?.score || 0;
-        return bScore - aScore;
+        const aAiScore = a.aiSummary?.scoreOutOf100 || 0;
+        const bAiScore = b.aiSummary?.scoreOutOf100 || 0;
+        return bAiScore - aAiScore;
       });
+      
+    case SORT_OPTIONS.AVERAGE_SCORE:
+      // 평균 점수 정렬 (사람들이 매긴 평가의 평균)
+      return sorted.sort((a, b) => b.averageScore - a.averageScore);
       
     case SORT_OPTIONS.NAME:
       return sorted.sort((a, b) => a.name.localeCompare(b.name));

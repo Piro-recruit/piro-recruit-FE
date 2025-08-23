@@ -47,8 +47,8 @@ export const PASS_STATUS_KOREAN = {
 };
 
 export const SORT_OPTIONS = {
-  AI_SCORE: 'AI스코어순',
-  EVALUATION_SCORE: '채점스코어순',
+  AI_EVALUATION_SCORE: 'AI평가점수순',
+  AVERAGE_SCORE: '평균점수순',
   NAME: '이름순',
   APPLICATION_DATE: '지원순',
 };
