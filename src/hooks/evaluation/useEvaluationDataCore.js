@@ -84,7 +84,7 @@ export const useEvaluationDataCore = (allApplicants, isLoadingApplications) => {
     if (allApplicants.length > 0 && !isLoadingApplications) {
       fetchEvaluations();
     }
-  }, [allApplicants.length, isLoadingApplications, fetchEvaluations]);
+  }, []);
 
   return {
     evaluations,
