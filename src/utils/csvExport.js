@@ -107,6 +107,63 @@ export const getCSVExportErrorMessage = (error) => {
 };
 
 /**
+ * 지원자 데이터를 CSV 문자열로 변환합니다.
+ * @param {Array} applicants - 지원자 데이터 배열
+ * @returns {string} CSV 형식의 문자열
+ */
+export const convertApplicantsToCSV = (applicants) => {
+  if (!applicants || applicants.length === 0) {
+    return '';
+  }
+
+  // CSV 헤더 정의 (API 명세에 따라)
+  const headers = [
+    'name',
+    'phone', 
+    'level',
+    'major',
+    'is_passed'
+  ];
+
+  // 헤더를 CSV 형식으로 변환
+  const csvHeaders = headers.join(',');
+
+  // 데이터 행들을 CSV 형식으로 변환
+  const csvRows = applicants.map(applicant => {
+    // 합격 상태 변환 (API 명세에 따라)
+    let passStatusText = '대기중';
+    switch(applicant.passStatus) {
+      case 'PENDING':
+        passStatusText = '대기중';
+        break;
+      case 'FAILED':
+        passStatusText = '불합격';
+        break;
+      case 'FIRST_PASS':
+        passStatusText = '1차 합격';
+        break;
+      case 'FINAL_PASS':
+        passStatusText = '최종 합격';
+        break;
+      default:
+        passStatusText = '대기중';
+    }
+
+    const row = [
+      `"${(applicant.name || '').replace(/"/g, '""')}"`, // 쌍따옴표 이스케이프
+      applicant.phoneNumber || '',
+      applicant.grade || '',
+      `"${(applicant.major || '').replace(/"/g, '""')}"`,
+      passStatusText
+    ];
+    return row.join(',');
+  });
+
+  // 헤더와 데이터 행들을 결합
+  return [csvHeaders, ...csvRows].join('\n');
+};
+
+/**
  * CSV 다운로드 진행 상태를 관리하는 커스텀 훅용 유틸리티
  * @param {Function} exportFunction - CSV 내보내기 API 함수
  * @param {string} defaultFilename - 기본 파일명
