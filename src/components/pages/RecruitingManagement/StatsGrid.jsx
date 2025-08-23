@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, CheckCircle, XCircle, Users } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Archive, Users } from 'lucide-react';
 import { RECRUITMENT_STATUS } from '../../../constants/recruitment';
 import './StatsGrid.css';
 
@@ -33,6 +33,16 @@ const StatsGrid = ({ stats, onStatCardClick }) => {
         <div className="recruitment-management-stat-info">
           <div className="recruitment-management-stat-label">비활성</div>
           <div className="recruitment-management-stat-value">{stats.inactive}</div>
+        </div>
+      </div>
+      
+      <div className="recruitment-management-stat-card clickable" onClick={() => onStatCardClick('closed')}>
+        <div className="recruitment-management-stat-icon orange">
+          <Archive size={24} />
+        </div>
+        <div className="recruitment-management-stat-info">
+          <div className="recruitment-management-stat-label">마감</div>
+          <div className="recruitment-management-stat-value">{stats.closed}</div>
         </div>
       </div>
       

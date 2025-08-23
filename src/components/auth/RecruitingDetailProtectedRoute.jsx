@@ -25,7 +25,13 @@ const RecruitingDetailProtectedRoute = ({ children }) => {
         const response = await googleFormsAPI.getFormById(actualId);
         
         if (response.success && response.data) {
-          const status = response.data.isActive ? RECRUITMENT_STATUS.ACTIVE : RECRUITMENT_STATUS.INACTIVE;
+          // API에서 status 필드 사용, 한글로 매핑
+          const statusMap = {
+            'ACTIVE': RECRUITMENT_STATUS.ACTIVE,
+            'INACTIVE': RECRUITMENT_STATUS.INACTIVE,
+            'CLOSED': RECRUITMENT_STATUS.CLOSED
+          };
+          const status = statusMap[response.data.status] || RECRUITMENT_STATUS.INACTIVE;
           setRecruitingStatus(status);
         } else {
           console.error('리쿠르팅 정보 조회 실패:', response.message);
@@ -73,8 +79,8 @@ const RecruitingDetailProtectedRoute = ({ children }) => {
     );
   }
 
-  // 비활성 리쿠르팅인 경우 RootAdmin 권한 필요
-  const requireRootAdmin = recruitingStatus === RECRUITMENT_STATUS.INACTIVE;
+  // 마감 리쿠르팅인 경우에만 RootAdmin 권한 필요
+  const requireRootAdmin = recruitingStatus === RECRUITMENT_STATUS.CLOSED;
 
   return (
     <AdminRoleProtectedRoute 

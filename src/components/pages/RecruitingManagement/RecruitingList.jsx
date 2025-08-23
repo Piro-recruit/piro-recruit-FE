@@ -26,12 +26,15 @@ const RecruitingList = ({ recruitings, onRecruitingClick, isLoading }) => {
 
   // 리쿠르팅 접근 권한 체크
   const canAccessRecruiting = (recruiting) => {
-    // 활성 상태는 모든 관리자가 접근 가능
-    if (recruiting.status === RECRUITMENT_STATUS.ACTIVE) {
+    // 활성, 비활성 상태는 모든 관리자가 접근 가능
+    if (recruiting.status === RECRUITMENT_STATUS.ACTIVE || recruiting.status === RECRUITMENT_STATUS.INACTIVE) {
       return true;
     }
-    // 비활성 상태는 RootAdmin만 접근 가능
-    return isRootAdmin;
+    // 마감 상태는 RootAdmin만 접근 가능
+    if (recruiting.status === RECRUITMENT_STATUS.CLOSED) {
+      return isRootAdmin;
+    }
+    return true;
   };
 
   // 클릭 핸들러
@@ -47,18 +50,19 @@ const RecruitingList = ({ recruitings, onRecruitingClick, isLoading }) => {
     <div className="recruitment-management-recruiting-list">
       {recruitings.map((recruiting) => {
         const canAccess = canAccessRecruiting(recruiting);
-        const isInactive = recruiting.status === RECRUITMENT_STATUS.INACTIVE;
+        const isClosed = recruiting.status === RECRUITMENT_STATUS.CLOSED;
+        const isRestricted = isClosed && !canAccess;
         
         return (
           <div 
             key={recruiting.id} 
-            className={`recruitment-management-recruiting-item ${canAccess ? 'clickable' : 'disabled'} ${isInactive && !canAccess ? 'access-restricted' : ''}`}
+            className={`recruitment-management-recruiting-item ${canAccess ? 'clickable' : 'disabled'} ${isRestricted ? 'access-restricted' : ''}`}
             onClick={() => handleRecruitingClick(recruiting)}
             title={!canAccess ? PERMISSION_MESSAGES.ACCESS_RESTRICTED : ''}
           >
             <div className="recruitment-management-recruiting-icon">
               <div className="recruitment-management-icon-wrapper">
-                {isInactive && !canAccess ? <Lock size={20} /> : <User size={20} />}
+                {isRestricted ? <Lock size={20} /> : <User size={20} />}
               </div>
             </div>
             
@@ -69,7 +73,7 @@ const RecruitingList = ({ recruitings, onRecruitingClick, isLoading }) => {
                   <span className={`recruitment-management-status-badge ${recruiting.statusColor}`}>
                     {recruiting.status}
                   </span>
-                  {isInactive && !canAccess && (
+                  {isRestricted && (
                     <span className="recruitment-management-access-indicator">
                       <Lock size={12} />
                       RootAdmin 전용
