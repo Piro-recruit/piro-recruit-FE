@@ -9,7 +9,7 @@ const LOG_LEVELS = {
 class Logger {
   constructor() {
     // 프로덕션에서는 ERROR와 WARN만, 개발에서는 모든 레벨
-    this.currentLevel = process.env.NODE_ENV === 'production' ? LOG_LEVELS.WARN : LOG_LEVELS.DEBUG;
+    this.currentLevel = import.meta.env.PROD ? LOG_LEVELS.WARN : LOG_LEVELS.DEBUG;
   }
 
   error(message, data = null) {

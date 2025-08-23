@@ -1,9 +1,7 @@
-import { useNavigate } from 'react-router-dom';
 import { googleFormsAPI } from '../../services/api/index.js';
 import { ROUTES } from '../../constants/routes';
 
 export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, loadingStates) => {
-  const navigate = useNavigate();
   const { setIsToggling, setIsDeleting, setIsUpdating } = loadingStates;
 
   const getStatusDisplayName = (status) => {

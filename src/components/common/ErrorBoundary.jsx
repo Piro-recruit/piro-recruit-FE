@@ -8,7 +8,7 @@ class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component {
           <div className="error-boundary-content">
             <h2>문제가 발생했습니다</h2>
             <p>페이지를 새로고침하거나 관리자에게 문의해주세요.</p>
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.DEV && (
               <details className="error-details">
                 <summary>에러 세부 정보</summary>
                 <pre>

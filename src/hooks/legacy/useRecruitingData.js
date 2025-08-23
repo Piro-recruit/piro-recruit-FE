@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { googleFormsAPI, applicationsAPI } from '../../services/api/index.js';
 import { PASS_STATUS_KOREAN } from '../../constants/recruitment';
 
@@ -13,7 +13,7 @@ export const useRecruitingData = (id) => {
   const [error, setError] = useState(null);
 
   // 리쿠르팅 정보 조회
-  const fetchRecruitingInfo = async () => {
+  const fetchRecruitingInfo = useCallback(async () => {
     if (!id) return;
     
     setIsLoadingRecruiting(true);
@@ -48,10 +48,10 @@ export const useRecruitingData = (id) => {
     } finally {
       setIsLoadingRecruiting(false);
     }
-  };
+  }, [id]);
 
   // 지원서 목록 조회
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     if (!id) return;
     
     setIsLoadingApplications(true);
@@ -157,10 +157,10 @@ export const useRecruitingData = (id) => {
     } finally {
       setIsLoadingApplications(false);
     }
-  };
+  }, [id]);
 
   // 통계 데이터 조회
-  const fetchStatistics = async () => {
+  const fetchStatistics = useCallback(async () => {
     if (!id) return;
     
     setIsLoadingStatistics(true);
@@ -182,7 +182,7 @@ export const useRecruitingData = (id) => {
     } finally {
       setIsLoadingStatistics(false);
     }
-  };
+  }, [id]);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -192,7 +192,7 @@ export const useRecruitingData = (id) => {
       fetchApplications();
       fetchStatistics();
     }
-  }, [id]);
+  }, [id, fetchRecruitingInfo, fetchApplications, fetchStatistics]);
 
   // 리턴 값들
   return {
