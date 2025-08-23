@@ -40,6 +40,7 @@ export const EvaluationProvider = ({ children, allApplicants, isLoadingApplicati
 };
 
 // Custom hook
+// eslint-disable-next-line react-refresh/only-export-components
 export const useEvaluation = () => {
   const context = useContext(EvaluationContext);
   if (!context) {

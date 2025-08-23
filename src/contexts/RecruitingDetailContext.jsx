@@ -95,6 +95,7 @@ export const RecruitingDetailProvider = ({ children }) => {
 };
 
 // Custom hook
+// eslint-disable-next-line react-refresh/only-export-components
 export const useRecruitingDetail = () => {
   const context = useContext(RecruitingDetailContext);
   if (!context) {

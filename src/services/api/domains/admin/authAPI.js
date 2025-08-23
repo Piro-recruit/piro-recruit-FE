@@ -111,6 +111,62 @@ export const authAPI = {
   },
 
   /**
+   * JWT 토큰을 디코딩하여 페이로드 정보 반환
+   * @returns {object|null} 토큰 페이로드 또는 null
+   */
+  decodeToken() {
+    try {
+      const token = this.getAccessToken();
+      if (!token) return null;
+      
+      const payload = token.split('.')[1];
+      if (!payload) return null;
+      
+      const decoded = JSON.parse(atob(payload));
+      return decoded;
+    } catch (error) {
+      console.error('토큰 디코딩 실패:', error);
+      return null;
+    }
+  },
+
+  /**
+   * 현재 사용자가 RootAdmin인지 확인
+   * @returns {boolean} RootAdmin 여부
+   */
+  isRootAdmin() {
+    try {
+      const tokenPayload = this.decodeToken();
+      if (!tokenPayload) return false;
+      
+      // JWT 페이로드에서 관리자 타입 확인
+      const adminType = tokenPayload.adminType || tokenPayload.role || tokenPayload.type;
+      
+      // ADMIN_TYPES 상수와 일치하는 값들 확인
+      return adminType === 'ROOT' || adminType === 'ROOT_ADMIN' || adminType === 'MASTER';
+    } catch (error) {
+      console.error('RootAdmin 권한 확인 실패:', error);
+      return false;
+    }
+  },
+
+  /**
+   * 관리자 타입 정보 반환
+   * @returns {string|null} 관리자 타입 ('ROOT', 'GENERAL' 등) 또는 null
+   */
+  getAdminType() {
+    try {
+      const tokenPayload = this.decodeToken();
+      if (!tokenPayload) return null;
+      
+      return tokenPayload.adminType || tokenPayload.role || tokenPayload.type || 'GENERAL';
+    } catch (error) {
+      console.error('관리자 타입 확인 실패:', error);
+      return null;
+    }
+  },
+
+  /**
    * 일반 관리자 계정 일괄 생성
    * @param {number} count - 생성할 관리자 계정 수
    * @param {number} expirationDays - 만료 기간(일), 기본값 30일

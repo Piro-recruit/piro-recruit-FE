@@ -1,4 +1,4 @@
-import { integrationAPI, googleFormsAPI } from '../../services/api/index.js';
+import { googleFormsAPI } from '../../services/api/index.js';
 import { createCSVDownloader, generateApplicantsCSVFilename } from '../../utils/csvExport';
 
 export const useCSVExport = (recruitingInfo, allApplicants, loadingStates) => {
@@ -23,7 +23,7 @@ export const useCSVExport = (recruitingInfo, allApplicants, loadingStates) => {
 
     // 토큰 유효성 테스트
     try {
-      const testResult = await googleFormsAPI.getForms();
+      await googleFormsAPI.getForms();
     } catch (testError) {
       if (testError.response?.status === 401) {
         alert('토큰이 만료되었습니다. 다시 로그인해주세요.');

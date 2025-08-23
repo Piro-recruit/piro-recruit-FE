@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import RecruitingDetailProtectedRoute from './components/auth/RecruitingDetailProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { 
   LazyMainPage, 
@@ -42,7 +43,9 @@ function App() {
             } />
             <Route path={ROUTES.ADMIN_RECRUITING_DETAIL} element={
               <ProtectedRoute>
-                <LazyRecruitingDetailPage />
+                <RecruitingDetailProtectedRoute>
+                  <LazyRecruitingDetailPage />
+                </RecruitingDetailProtectedRoute>
               </ProtectedRoute>
             } />
           </Routes>

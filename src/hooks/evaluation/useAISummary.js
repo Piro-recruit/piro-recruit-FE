@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { aiSummaryAPI } from '../../services/api/index.js';
 
 export const useAISummary = (allApplicants, isLoadingApplications) => {
   const [aiSummaries, setAiSummaries] = useState({});
   const [isLoadingAiSummaries, setIsLoadingAiSummaries] = useState(false);
 
-  const fetchAiSummaries = async () => {
+  const fetchAiSummaries = useCallback(async () => {
     if (!allApplicants.length) return;
     
     setIsLoadingAiSummaries(true);
@@ -23,7 +23,7 @@ export const useAISummary = (allApplicants, isLoadingApplications) => {
           } else {
             return null;
           }
-        } catch (error) {
+        } catch {
           // 에러는 이미 apiClient에서 로깅됨
           return null;
         }
@@ -40,18 +40,18 @@ export const useAISummary = (allApplicants, isLoadingApplications) => {
       });
       
       setAiSummaries(newAiSummaries);
-    } catch (error) {
+    } catch {
       // 에러는 이미 apiClient에서 로깅됨
     } finally {
       setIsLoadingAiSummaries(false);
     }
-  };
+  }, [allApplicants]);
 
   useEffect(() => {
     if (allApplicants.length > 0 && !isLoadingApplications) {
       fetchAiSummaries();
     }
-  }, [allApplicants.length, isLoadingApplications]);
+  }, [allApplicants.length, isLoadingApplications, fetchAiSummaries]);
 
   return {
     aiSummaries,
