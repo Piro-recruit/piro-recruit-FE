@@ -15,39 +15,6 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
     }
   };
 
-  const handleToggleStatus = async () => {
-    if (!recruitingInfo?.id) {
-      return { success: false, message: '리쿠르팅 정보가 없습니다.' };
-    }
-    
-    setIsToggling(true);
-    const isCurrentlyActive = recruitingInfo.status === '활성';
-    
-    try {
-      if (isCurrentlyActive) {
-        await googleFormsAPI.deactivateForm(recruitingInfo.id);
-      } else {
-        await googleFormsAPI.activateForm(recruitingInfo.id);
-      }
-      
-      await refetchRecruitingInfo();
-      
-      return { 
-        success: true, 
-        message: isCurrentlyActive 
-          ? '리쿠르팅이 비활성화되었습니다.' 
-          : '리쿠르팅이 활성화되었습니다.'
-      };
-    } catch (error) {
-      console.error('상태 변경 실패:', error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || '상태 변경에 실패했습니다.' 
-      };
-    } finally {
-      setIsToggling(false);
-    }
-  };
 
   const handleChangeStatus = async (newStatus) => {
     if (!recruitingInfo?.id) {
@@ -148,7 +115,6 @@ export const useRecruitingActions = (recruitingInfo, refetchRecruitingInfo, load
 
   return {
     getStatusDisplayName,
-    handleToggleStatus,
     handleChangeStatus,
     handleDelete,
     handleFieldUpdate

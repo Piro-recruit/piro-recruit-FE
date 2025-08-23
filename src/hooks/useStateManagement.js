@@ -78,7 +78,6 @@ export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetc
     changeTopNStatus: bulkActions.changeTopNStatus,
     
     // 리쿠르팅 관리 함수들
-    toggleActivation: recruitingActions.handleToggleStatus,
     changeStatus: recruitingActions.handleChangeStatus,
     deleteRecruiting: recruitingActions.handleDelete,
     

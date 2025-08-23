@@ -38,6 +38,7 @@ const ApplicantListSection = ({
     aiSummaries,
     isLoadingAiSummaries,
     isLoadingEvaluations,
+    fetchApplicantEvaluation,
     editingEvaluation,
     handleEvaluationSubmit,
     handleEvaluationUpdate,
@@ -45,6 +46,20 @@ const ApplicantListSection = ({
     handleEditEvaluation,
     handleCancelEdit
   } = useEvaluation();
+
+  // 카드 토글 시 평가 데이터 로드
+  const handleToggleApplicant = async (applicantId) => {
+    const isCurrentlyExpanded = expandedApplicants.has(applicantId);
+    
+    // 카드를 펼칠 때만 평가 데이터 로드
+    if (!isCurrentlyExpanded) {
+      await fetchApplicantEvaluation(applicantId);
+    }
+    
+    // 카드 토글 (기존 로직)
+    toggleApplicant(applicantId);
+  };
+
   return (
     <div className="recruiting-detail-applicants-section">
       <div className="recruiting-detail-applicants-header">
@@ -78,7 +93,7 @@ const ApplicantListSection = ({
               aiSummary={aiSummary}
               isLoadingAi={isLoadingAiSummaries}
               isLoadingEvaluation={isLoadingEvaluations}
-              onToggle={toggleApplicant}
+              onToggle={handleToggleApplicant}
               onShowOriginal={onShowOriginal}
               onEvaluationSubmit={handleEvaluationSubmit}
               onEvaluationUpdate={handleEvaluationUpdate}

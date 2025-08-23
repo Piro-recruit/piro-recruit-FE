@@ -55,7 +55,6 @@ const RecruitingDetailPageInner = () => {
     subscriberCount,
     changeApplicationStatus,
     changeTopNStatus,
-    toggleActivation,
     changeStatus,
     deleteRecruiting,
     startEdit,
@@ -226,15 +225,6 @@ const RecruitingDetailPageInner = () => {
     }
   };
 
-  // 리쿠르팅 활성화/비활성화 토글 핸들러
-  const handleToggleActivation = async () => {
-    const result = await toggleActivation();
-    if (result.success) {
-      alert(result.message);
-    } else {
-      alert(result.message);
-    }
-  };
 
   // 리쿠르팅 상태 변경 핸들러
   const handleChangeStatus = async (newStatus) => {
@@ -345,7 +335,6 @@ const RecruitingDetailPageInner = () => {
                 managementState={{
                   isToggling,
                   isDeleting,
-                  onToggleActivation: handleToggleActivation,
                   onChangeStatus: handleChangeStatus,
                   onShowDeleteModal: handleShowDeleteModal
                 }}

@@ -8,7 +8,7 @@ export const useEvaluationData = (allApplicants, isLoadingApplications) => {
   const aiSummaryHook = useAISummary(allApplicants, isLoadingApplications);
   
   // 평가 데이터 관리
-  const evaluationDataHook = useEvaluationDataCore(allApplicants, isLoadingApplications);
+  const evaluationDataHook = useEvaluationDataCore(allApplicants);
   
   // 평가 CRUD 작업
   const evaluationCRUD = useEvaluationCRUD(
@@ -28,6 +28,7 @@ export const useEvaluationData = (allApplicants, isLoadingApplications) => {
     // 함수들
     refetchAiSummaries: aiSummaryHook.refetchAiSummaries,
     refetchEvaluations: evaluationDataHook.refetchEvaluations,
+    fetchApplicantEvaluation: evaluationDataHook.fetchApplicantEvaluation,
     createEvaluation: evaluationCRUD.createEvaluation,
     updateEvaluation: evaluationCRUD.updateEvaluation,
     deleteEvaluation: evaluationCRUD.deleteEvaluation

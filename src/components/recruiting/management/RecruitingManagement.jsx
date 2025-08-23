@@ -6,7 +6,6 @@ const RecruitingManagement = ({
   recruitingInfo,
   isToggling,
   isDeleting,
-  onToggleActivation,
   onChangeStatus,
   onShowDeleteModal
 }) => {
