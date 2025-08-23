@@ -103,7 +103,7 @@
 .main-page-email-success-message {
   color: var(--color-green-1);
   font-size: 0.9rem;
-  margin-top: 1rem;
+  margin: 1rem auto 0 auto;
   text-align: center;
   padding: 0.75rem;
   border-radius: 8px;
