@@ -13,6 +13,26 @@
     <link rel="preconnect" href="https://github.com" />
     <link rel="dns-prefetch" href="https://www.pirogramming.com" />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <!-- Critical CSS inlined -->
+    <style>
+      *,*::before,*::after{box-sizing:border-box}*{margin:0;padding:0}html,body{height:100%}body{line-height:1.5;-webkit-font-smoothing:antialiased}#root{min-height:100vh;display:flex;flex-direction:column}
+      :root{--font-family:"Pretendard",-apple-system,BlinkMacSystemFont,system-ui,Roboto,"Helvetica Neue","Segoe UI","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol",sans-serif;--color-white:#ffffff;--color-gray-1:#f8f9fa;--color-gray-8:#343a40;--color-primary:#007bff;--color-black:#000000}
+      body{font-family:var(--font-family);color:var(--color-gray-8);background-color:var(--color-white)}
+      .recruitment-management-page-wrapper{min-height:100vh;background-color:var(--color-black);font-family:var(--font-family)}
+      .recruitment-management-page-main{padding:2rem}
+      .recruitment-management-page-container{max-width:1200px;margin:0 auto}
+      .admin-header{background-color:var(--color-primary);color:var(--color-white);padding:1rem 2rem}
+    </style>
+    
+    <!-- Async font loading -->
+    <script>
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css';
+      document.head.appendChild(link);
+    </script>
   </head>
   <body>
     <div id="root"></div>

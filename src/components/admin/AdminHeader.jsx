@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { authAPI } from '../../services/api/domains/admin';
 import { ROUTES } from '../../constants/routes';
-import logoImage from '../../assets/pirologo.png';
+import logoImage from '../../assets/pirologo.webp';
 import './AdminHeader.css';
 
 const AdminHeader = ({ pageType, title, onClick }) => {

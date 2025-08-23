@@ -1,6 +1,6 @@
 import React from 'react';
 import { ROUTES } from '../../../constants/routes';
-import logoImage from '../../../assets/pirologo.png';
+import logoImage from '../../../assets/pirologo.webp';
 import './NavigationHeader.css';
 
 const NavigationHeader = () => {
