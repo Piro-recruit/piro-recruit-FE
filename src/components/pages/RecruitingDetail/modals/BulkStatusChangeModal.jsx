@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './BulkStatusChangeModal.css';
 
 const BulkStatusChangeModal = ({
@@ -7,17 +7,23 @@ const BulkStatusChangeModal = ({
   bulkChangeCount,
   setBulkChangeCount,
   isBulkChanging,
-  onStatusChange
+  onStatusChange,
+  onBottomStatusChange
 }) => {
+  const [rankingType, setRankingType] = useState('TOP'); // 'TOP' | 'BOTTOM'
+  
   if (!isOpen) return null;
 
   const handleCountChange = (e) => {
     setBulkChangeCount(Math.max(1, parseInt(e.target.value) || 1));
   };
 
-
   const handleStatusClick = (passStatus) => {
-    onStatusChange(passStatus);
+    if (rankingType === 'TOP') {
+      onStatusChange && onStatusChange(passStatus);
+    } else {
+      onBottomStatusChange && onBottomStatusChange(passStatus);
+    }
   };
 
   return (
@@ -35,10 +41,48 @@ const BulkStatusChangeModal = ({
         </div>
         <div className="bulk-change-modal-content">
           <div className="bulk-change-description">
-            평가 점수를 기준으로 상위 지원자들의 상태를 일괄 변경합니다.
+            평가 점수를 기준으로 {rankingType === 'TOP' ? '상위' : '하위'} 지원자들의 상태를 일괄 변경합니다.
           </div>
           
           <div className="bulk-change-controls">
+            <div className="bulk-change-modal__ranking-type-section">
+              <label className="bulk-change-modal__ranking-type-label">선택 기준</label>
+              <div className="bulk-change-modal__ranking-type-options">
+                <label className={`bulk-change-modal__ranking-type-option ${
+                  rankingType === 'TOP' ? 'bulk-change-modal__ranking-type-option--selected' : ''
+                } ${
+                  isBulkChanging ? 'bulk-change-modal__ranking-type-option--disabled' : ''
+                }`}>
+                  <input 
+                    type="radio" 
+                    name="rankingType" 
+                    value="TOP"
+                    checked={rankingType === 'TOP'}
+                    onChange={(e) => setRankingType(e.target.value)}
+                    disabled={isBulkChanging}
+                    className="bulk-change-modal__ranking-type-radio"
+                  />
+                  <span className="bulk-change-modal__ranking-type-text">상위 (점수 높은 순)</span>
+                </label>
+                <label className={`bulk-change-modal__ranking-type-option ${
+                  rankingType === 'BOTTOM' ? 'bulk-change-modal__ranking-type-option--selected' : ''
+                } ${
+                  isBulkChanging ? 'bulk-change-modal__ranking-type-option--disabled' : ''
+                }`}>
+                  <input 
+                    type="radio" 
+                    name="rankingType" 
+                    value="BOTTOM"
+                    checked={rankingType === 'BOTTOM'}
+                    onChange={(e) => setRankingType(e.target.value)}
+                    disabled={isBulkChanging}
+                    className="bulk-change-modal__ranking-type-radio"
+                  />
+                  <span className="bulk-change-modal__ranking-type-text">하위 (점수 낮은 순)</span>
+                </label>
+              </div>
+            </div>
+
             <div className="bulk-count-section">
               <label htmlFor="bulk-count" className="bulk-count-label">
                 변경할 인원수

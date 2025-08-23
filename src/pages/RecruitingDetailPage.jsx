@@ -55,6 +55,7 @@ const RecruitingDetailPageInner = () => {
     subscriberCount,
     changeApplicationStatus,
     changeTopNStatus,
+    changeBottomNStatus,
     changeStatus,
     deleteRecruiting,
     startEdit,
@@ -69,7 +70,7 @@ const RecruitingDetailPageInner = () => {
     closeBulkModal,
     showDeleteModalWithCheck,
     closeDeleteModal
-  } = useStateManagement(recruitingInfo, refetchRecruitingInfo, refetchApplications, allApplicants);
+  } = useStateManagement(recruitingInfo, refetchRecruitingInfo, refetchApplications, allApplicants, recruitingInfo?.id);
   
   // UI 상태 (Context로 이동한 것들은 제거)
   const [showRecruitingDetails, setShowRecruitingDetails] = useState(false);
@@ -200,6 +201,14 @@ const RecruitingDetailPageInner = () => {
   // 점수 기준 상위 N명 상태 변경
   const handleTopNStatusChange = async (passStatus) => {
     const result = await changeTopNStatus(passStatus);
+    if (!result.success && !result.cancelled) {
+      alert(result.message);
+    }
+  };
+
+  // 점수 기준 하위 N명 상태 변경
+  const handleBottomNStatusChange = async (passStatus) => {
+    const result = await changeBottomNStatus(passStatus);
     if (!result.success && !result.cancelled) {
       alert(result.message);
     }
@@ -400,6 +409,7 @@ const RecruitingDetailPageInner = () => {
         setBulkChangeCount={setBulkChangeCount}
         isBulkChanging={isBulkChanging}
         onStatusChange={handleTopNStatusChange}
+        onBottomStatusChange={handleBottomNStatusChange}
       />
     </div>
   );
