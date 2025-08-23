@@ -1,16 +1,17 @@
 import { applicationStatusAPI } from '../../services/api/index.js';
 
-export const useBulkActions = (formStates, loadingStates, refetchApplications) => {
+export const useBulkActions = (formStates, loadingStates, refetchApplications, googleFormId) => {
   const { bulkChangeCount } = formStates;
   const { isBulkChanging, setIsBulkChanging } = loadingStates;
 
   const changeTopNStatus = async (passStatus) => {
-    if (!bulkChangeCount || bulkChangeCount <= 0) {
-      alert('변경할 인원 수를 올바르게 입력해주세요.');
-      return { success: false, message: '올바른 인원 수를 입력해주세요.' };
+    const numValue = parseInt(bulkChangeCount) || 0;
+    if (!bulkChangeCount || numValue <= 0) {
+      alert('변경할 인원 수를 1 이상으로 입력해주세요.');
+      return { success: false, message: '변경할 인원 수를 1 이상으로 입력해주세요.' };
     }
 
-    const confirmMessage = `상위 ${bulkChangeCount}명을 "${passStatus}"로 변경하시겠습니까?`;
+    const confirmMessage = `상위 ${numValue}명을 "${passStatus}"로 변경하시겠습니까?`;
     if (!window.confirm(confirmMessage)) {
       return { success: false, message: '사용자가 취소했습니다.' };
     }
@@ -18,10 +19,10 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications) =
     setIsBulkChanging(true);
     
     try {
-      const result = await applicationStatusAPI.bulkChangeApplicationStatus(bulkChangeCount, passStatus);
+      const result = await applicationStatusAPI.bulkChangeApplicationStatus(googleFormId, numValue, passStatus);
       
       if (result.success) {
-        alert(`상위 ${bulkChangeCount}명의 상태가 성공적으로 변경되었습니다.`);
+        alert(`상위 ${numValue}명의 상태가 성공적으로 변경되었습니다.`);
         
         // 애플리케이션 데이터 새로고침
         if (refetchApplications) {
@@ -40,6 +41,53 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications) =
         message = '잘못된 요청입니다. 인원 수나 상태를 확인해주세요.';
       } else if (error.response?.status === 403) {
         message = '권한이 없습니다. 관리자에게 문의해주세요.';
+      } else if (error.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      
+      return { success: false, error, message };
+    } finally {
+      setIsBulkChanging(false);
+    }
+  };
+
+  const changeBottomNStatus = async (passStatus) => {
+    const numValue = parseInt(bulkChangeCount) || 0;
+    if (!bulkChangeCount || numValue <= 0) {
+      alert('변경할 인원 수를 1 이상으로 입력해주세요.');
+      return { success: false, message: '변경할 인원 수를 1 이상으로 입력해주세요.' };
+    }
+
+    const confirmMessage = `하위 ${numValue}명을 "${passStatus}"로 변경하시겠습니까?`;
+    if (!window.confirm(confirmMessage)) {
+      return { success: false, message: '사용자가 취소했습니다.' };
+    }
+
+    setIsBulkChanging(true);
+    
+    try {
+      const result = await applicationStatusAPI.bulkChangeBottomStatus(googleFormId, numValue, passStatus);
+      
+      if (result.success) {
+        alert(`하위 ${numValue}명의 상태가 성공적으로 변경되었습니다.`);
+        
+        // 애플리케이션 데이터 새로고침
+        if (refetchApplications) {
+          await refetchApplications();
+        }
+        
+        return { success: true };
+      } else {
+        return { success: false, message: result.message || '상태 변경에 실패했습니다.' };
+      }
+    } catch (error) {
+      // 에러는 이미 apiClient에서 로깅됨
+      
+      let message = '상태 변경 중 오류가 발생했습니다.';
+      if (error.response?.status === 400) {
+        message = '잘못된 요청입니다. 인원 수나 상태를 확인해주세요.';
+      } else if (error.response?.status === 403) {
+        message = 'Root 권한이 필요합니다. 관리자에게 문의해주세요.';
       } else if (error.response?.data?.message) {
         message = error.response.data.message;
       }
@@ -88,6 +136,7 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications) =
 
   return {
     changeTopNStatus,
+    changeBottomNStatus,
     changeApplicationStatus,
     isBulkChanging
   };

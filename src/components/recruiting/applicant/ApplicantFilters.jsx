@@ -39,10 +39,10 @@ const ApplicantFilters = ({
         onChange={(e) => onSortChange(e.target.value)}
         className="sort-filter"
       >
-        <option value={SORT_OPTIONS.APPLICATION_DATE}>지원순</option>
-        <option value={SORT_OPTIONS.AI_SCORE}>AI 스코어순</option>
-        <option value={SORT_OPTIONS.EVALUATION_SCORE}>채점 스코어순</option>
+        <option value={SORT_OPTIONS.AI_EVALUATION_SCORE}>AI 평가 점수순</option>
+        <option value={SORT_OPTIONS.AVERAGE_SCORE}>평균 점수순</option>
         <option value={SORT_OPTIONS.NAME}>이름순</option>
+        <option value={SORT_OPTIONS.APPLICATION_DATE}>지원순</option>
       </select>
     </div>
   );

@@ -118,7 +118,7 @@ export const useRecruitingData = (id) => {
                         app.passStatus === 'FIRST_PASS' ? 'blue' :
                         app.passStatus === 'FAILED' ? 'red' :
                         app.passStatus === 'PENDING' ? 'yellow' : 'yellow',
-            aiScore: 0, // AI Summary API에서 가져올 예정
+            averageScore: app.averageScore || 0, // API에서 제공하는 평균 점수 사용
             skills: [app.major, app.department].filter(Boolean), // 전공여부와 학과를 스킬로 표시
             portfolio: formData['포트폴리오'] || formData['포트폴리오 링크'] || '',
             application: fullApplication, // 전체 지원서 데이터

@@ -7,7 +7,7 @@ import { useCSVExport } from './business/useCSVExport';
 import { useEmailActions } from './business/useEmailActions';
 import { useBulkActions } from './business/useBulkActions';
 
-export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetchApplications, allApplicants) => {
+export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetchApplications, allApplicants, googleFormId) => {
   // 상태 훅들
   const modalStates = useModalStates();
   const loadingStates = useLoadingStates();
@@ -17,7 +17,7 @@ export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetc
   const recruitingActions = useRecruitingActions(recruitingInfo, refetchRecruitingInfo, loadingStates);
   const csvExport = useCSVExport(recruitingInfo, allApplicants, loadingStates);
   const emailActions = useEmailActions(formStates, loadingStates, modalStates);
-  const bulkActions = useBulkActions(formStates, loadingStates, refetchApplications);
+  const bulkActions = useBulkActions(formStates, loadingStates, refetchApplications, googleFormId);
 
   // 편집 관련 함수들
   const startEdit = (field, currentValue) => {
@@ -76,6 +76,7 @@ export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetc
     // 상태 변경 함수들
     changeApplicationStatus: bulkActions.changeApplicationStatus,
     changeTopNStatus: bulkActions.changeTopNStatus,
+    changeBottomNStatus: bulkActions.changeBottomNStatus,
     
     // 리쿠르팅 관리 함수들
     changeStatus: recruitingActions.handleChangeStatus,

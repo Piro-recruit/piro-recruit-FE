@@ -163,11 +163,8 @@ const ApplicantCard = memo(({
           <div className="recruiting-detail-applicant-right-info">
             <span className="recruiting-detail-applied-date">{applicant.appliedDate}</span>
             <span className="recruiting-detail-applicant-score">
-              AI 점수: {isLoadingAi ? '로딩중...' : aiSummary?.scoreOutOf100 ? `${aiSummary.scoreOutOf100}점` : '분석 대기'}
+              평균 점수: {applicant.averageScore}점
             </span>
-            {evaluation && (
-              <span className="recruiting-detail-evaluation-score">평가: {evaluation.score}점</span>
-            )}
           </div>
         </div>
         
@@ -241,7 +238,7 @@ const ApplicantCard = memo(({
               <h4 className="section-subtitle">💬 평가 ({allEvaluations.length})</h4>
               <div className="ai-score">
                 <Star size={16} className="star-icon" />
-                <span>AI 점수: {isLoadingAi ? '로딩중...' : aiSummary?.scoreOutOf100 ? `${aiSummary.scoreOutOf100}점` : '분석 대기'}</span>
+                <span>평균 점수: {applicant.averageScore}점</span>
               </div>
             </div>
             
