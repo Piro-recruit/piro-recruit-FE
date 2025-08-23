@@ -122,15 +122,9 @@
 }
 
 .recruiting-detail-applied-date,
-.recruiting-detail-applicant-score,
-.recruiting-detail-evaluation-score {
+.recruiting-detail-applicant-score {
   color: var(--color-gray-4);
   font-size: 0.75rem;
-}
-
-.recruiting-detail-evaluation-score {
-  color: var(--color-green-0);
-  font-weight: 500;
 }
 
 .recruiting-detail-toggle-btn {

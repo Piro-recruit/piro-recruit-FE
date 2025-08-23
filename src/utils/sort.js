@@ -12,7 +12,7 @@ export const sortApplicants = (applicants, sortBy, evaluations) => {
   
   switch (sortBy) {
     case SORT_OPTIONS.AI_SCORE:
-      return sorted.sort((a, b) => b.aiScore - a.aiScore);
+      return sorted.sort((a, b) => b.averageScore - a.averageScore);
       
     case SORT_OPTIONS.EVALUATION_SCORE:
       return sorted.sort((a, b) => {
