@@ -138,7 +138,7 @@ const RecruitingDetailPageInner = () => {
       const pending = statisticsData.PENDING || 0;
       const firstPass = statisticsData.FIRST_PASS || 0;
       const finalPass = statisticsData.FINAL_PASS || 0;
-      const failed = statisticsData.FAIL || 0;
+      const failed = statisticsData.FAILED || 0;
       
       return {
         total: pending + firstPass + finalPass + failed,
