@@ -24,6 +24,7 @@ const RecruitingInfoSection = ({
     isToggling,
     isDeleting,
     onToggleActivation,
+    onChangeStatus,
     onShowDeleteModal
   } = managementState;
   return (
@@ -60,6 +61,7 @@ const RecruitingInfoSection = ({
             isToggling={isToggling}
             isDeleting={isDeleting}
             onToggleActivation={onToggleActivation}
+            onChangeStatus={onChangeStatus}
             onShowDeleteModal={onShowDeleteModal}
           />
         </div>

@@ -56,6 +56,7 @@ const RecruitingDetailPageInner = () => {
     changeApplicationStatus,
     changeTopNStatus,
     toggleActivation,
+    changeStatus,
     deleteRecruiting,
     startEdit,
     cancelEdit,
@@ -235,6 +236,16 @@ const RecruitingDetailPageInner = () => {
     }
   };
 
+  // 리쿠르팅 상태 변경 핸들러
+  const handleChangeStatus = async (newStatus) => {
+    const result = await changeStatus(newStatus);
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert(result.message);
+    }
+  };
+
   // 삭제 모달 표시
   const handleShowDeleteModal = () => {
     const result = showDeleteModalWithCheck();
@@ -335,6 +346,7 @@ const RecruitingDetailPageInner = () => {
                   isToggling,
                   isDeleting,
                   onToggleActivation: handleToggleActivation,
+                  onChangeStatus: handleChangeStatus,
                   onShowDeleteModal: handleShowDeleteModal
                 }}
               />

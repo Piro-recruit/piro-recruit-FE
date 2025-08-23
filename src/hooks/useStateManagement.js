@@ -38,9 +38,9 @@ export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetc
 
   // 모달 관리 함수들 (기존 인터페이스)
   const showDeleteModalWithCheck = () => {
-    if (recruitingInfo.status === '활성') {
-      alert('활성화된 리쿠르팅은 삭제할 수 없습니다. 먼저 비활성화해주세요.');
-      return { success: false, message: '활성화된 리쿠르팅은 삭제할 수 없습니다.' };
+    if (recruitingInfo.status === '활성' || recruitingInfo.status === '마감') {
+      alert('활성화되거나 마감된 리쿠르팅은 삭제할 수 없습니다. 먼저 비활성화해주세요.');
+      return { success: false, message: '활성화되거나 마감된 리쿠르팅은 삭제할 수 없습니다.' };
     }
     modalStates.openDeleteModal();
     return { success: true };
@@ -79,6 +79,7 @@ export const useStateManagement = (recruitingInfo, refetchRecruitingInfo, refetc
     
     // 리쿠르팅 관리 함수들
     toggleActivation: recruitingActions.handleToggleStatus,
+    changeStatus: recruitingActions.handleChangeStatus,
     deleteRecruiting: recruitingActions.handleDelete,
     
     // 편집 함수들

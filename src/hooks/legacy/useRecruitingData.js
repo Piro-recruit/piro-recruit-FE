@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { googleFormsAPI, applicationsAPI } from '../../services/api/index.js';
-import { PASS_STATUS_KOREAN } from '../../constants/recruitment';
+import { PASS_STATUS_KOREAN, FORM_STATUS_KOREAN, FORM_STATUS_COLORS } from '../../constants/recruitment';
 
 export const useRecruitingData = (id) => {
   // 상태들
@@ -31,8 +31,8 @@ export const useRecruitingData = (id) => {
             : formData.createdAt 
             ? `${new Date(formData.createdAt).toLocaleDateString()} ~ 진행중`
             : '기간 미정',
-          status: formData.isActive ? '활성' : '비활성',
-          statusColor: formData.isActive ? 'green' : 'red',
+          status: FORM_STATUS_KOREAN[formData.status] || '비활성',
+          statusColor: FORM_STATUS_COLORS[formData.status] || 'gray',
           formId: formData.formId,
           formUrl: formData.formUrl,
           sheetUrl: formData.sheetUrl,

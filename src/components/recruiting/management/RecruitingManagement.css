@@ -22,8 +22,8 @@
   gap: 1rem;
 }
 
-/* 토글 섹션 */
-.recruiting-management__toggle-section {
+/* 상태 섹션 */
+.recruiting-management__status-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34,79 +34,60 @@
   border-radius: 8px;
 }
 
-.recruiting-management__toggle-info {
+.recruiting-management__status-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.recruiting-management__toggle-label {
+.recruiting-management__status-label {
   color: var(--color-white);
   font-size: 0.875rem;
   font-weight: 600;
 }
 
-.recruiting-management__toggle-description {
+.recruiting-management__status-description {
   color: var(--color-gray-3);
   font-size: 0.7rem;
   line-height: 1.3;
 }
 
-/* 토글 스위치 */
-.recruiting-management__toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.recruiting-management__toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.recruiting-management__toggle-slider {
-  position: absolute;
+/* 상태 선택 드롭다운 */
+.recruiting-management__status-select {
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-gray-7);
+  border: 1px solid var(--color-gray-5);
+  border-radius: 6px;
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  min-width: 100px;
+}
+
+.recruiting-management__status-select:hover:not(:disabled) {
   background-color: var(--color-gray-6);
-  transition: 0.4s;
-  border-radius: 28px;
+  border-color: var(--color-gray-4);
 }
 
-.recruiting-management__toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 22px;
-  width: 22px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
+.recruiting-management__status-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
 }
 
-.recruiting-management__toggle-switch input:checked + .recruiting-management__toggle-slider {
-  background-color: var(--color-green-0);
-}
-
-.recruiting-management__toggle-switch input:focus + .recruiting-management__toggle-slider {
-  box-shadow: 0 0 1px var(--color-green-0);
-}
-
-.recruiting-management__toggle-switch input:checked + .recruiting-management__toggle-slider:before {
-  transform: translateX(22px);
-}
-
-.recruiting-management__toggle-switch input:disabled + .recruiting-management__toggle-slider {
+.recruiting-management__status-select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.recruiting-management__status-select option {
+  background-color: var(--color-gray-7);
+  color: var(--color-white);
+  padding: 0.5rem;
 }
 
 /* 삭제 섹션 */
