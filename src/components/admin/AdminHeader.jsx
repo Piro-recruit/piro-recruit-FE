@@ -25,7 +25,14 @@ const AdminHeader = ({ pageType, title, onClick }) => {
       <div className="admin-header-container">
         <div className="admin-header-left">
           <div className="admin-logo">
-            <img src={logoImage} alt="피로그래밍 로고" className="admin-logo-image" />
+            <img 
+              src={logoImage} 
+              alt="피로그래밍 로고" 
+              className="admin-logo-image"
+              width="80"
+              height="26"
+              loading="eager"
+            />
           </div>
           <div className="admin-header-title">
             {pageType && <div className="admin-page-type">{pageType}</div>}
