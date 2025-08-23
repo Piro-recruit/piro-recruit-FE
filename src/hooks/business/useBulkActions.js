@@ -5,12 +5,13 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications, g
   const { isBulkChanging, setIsBulkChanging } = loadingStates;
 
   const changeTopNStatus = async (passStatus) => {
-    if (!bulkChangeCount || bulkChangeCount <= 0) {
-      alert('변경할 인원 수를 올바르게 입력해주세요.');
-      return { success: false, message: '올바른 인원 수를 입력해주세요.' };
+    const numValue = parseInt(bulkChangeCount) || 0;
+    if (!bulkChangeCount || numValue <= 0) {
+      alert('변경할 인원 수를 1 이상으로 입력해주세요.');
+      return { success: false, message: '변경할 인원 수를 1 이상으로 입력해주세요.' };
     }
 
-    const confirmMessage = `상위 ${bulkChangeCount}명을 "${passStatus}"로 변경하시겠습니까?`;
+    const confirmMessage = `상위 ${numValue}명을 "${passStatus}"로 변경하시겠습니까?`;
     if (!window.confirm(confirmMessage)) {
       return { success: false, message: '사용자가 취소했습니다.' };
     }
@@ -18,10 +19,10 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications, g
     setIsBulkChanging(true);
     
     try {
-      const result = await applicationStatusAPI.bulkChangeApplicationStatus(googleFormId, bulkChangeCount, passStatus);
+      const result = await applicationStatusAPI.bulkChangeApplicationStatus(googleFormId, numValue, passStatus);
       
       if (result.success) {
-        alert(`상위 ${bulkChangeCount}명의 상태가 성공적으로 변경되었습니다.`);
+        alert(`상위 ${numValue}명의 상태가 성공적으로 변경되었습니다.`);
         
         // 애플리케이션 데이터 새로고침
         if (refetchApplications) {
@@ -51,12 +52,13 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications, g
   };
 
   const changeBottomNStatus = async (passStatus) => {
-    if (!bulkChangeCount || bulkChangeCount <= 0) {
-      alert('변경할 인원 수를 올바르게 입력해주세요.');
-      return { success: false, message: '올바른 인원 수를 입력해주세요.' };
+    const numValue = parseInt(bulkChangeCount) || 0;
+    if (!bulkChangeCount || numValue <= 0) {
+      alert('변경할 인원 수를 1 이상으로 입력해주세요.');
+      return { success: false, message: '변경할 인원 수를 1 이상으로 입력해주세요.' };
     }
 
-    const confirmMessage = `하위 ${bulkChangeCount}명을 "${passStatus}"로 변경하시겠습니까?`;
+    const confirmMessage = `하위 ${numValue}명을 "${passStatus}"로 변경하시겠습니까?`;
     if (!window.confirm(confirmMessage)) {
       return { success: false, message: '사용자가 취소했습니다.' };
     }
@@ -64,10 +66,10 @@ export const useBulkActions = (formStates, loadingStates, refetchApplications, g
     setIsBulkChanging(true);
     
     try {
-      const result = await applicationStatusAPI.bulkChangeBottomStatus(googleFormId, bulkChangeCount, passStatus);
+      const result = await applicationStatusAPI.bulkChangeBottomStatus(googleFormId, numValue, passStatus);
       
       if (result.success) {
-        alert(`하위 ${bulkChangeCount}명의 상태가 성공적으로 변경되었습니다.`);
+        alert(`하위 ${numValue}명의 상태가 성공적으로 변경되었습니다.`);
         
         // 애플리케이션 데이터 새로고침
         if (refetchApplications) {

@@ -113,6 +113,11 @@
   text-align: center;
 }
 
+.bulk-count-input::placeholder {
+  color: var(--color-gray-4);
+  font-weight: 400;
+}
+
 .bulk-count-input:focus {
   outline: none;
   border-color: var(--color-green-0);

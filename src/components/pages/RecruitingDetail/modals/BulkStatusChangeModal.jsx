@@ -15,7 +15,22 @@ const BulkStatusChangeModal = ({
   if (!isOpen) return null;
 
   const handleCountChange = (e) => {
-    setBulkChangeCount(Math.max(1, parseInt(e.target.value) || 1));
+    const value = e.target.value;
+    // 입력 중에는 자유롭게 허용 (빈 값, 0 포함)
+    if (value === '' || value === '0') {
+      setBulkChangeCount(value);
+    } else {
+      const numValue = parseInt(value) || 0;
+      setBulkChangeCount(Math.min(numValue, 1000)); // 최대값 제한만 적용
+    }
+  };
+
+  const handleCountBlur = () => {
+    // blur 시에만 최소값 보정
+    const numValue = parseInt(bulkChangeCount) || 0;
+    if (numValue < 1) {
+      setBulkChangeCount(1);
+    }
   };
 
   const handleStatusClick = (passStatus) => {
@@ -93,10 +108,12 @@ const BulkStatusChangeModal = ({
                   type="number" 
                   value={bulkChangeCount}
                   onChange={handleCountChange}
+                  onBlur={handleCountBlur}
                   className="bulk-count-input"
                   min="1"
-                  max="100"
+                  max="1000"
                   disabled={isBulkChanging}
+                  placeholder="인원 수 입력"
                 />
                 <span className="bulk-count-suffix">명</span>
               </div>
