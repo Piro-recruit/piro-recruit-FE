@@ -115,8 +115,65 @@
   color: var(--color-white);
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
   box-sizing: border-box;
+  cursor: text;
+}
+
+/* datetime-local 타입 input을 버튼 형태로 스타일링 */
+.create-recruiting-form-input[type="datetime-local"] {
+  cursor: pointer;
+  position: relative;
+  background: linear-gradient(135deg, var(--color-gray-8) 0%, var(--color-gray-7) 100%);
+  border: 2px solid var(--color-gray-6);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 0.5rem;
+}
+
+.create-recruiting-form-input[type="datetime-local"]:hover {
+  border-color: var(--color-green-0);
+  background: linear-gradient(135deg, var(--color-gray-7) 0%, var(--color-gray-6) 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  transform: translateY(-1px);
+}
+
+.create-recruiting-form-input[type="datetime-local"]:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
+}
+
+.create-recruiting-form-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  background-color: var(--color-green-0);
+  border-radius: 6px;
+  padding: 8px;
+  margin-left: auto;
+  margin-right: 0;
+  width: 20px;
+  height: 20px;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  filter: brightness(1);
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.create-recruiting-form-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--color-green-1);
+  transform: translateY(-50%) scale(1.1);
+  opacity: 1;
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
+}
+
+.create-recruiting-form-input[type="datetime-local"]::-webkit-calendar-picker-indicator:active {
+  transform: translateY(-50%) scale(0.95);
+  box-shadow: 0 1px 3px rgba(34, 197, 94, 0.4);
 }
 
 .create-recruiting-form-input:focus,
